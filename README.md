@@ -8,10 +8,6 @@ Methodology:           Scrum
 Sprints:               3
 Team Members:          [student no] [name]
                        [student no] [name]
-                       [student no] [name]
-                       [student no] [name]
-                       [student no] [name]
-                       [student no] [name]
 
 # Project Overview
 
