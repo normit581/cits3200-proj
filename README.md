@@ -1,6 +1,6 @@
 # cits3200-proj
 
-# Project Plan for Document Matcher Tool
+# Document Matcher Tool
 
 Project Title: Document Matcher for Cheating Detection
 Project Manager: [Team Manager]
@@ -12,9 +12,11 @@ Methodology: Scrum
 Sprints: 3
 
 
-    1. Project Overview
+1. Project Overview
 
-Objective: Develop a Document Matcher tool that automates the process of comparing rsid codes in Microsoft Word documents to identify potential instances of cheating or collusion in an academic setting.
+Objective: 
+
+Develop a Document Matcher tool that automates the process of comparing rsid codes in Microsoft Word documents to identify potential instances of cheating or collusion in an academic setting.
 
 Scope:
     • Develop a backend for extracting and comparing rsid codes from Word documents.
