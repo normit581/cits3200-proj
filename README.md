@@ -1,22 +1,19 @@
 # Document Matcher Tool
 
-Project Title:         Document Matcher for Cheating Detection
-Client:                A/Prof Guy Curtis
-Start Date:            29th Jul 2024
-End Date:              14th Oct 2024 5:00 PM
-Methodology:           Scrum
-Sprints:               3
-Team Members:          [student no] [name]
-                       [student no] [name]
+Project Title: Document Matcher for Cheating Detection  
+Client: A/Prof Guy Curtis  
+Start Date: 29th Jul 2024  
+End Date: 14th Oct 2024 5:00 PM  
+Methodology: Scrum  
+Sprints: 3  
 
-Project Tilte:         Document Matcher for Cheating Detection
-Client:                A/Prof Guy Curtis
-Start Date:            29th Jul 2024
-End Date:              14th Oct 2024 5:00 PM
-Methodology:           Scrum
-Sprints:               3
-Team Members:          [student no] [name]
-                       [student no] [name]
+Team Members:  
+[student no] [name]  
+[student no] [name]  
+[student no] [name]  
+[student no] [name]  
+[student no] [name]  
+[student no] [name]  
 
 # Project Overview
 
