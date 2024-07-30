@@ -7,10 +7,7 @@ setup python virtual environment
     python -m venv env
 
 activate python virtual environment
-    Linux :
-        source env/bin/activate
-    Windows :
-        .\env\Scripts\activate
+    .\env\Scripts\activate
 
 install python package
     pip install pywin32
