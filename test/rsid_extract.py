@@ -35,7 +35,7 @@ if __name__ == "__main__" :
     number_of_docs = int(sys.argv[1])
 
     for i in range(number_of_docs) :
-        docx_directory = f"testdocxs/"
+        docx_directory = f"testdocs/"
         docx_name = f"document_{i}.docx"
         docx_path = docx_directory + docx_name
         rsid_numbers, rsid_count = extract_rsid(docx_path)
