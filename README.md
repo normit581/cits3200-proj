@@ -8,12 +8,12 @@ Methodology: Scrum
 Sprints: 3  
 
 Team Members:  
-23335907 (Elijah Mullens)
-[student no] [name]  
-[student no] [name]  
-[student no] [name]  
-[student no] [name]  
-[student no] [name]  
+- 23335907 (Elijah Mullens)
+- [student no] [name]  
+- [student no] [name]  
+- [student no] [name]  
+- [student no] [name]  
+- [student no] [name]  
 
 # Project Overview
 
