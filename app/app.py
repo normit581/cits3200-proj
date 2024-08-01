@@ -13,7 +13,7 @@ app = create_app(Config)
 
 
 @app.route('/', methods=['GET'])
-def index():
+def home():
     return render_template('home.html')
 
 
