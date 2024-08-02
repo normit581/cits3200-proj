@@ -7,3 +7,6 @@
 
 # Test Suite
 /test/testdocs/
+
+# Cache
+*__pycache__*
