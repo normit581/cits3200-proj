@@ -1,21 +1,18 @@
 from flask import Flask, render_template
-from config import Config
+from app.config import Config
 
+def page_not_found(e):
+    return render_template('/layout/page_not_found.html', project_name="DocuMatcher"), 404
 
 def create_app(config: Config):
     app = Flask(__name__)
     app.config.from_object(config)
-
+    app.register_error_handler(404, page_not_found)
     return app
-
 
 app = create_app(Config)
 
-
-@app.route('/', methods=['GET'])
-def home():
-    return render_template('home.html')
-
-
 if __name__ == "__main__":
     app.run()
+
+from app import routes

@@ -1,15 +1,86 @@
 body {
+  font-family: "Nunito", sans-serif !important;
+  font-style: normal;
   margin: 0;
-  height: 100vh;
-  width: 100vw;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #858796 !important;
+  text-align: left;
+  background-color: #fff;
 }
 
-header {
-  background: rgb(136,245,255);
-  background: radial-gradient(circle, rgba(195,250,255,1) 0%, rgba(206,254,255,1) 100%);
+.topbar .topbar-brand {
+  padding: 1rem 0rem;
+  letter-spacing: 0.1rem;
+  z-index: 1;
+  text-decoration: none;
+  text-align: center;
 }
 
-main {
-  height: 100%;
-  width: 100%;
+.navbar {
+  margin-bottom: 1.5rem;
+}
+
+.logo-word {
+  font-weight: 800;
+  font-size: 0.5em;
+  position: absolute;
+}
+
+.pos-up {
+  top: -25%;
+  left: 85%;
+}
+
+.pos-down {
+  top: 25%;
+  left: 85%;
+}
+
+.logo {
+  color: darkblue;
+}
+
+footer.page-footer {
+  padding: 2rem 0;
+}
+
+.shaded {
+  box-shadow: 0 0.3rem 2rem 0 rgba(58, 59, 69, 0.15) !important;
+}
+
+@keyframes shake {
+  0% {
+      transform: translateX(0);
+  }
+
+  25% {
+      transform: translateX(-5px);
+  }
+
+  50% {
+      transform: translateX(5px);
+  }
+
+  75% {
+      transform: translateX(-3px);
+  }
+
+  100% {
+      transform: translateX(0);
+  }
+}
+
+.error {
+  color: #5a5c69;
+  font-size: 7rem;
+  position: relative;
+  line-height: 1;
+  width: 12.5rem;
+  animation: shake 0.5s ease-in-out infinite;
+}
+
+.hidden {
+  display: none;
 }
