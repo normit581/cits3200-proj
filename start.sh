@@ -14,7 +14,7 @@ start_app() {
   source "${envfile}"
   set +a
 
-  python3 "${appdir}/${FLASK_APP}"
+  flask --app "${appdir}" run
 }
 
 case $1 in

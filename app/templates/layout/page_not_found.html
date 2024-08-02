@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}ERROR Page {% endblock %}
+
+{% block content %}
+    <div class="text-center">
+        <div class="error mx-auto">404</div>
+        <p class="lead text-gray-800 mb-5">Page Not Found</p>
+        <p class="text-gray-500 mb-0">Oops! It seems you've encountered a glitch in the matrix...</p>
+        <p>But don't worry, our team of agents is working to fix it.</p>
+        <a href="{{ url_for('home') }}">← Back to Home Page</a>
+    </div>
+    <br/><br/>
+{% endblock %}
+
