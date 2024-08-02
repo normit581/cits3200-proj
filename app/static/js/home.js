@@ -1,17 +1,13 @@
-const validExtensions = [
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
-    "application/msword" // .doc
-];
-
+const docxExtension = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 
 function handleFiles(files) {
     var $fileList = $('#file-list');
     $fileList.empty();
     $.each(files, function(index, file) {
-        if (validExtensions.includes(file.type)) {
+        if (file.type === docxExtension) {
             $fileList.append('<p>' + file.name + '</p>');
         } else {
-            alert('Only Word files (.doc, .docx) are allowed.');
+            alert('Only .docx files are allowed.');
         }
     });
 }
