@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='styles/home.css')}}"
+{% endblock %}
+
+{% block content %}
+
+<div class="home-body">
+  <div class="upload-container">
+    <div class="upload-drop card">
+      <p>Upload</p>
+    </div>
+    <button type="button" class="btn btn-outline-secondary">Document 1</button>
+  </div>
+  <div class="upload-container">
+    <div class="upload-drop card">
+      <p>Upload</p>
+    </div>
+    <button type="button" class="btn btn-outline-secondary">Document 2</button>
+  </div>
+</div>
+
+{% endblock %}
