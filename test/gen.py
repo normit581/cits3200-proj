@@ -1,38 +1,197 @@
 import win32com.client as win32
+import zipfile
+import xml.etree.ElementTree as ET
 import random
 import string
 import os
 import sys
 
-# generate random text
+testdocx_dir = 'testdocs'
+os.makedirs(testdocx_dir, exist_ok=True)
+
+# Generate random text
 def generate_random_text(length):
     return ''.join(random.choices(string.ascii_letters + string.digits + ' ', k=length))
 
-# directory to save the generated documents
-output_dir = 'testdocs'
-os.makedirs(output_dir, exist_ok=True)
+def generate_docx(num_files) :
+    # Generate .docx files and edit them multiple times
+    for i in range(num_files):
+        filename = os.path.join(testdocx_dir, f'document_{i}.docx')
 
-# generate .docx files
-num_files = int(sys.argv[1])
-for i in range(num_files):
-    filename = os.path.join(output_dir, f'document_{i}.docx')
+        # Start MS Word
+        word = win32.gencache.EnsureDispatch('Word.Application')
+        word.Visible = False
 
-    # start ms word
+        # Create new document
+        doc = word.Documents.Add()
+        doc.Content.Text = f'Random Document {i}\n\n'
+
+        # Generate initial random paragraphs
+        for _ in range(random.randint(5, 15)):
+            doc.Content.InsertAfter(generate_random_text(random.randint(50, 200)) + '\n\n')
+
+        # Save the initial document
+        doc.SaveAs(os.path.abspath(filename), FileFormat=win32.constants.wdFormatXMLDocument)
+        print(f'Created {filename}')
+
+        # Perform several random edits
+        num_edits = random.randint(1, 3)
+        for edit in range(num_edits):
+            # Get a random paragraph in the document
+            para_count = doc.Paragraphs.Count
+            para_index = random.randint(1, para_count)
+            paragraph = doc.Paragraphs(para_index)
+
+            # Insert random text before or after the paragraph
+            if random.choice([True, False]):
+                paragraph.Range.InsertBefore(generate_random_text(random.randint(20, 100)) + '\n\n')
+            else:
+                paragraph.Range.InsertAfter(generate_random_text(random.randint(20, 100)) + '\n\n')
+
+            # Save the document, overwriting the original file
+            doc.SaveAs(os.path.abspath(filename), FileFormat=win32.constants.wdFormatXMLDocument)
+            print(f'Edited {filename} - Edit {edit + 1}')
+
+        # Close the document
+        doc.Close()
+
+    # Quit Word
+    word.Quit()
+    
+# Function to rearrange paragraphs
+def rearrange_paragraphs(doc):
+    paragraphs = doc.Paragraphs
+    if paragraphs.Count > 1:
+        # Swap first and last paragraphs
+        first_paragraph = paragraphs(1)
+        last_paragraph = paragraphs(paragraphs.Count)
+        first_text = first_paragraph.Range.Text
+        last_text = last_paragraph.Range.Text
+        
+        first_paragraph.Range.Text = last_text
+        last_paragraph.Range.Text = first_text
+
+# Function to edit a paragraph
+def edit_paragraph(doc, index, new_text):
+    paragraphs = doc.Paragraphs
+    if index <= paragraphs.Count:
+        paragraphs(index).Range.Text = new_text
+
+# Function to delete a paragraph
+def delete_paragraph(doc, index):
+    paragraphs = doc.Paragraphs
+    if index <= paragraphs.Count:
+        paragraphs(index).Range.Delete()
+
+# Function to add a new paragraph
+def add_paragraph(doc, text):
+    doc.Content.InsertAfter(text + '\n\n')
+
+def edit_docx(input_file, output_file) :   
+    input_path = os.path.join(testdocx_dir, input_file)
+    output_path = os.path.join(testdocx_dir, output_file)
+
+    # Start MS Word and open the document
     word = win32.gencache.EnsureDispatch('Word.Application')
-    word.Visible = False  # Keep Word hidden during the process
+    word.Visible = False
+    doc = word.Documents.Open(os.path.abspath(input_path))
 
-    # create new document
-    doc = word.Documents.Add()
-    doc.Content.Text = 'Random Document\n\n'
+    # Perform operations
+    r = random.randint(1, 3)
+    rearrange_paragraphs(doc)  # Rearrange paragraphs
+    edit_paragraph(doc, r, "This is the new text for the second paragraph.")  # Edit second paragraph
+    delete_paragraph(doc, r)  # Delete the third paragraph
+    add_paragraph(doc, generate_random_text(random.randint(50, 100)))  # Add a new paragraph
 
-    # generate random paragraph
-    for _ in range(random.randint(5, 15)):
-        doc.Content.InsertAfter(generate_random_text(random.randint(50, 200)) + '\n\n')
-
-    # save
-    doc.SaveAs(os.path.abspath(filename), FileFormat=win32.constants.wdFormatXMLDocument)
+    # Save the modified document
+    doc.SaveAs(os.path.abspath(output_path), FileFormat=win32.constants.wdFormatXMLDocument)
     doc.Close()
 
-    print(f'Generated {filename}')
+    # Quit Word
+    word.Quit()
+    print(f'Successfully saved the modified document as {output_path}')
+    
+# Function to extract RSID from a .docx file
+def extract_rsid(docx_path):
+    rsid_numbers = {}
+    rsid_count = 0
+    
+    # Open .docx file as a zip archive
+    with zipfile.ZipFile(docx_path, 'r') as docx:
+        # Read the document.xml file
+        document_xml = docx.read('word/document.xml')
+        
+        # Parse the XML content
+        root = ET.fromstring(document_xml)
+    
+        # Find all elements with RSID attributes
+        for elem in root.iter():
+            for attrib in elem.attrib:
+                if attrib.startswith('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}rsid'):
+                    if (elem.attrib[attrib]) in rsid_numbers : 
+                        rsid_numbers[elem.attrib[attrib]] += 1
+                    else :
+                        rsid_numbers[elem.attrib[attrib]] = 1
+                    rsid_count += 1
+    
+    return rsid_numbers, rsid_count
 
-word.Quit()
+def usage() :
+    print("\nusage: $ python gen.py <option>\n")
+    print("options: ")
+    print("\tg <number of .docx>\t\t-----\tgenerate <number of .docx> new .docx file in /testdocs")
+    print("\te <input .docx> <output .docx>\t-----\trandomly edit <input .docx> and save the result to newly created <output .docx> in /testdocs")
+    print("\trsid <document.docx>\t-----\textract and print rsid of <document.docx> in /testdocs")
+    print("\trsid_all <number of .docx>\t-----\textract and print rsid details of <number of .docx> .docx in /testdocs, only works went filename is document_n.docx")
+    # print("\tclean\t\t\t\t-----\tdelete all contents in /testdocs")
+    exit()
+
+if __name__ == "__main__" :
+    if len(sys.argv) == 1 :
+        usage()
+  
+    option = sys.argv[1]
+
+    if option == 'g' :
+        if len(sys.argv) < 3 or sys.argv[2].isdigit() == False:
+            usage()
+        
+        num_file = int(sys.argv[2])
+        generate_docx(num_file)
+        exit()
+        
+    if option == 'e' :
+        if len(sys.argv) < 4 :
+            usage()
+            
+        input_file = sys.argv[2]
+        output_file = sys.argv[3]
+        edit_docx(input_file, output_file)
+        exit()
+        
+    if option == 'rsid' :
+        if len(sys.argv) < 3 :
+            usage()
+            
+        docx_name = sys.argv[2]
+        docx_path = os.path.join(testdocx_dir, docx_name)
+        rsid_numbers, rsid_count = extract_rsid(docx_path)
+        print(docx_name, "\trsid count: ", rsid_count, " ", rsid_numbers)
+        exit()
+        
+    if option == 'rsid_all' :
+        files = os.listdir(testdocx_dir)
+        docx_files = [file for file in files if file.endswith('.docx')]
+        
+        for file in docx_files :
+            docx_name = file
+            docx_path = os.path.join(testdocx_dir, file)
+            rsid_numbers, rsid_count = extract_rsid(docx_path)
+            print(docx_name, "\trsid count: ", rsid_count, " ", rsid_numbers)
+            
+        
+        
+        
+
+    
+
