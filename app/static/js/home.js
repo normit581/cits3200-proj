@@ -5,40 +5,48 @@ let fileId = 0;
 function openFileList() {
     $("#file-list").css("width", "15%");
     $("#drop-zone").css("width", "85%");
-    $("#file-list").prop('hidden', false);
 }
 
 function closeFileList() {
     $("#file-list").css("width", "0%");
     $("#drop-zone").css("width", "100%");
-    $("#file-list").prop('hidden', true);
 }
 
 function handleFileList(change) {
+    numFiles += change;
     switch (change) {
         case 1:
-            if (numFiles === 0) { openFileList(); }
+            if (numFiles === 1) { openFileList(); }
             break;
         case -1:
-            if (numFiles === 1) { closeFileList(); }
+            if (numFiles === 0) { closeFileList(); }
             break;
     }
+}
+
+function deleteListItem(e) {
+    $(`#list-item-${e.data.itemId}`).remove();
+    handleFileList(-1);
 }
 
 function createListItem(name) {
     let delIcon = $('<i>')
         .addClass('bi')
-        .addClass('bi-trash3');
+        .addClass('bi-trash3')
+        .click({itemId: fileId}, deleteListItem);
     
     let para = $('<p>')
         .text(name);
-
-    return $('<span>')
+    
+    let item = $('<span>')
         .addClass('d-flex')
         .addClass('justify-content-between')
-        .attr('id', `${++fileId}`)
+        .attr('id', `list-item-${fileId}`)
         .append(para)
         .append(delIcon);
+
+    fileId++;
+    return item
 }
 
 function handleFiles(files) {
@@ -53,20 +61,28 @@ function handleFiles(files) {
             handleFileList(1);
             let item = createListItem(file.name);
             $fileList.append(item);
-            numFiles++;
         } else {
             alert('Only .docx files are allowed.');
         }
     });
 }
 
+function listTransition() {
+    let list = $('#file-list');
+    if (list.is(':visible')) {
+        list.remoevAttr('hidden');
+    } else {
+        list.attr('hidden');
+    }
+}
+
 function setFileEvents(){
-    var $fileInput = $('#file-input');
+    let $fileInput = $('#file-input');
     $fileInput.on('change', function(e) {
         handleFiles(e.target.files);
     });
 
-    var $dropZone = $('#drop-zone');
+    let $dropZone = $('#drop-zone');
     $dropZone.on('click', function() {
         $fileInput.click();
     });
@@ -90,6 +106,8 @@ function setFileEvents(){
         var files = e.originalEvent.dataTransfer.files;
         handleFiles(files);
     });
+
+    $('#file-list').one('animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd', listTransition);
 }
 
 $(() => {
