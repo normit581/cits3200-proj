@@ -19,23 +19,26 @@
     min-height: 100%;
     border-radius: 5px;
     overflow-y: scroll;
-    /* transition: ease-in 0.4s forward; */
     transition: width 0.4s ease-in-out;
 }
 
 #file-list span {
     margin: 0.25rem;
+    max-height: 24px;
 }
 
 #file-list p {
     overflow-x: hidden;
     white-space: nowrap;
+    min-height: 24px;
 }
 
 #file-list i {
     color: #ff8080;
-    right: 0.25rem;
+    right: 0.5rem;
     margin-left: 0.35rem;
+    height: 24px;
+    width: 16px;
 }
 
 #file-list i:hover {
