@@ -25,6 +25,7 @@ function handleFileList(change) {
 }
 
 function deleteListItem(e) {
+    $(`#list-item-${e.data.itemId} i`).tooltip('dispose');
     $(`#list-item-${e.data.itemId}`).remove();
     handleFileList(-1);
 }
@@ -33,7 +34,11 @@ function createListItem(name) {
     let delIcon = $('<i>')
         .addClass('bi')
         .addClass('bi-trash3')
-        .click({itemId: fileId}, deleteListItem);
+        .click({itemId: fileId}, deleteListItem)
+        .attr('data-bs-toggle', 'tooltip')
+        .attr('data-bs-placement', 'left')
+        .attr('title', `Delete: ${name}`)
+        .tooltip();
     
     let para = $('<p>')
         .text(name);
