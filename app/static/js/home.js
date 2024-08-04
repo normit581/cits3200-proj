@@ -67,15 +67,6 @@ function handleFiles(files) {
     });
 }
 
-function listTransition() {
-    let list = $('#file-list');
-    if (list.is(':visible')) {
-        list.remoevAttr('hidden');
-    } else {
-        list.attr('hidden');
-    }
-}
-
 function setFileEvents(){
     let $fileInput = $('#file-input');
     $fileInput.on('change', function(e) {
@@ -106,8 +97,6 @@ function setFileEvents(){
         var files = e.originalEvent.dataTransfer.files;
         handleFiles(files);
     });
-
-    $('#file-list').one('animationend webkitAnimationEnd oAnimationEnd MSAnimationEnd', listTransition);
 }
 
 $(() => {
