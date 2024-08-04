@@ -35,12 +35,12 @@ function createListItem(name) {
         .addClass('bi')
         .addClass('bi-trash3')
         .click({itemId: fileId}, deleteListItem)
-        .attr('data-bs-toggle', 'tooltip')
-        .attr('data-bs-placement', 'left')
-        .attr('title', `Delete: ${name}`)
-        .tooltip();
     
     let para = $('<p>')
+        .attr('data-bs-toggle', "tooltip")
+        .attr('data-bs-title', name)
+        .attr('data-bs-placement', "right")
+        .tooltip()
         .text(name);
     
     let item = $('<span>')
@@ -102,6 +102,7 @@ function setFileEvents(){
         var files = e.originalEvent.dataTransfer.files;
         handleFiles(files);
     });
+
 }
 
 $(() => {
