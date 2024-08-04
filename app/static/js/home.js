@@ -25,7 +25,7 @@ function handleFileList(change) {
 }
 
 function deleteListItem(e) {
-    $(`#list-item-${e.data.itemId} i`).tooltip('dispose');
+    $(`#list-item-${e.data.itemId}`).tooltip('dispose');
     $(`#list-item-${e.data.itemId}`).remove();
     handleFileList(-1);
 }
@@ -37,13 +37,13 @@ function createListItem(name) {
         .click({itemId: fileId}, deleteListItem)
     
     let para = $('<p>')
+        .text(name);
+    
+    let item = $('<span>')
         .attr('data-bs-toggle', "tooltip")
         .attr('data-bs-title', name)
         .attr('data-bs-placement', "right")
         .tooltip()
-        .text(name);
-    
-    let item = $('<span>')
         .addClass('d-flex')
         .addClass('justify-content-between')
         .attr('id', `list-item-${fileId}`)
