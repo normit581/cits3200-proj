@@ -19,7 +19,7 @@
     min-height: 100%;
     border-radius: 5px;
     overflow-y: scroll;
-    transition: 0.4s;
+    transition: ease-in 0.4s forward;
 }
 
 #file-list span {
@@ -27,7 +27,7 @@
 }
 
 #file-list p {
-    overflow-x: scroll;
+    overflow-x: hidden;
     white-space: nowrap;
 }
 
