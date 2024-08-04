@@ -101,4 +101,5 @@ function setFileEvents(){
 
 $(() => {
     setFileEvents();
+    closeFileList();
 });
