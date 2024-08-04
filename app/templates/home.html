@@ -4,6 +4,7 @@
 
 {% block head %}
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/home.css')}}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
   <script src="{{ url_for('static', filename='js/home.js') }}"></script>
 {% endblock %}
 
@@ -15,7 +16,7 @@
     <div id="drop-zone" class="drop-zone">
       Drag and drop .docx files here or click to upload.
     </div>
-    <input class="hidden" type="file" id="file-input" multiple accept=".doc,.docx">
+    <input class="hidden" type="file" id="file-input" multiple accept=".docx">
   </div>
 </div>
 {% endblock %}

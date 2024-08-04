@@ -1,5 +1,6 @@
 const docxExtension = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 let numFiles = 0;
+let fileId = 0;
 
 function openFileList() {
     $("#file-list").css("width", "15%");
@@ -24,6 +25,22 @@ function handleFileList(change) {
     }
 }
 
+function createListItem(name) {
+    let delIcon = $('<i>')
+        .addClass('bi')
+        .addClass('bi-trash3');
+    
+    let para = $('<p>')
+        .text(name);
+
+    return $('<span>')
+        .addClass('d-flex')
+        .addClass('justify-content-between')
+        .attr('id', `${++fileId}`)
+        .append(para)
+        .append(delIcon);
+}
+
 function handleFiles(files) {
     var $fileList = $('#file-list');
     $.each(files, function(index, file) {
@@ -32,8 +49,10 @@ function handleFiles(files) {
                 alert("Maximum of 2 files")
                 return;
             }
+
             handleFileList(1);
-            $fileList.append('<p>' + file.name + '</p>');
+            let item = createListItem(file.name);
+            $fileList.append(item);
             numFiles++;
         } else {
             alert('Only .docx files are allowed.');

@@ -7,7 +7,7 @@
     cursor: pointer;
     width: 100%;
     margin: 2px;
-    transition: ease-in 0.4s;
+    transition: 0.4s;
 }
 
 .drop-zone.dragover {
@@ -17,18 +17,28 @@
 #file-list {
     background-color: var(--bs-secondary-bg);
     min-height: 100%;
-    text-align: center;
     border-radius: 5px;
     overflow-y: scroll;
-    overflow-x: hidden;
+    transition: 0.4s;
 }
 
-#file-list, #file-list p {
-    transition: ease-in 0.4s;
+#file-list span {
+    margin: 0.25rem;
 }
 
 #file-list p {
-    margin: 0.25rem;
+    overflow-x: scroll;
+    white-space: nowrap;
+}
+
+#file-list i {
+    color: #ff8080;
+    right: 0.25rem;
+    margin-left: 0.35rem;
+}
+
+#file-list i:hover {
+    cursor: pointer;
 }
 
 .main-container {
