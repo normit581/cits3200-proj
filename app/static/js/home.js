@@ -59,6 +59,14 @@ function createListItem(name) {
     return item
 }
 
+function applyConfirmAnimation() {
+    const dropZone = document.getElementById('drop-zone');
+    dropZone.classList.add('confirm-animation');
+    setTimeout(() => {
+        dropZone.classList.remove('confirm-animation');
+    }, 500);
+}
+
 function handleFiles(files) {
     var $fileList = $('#file-list');
     $.each(files, function(index, file) {
@@ -78,6 +86,7 @@ function handleFiles(files) {
             let item = createListItem(file.name);
             $fileList.append(item);
             updateFileInput();
+            applyConfirmAnimation();
         } else {
             alert('Only .docx files are allowed.');
         }
@@ -114,7 +123,6 @@ function setFileEvents(){
         var files = e.originalEvent.dataTransfer.files;
         handleFiles(files);
     });
-
 }
 
 function updateFileInput() {
