@@ -7,6 +7,7 @@ def page_not_found(e):
 def create_app(config: Config):
     app = Flask(__name__)
     app.config.from_object(config)
+    app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024
     app.register_error_handler(404, page_not_found)
     return app
 

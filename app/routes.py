@@ -1,6 +1,7 @@
 from flask import render_template, flash
 from app import app
 from app.forms import MatchDocumentForm
+from werkzeug.utils import secure_filename
 
 @app.context_processor
 def inject_global_variable():
@@ -11,7 +12,9 @@ def inject_global_variable():
 def home():
     form = MatchDocumentForm()
     if form.validate_on_submit():
-        print(form.files.data)
+        for file in form.files.data:
+            filename = secure_filename(file.filename)
+            print(filename)
         flash('Docx is sent to backend.', 'success')
     return render_template('home.html', form=form)
 

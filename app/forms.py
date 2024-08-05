@@ -21,3 +21,7 @@ class MatchDocumentForm(FlaskForm):
     def validate_files(self, files):
         if files.data == None or len(files.data) < 1:
             raise ValidationError('Please add at least 1 docx file.')
+        max_size = 100 * 1024 * 1024  # 100MB
+        for file in files.data:
+            if file.content_length > max_size:
+                raise ValidationError(f'File {file.filename} exceeds the maximum size of 100MB.')
