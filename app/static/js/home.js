@@ -3,6 +3,7 @@ let numFiles = 0;
 let fileId = 0;
 let currentFiles = new Map();
 const maxFileSize = 100 * 1024 * 1024; //100MB
+const maxTotalSize = 200 * 1024 * 1024; //200MB (assuming max 2 files)
 
 function openFileList() {
     $("#file-list").css("width", "15%");
@@ -34,6 +35,7 @@ function deleteListItem(e) {
 
     currentFiles.delete(itemId);
     updateFileInput();
+    updateProgressBar();
 }
 
 function createListItem(name) {
@@ -67,18 +69,35 @@ function applyConfirmAnimation() {
     }, 500);
 }
 
+function validateFile(file) {
+    if (file.type !== docxExtension) {
+        alert('Only .docx files are allowed.');
+        return false;
+    }
+    if (file.size > maxFileSize) {
+        alert(`File ${file.name} exceeds the maximum size of 100MB.`);
+        return false;
+    }
+    return true;
+}
+
+function updateTotalSize() {
+    return Array.from(currentFiles.values()).reduce((sum, file) => sum + file.size, 0);
+}
+
 function handleFiles(files) {
     const $fileList = $('#file-list');
+    
     $.each(files, function(index, file) {
-        if (file.type === docxExtension) {
-            if (file.size > maxFileSize) {
-                alert(`File ${file.name} exceeds the maximum size of 100MB.`);
-                return;
+        if (validateFile(file)) {
+            if (currentFiles.size >= 2) {
+                alert("Maximum of 2 files reached.");
+                return false;
             }
-
-            if (numFiles === 2) {
-                alert("Maximum of 2 files");
-                return;
+            
+            if (updateTotalSize() + file.size > maxTotalSize) {
+                alert("Total file size exceeds the maximum of 200MB.");
+                return false;
             }
 
             handleFileList(1);
@@ -87,8 +106,7 @@ function handleFiles(files) {
             $fileList.append(item);
             updateFileInput();
             applyConfirmAnimation();
-        } else {
-            alert('Only .docx files are allowed.');
+            updateProgressBar();
         }
     });
 }
