@@ -1,20 +1,40 @@
 .drop-zone {
     border: 2px dashed #007bff;
-    border-radius: 5px;
-    padding: 7rem 0rem;
+    border-radius: 10px;
+    padding: 7rem 0;
     text-align: center;
     color: #6c757d;
     cursor: pointer;
     width: 100%;
     margin: 2px;
-    transition: width 0.4s ease-in-out;
+    transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out;
+    position: relative;
+    background-color: #f8f9fa;
 }
 
 .drop-zone.dragover {
     background-color: #e9ecef;
+    transform: scale(1.02);
 }
 
-#drop-zone.confirm-animation {
+.drop-zone::before {
+    content: '\f093';
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    font-size: 5rem;
+    color: #007bff;
+    display: block;
+    margin-bottom: 1rem;
+    transition: transform 0.3s ease-in-out, color 0.3s ease-in-out;
+    transform-origin: center;
+}
+
+.drop-zone:hover::before {
+    transform: scale(1.1);
+    color: #0056b3;
+}
+
+.drop-zone.confirm-animation {
     animation: confirm-animation 0.5s forwards;
 }
 
@@ -33,17 +53,13 @@
     }
 }
 
-#drop-zone.dragover {
-    border-color: #2ecc71;
-    background-color: #ecf0f1;
-}
-
 #file-list {
-    background-color: var(--bs-secondary-bg);
+    background-color: #f8f9fa;
     min-height: 100%;
     border-radius: 5px;
-    overflow-y: scroll;
-    transition: width 0.4s ease-in-out;
+    overflow-y: auto;
+    transition: width 0.3s ease-in-out;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
 #file-list span {
@@ -53,9 +69,12 @@
 
 #file-list p {
     overflow-x: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
     min-height: 24px;
     width: 100%;
+    color: #333;
+
 }
 
 #file-list i {
@@ -64,29 +83,23 @@
     margin-left: 0.35rem;
     height: 24px;
     width: 16px;
+    cursor: pointer;
+    transition: color 0.3s ease-in-out, transform 0.3s ease-in-out;
 }
 
 #file-list i:hover {
-    cursor: pointer;
+    color: #ff4d4d;
+    transform: scale(1.2);
 }
 
 .main-container {
     min-width: 100%;
 }
 
-#loading-bar-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 5px;
-    background-color: #f3f3f3;
-    z-index: 9999;
-    display: none;
+.toast {
+    min-width: 200px;
 }
 
-#loading-bar {
-    width: 0;
-    height: 100%;
-    background-color: #3498db;
+.hidden {
+    display: none;
 }
