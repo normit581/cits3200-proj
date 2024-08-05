@@ -77,6 +77,7 @@ function handleFiles(files) {
             currentFiles.set(fileId, file);
             let item = createListItem(file.name);
             $fileList.append(item);
+            updateFileInput();
         } else {
             alert('Only .docx files are allowed.');
         }
