@@ -151,7 +151,74 @@ function updateFileInput() {
     $('#files')[0].files = dataTransfer.files;
 }
 
-$(() => {
+$(document).ready(function() {
     setFileEvents();
     closeFileList();
+
+    $('#match-form').on('submit', function(e) {
+    e.preventDefault();
+    
+    if (currentFiles.size === 0) {
+        alert('Please add at least one file.');
+        return;
+    }
+
+    const formData = new FormData();
+    let isValid = true;
+
+    currentFiles.forEach((file, id) => {
+        if (validateFile(file)) {
+            formData.append('files', file);
+        } else {
+            isValid = false;
+            currentFiles.delete(id);
+            $(`#list-item-${id}`).remove();
+            handleFileList(-1);
+        }
+    });
+
+    if (!isValid) {
+        
+        alert('Some files were removed due to validation errors. Please check and try again.');
+        updateProgressBar();
+        return;
+    }
+    formData.append('csrf_token', $('input[name=csrf_token]').val());
+
+    $.ajax({
+        url: $(this).attr('action'),
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        xhr: function() {
+            var xhr = new window.XMLHttpRequest();
+            xhr.upload.addEventListener("progress", function(evt) {
+                if (evt.lengthComputable) {
+                    var percentComplete = evt.loaded / evt.total * 100;
+                    $('#upload-progress').css('width', percentComplete + '%').attr('aria-valuenow', percentComplete);
+                }
+            }, false);
+            return xhr;
+        },
+        success: function(response) {
+            if (response.message) {
+                alert(response.message);
+                // Do what we need to do here
+            } else if (response.error) {
+                alert(response.error);
+            }
+        },
+        error: function(xhr, status, error) {
+            if (xhr.status === 413) {
+                alert('The uploaded files are too large. Please try again with smaller files.');
+            } else if (xhr.status === 400) {
+                alert('Invalid request. Please check your files and try again.');
+            } else {
+                alert('An error occurred while uploading the files. Please try again.');
+            }
+            console.error(xhr.responseText);
+        }
+    });
+});
 });

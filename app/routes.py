@@ -1,21 +1,32 @@
-from flask import render_template, flash
+from flask import render_template, flash, request, jsonify
 from app import app
 from app.forms import MatchDocumentForm
 from werkzeug.utils import secure_filename
+from werkzeug.exceptions import RequestEntityTooLarge
 
 @app.context_processor
 def inject_global_variable():
     return dict(project_name="DocuMatcher")
 
 @app.route('/', methods=['GET'])
-@app.route('/home', methods= ['GET', 'POST'])
+@app.route('/home', methods=['GET', 'POST'])
 def home():
     form = MatchDocumentForm()
-    if form.validate_on_submit():
-        for file in form.files.data:
-            filename = secure_filename(file.filename)
-            print(filename)
-        flash('Docx is sent to backend.', 'success')
+    if request.method == 'POST':
+        if request.content_length and request.content_length > app.config['MAX_CONTENT_LENGTH']:
+            return jsonify({'error': f'File size exceeds the maximum limit of {app.config["MAX_CONTENT_LENGTH"] // (1024 * 1024)}MB.'}), 413
+        
+        if form.validate_on_submit():
+            try:
+                for file in form.files.data:
+                    filename = secure_filename(file.filename)
+                    print(f"Processing file: {filename}")
+                return jsonify({'message': 'Files processed successfully.'})
+            except Exception as e:
+                app.logger.error(f"Error processing files: {str(e)}")
+                return jsonify({'error': 'An error occurred while processing the files.'}), 500
+        else:
+            return jsonify({'error': form.errors}), 400
     return render_template('home.html', form=form)
 
 @app.route('/team', methods=['GET'])
