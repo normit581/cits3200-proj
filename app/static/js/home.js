@@ -85,6 +85,22 @@ function updateTotalSize() {
     return Array.from(currentFiles.values()).reduce((sum, file) => sum + file.size, 0);
 }
 
+function updateProgressBar() {
+    const progressBar = $('#progress-bar');
+    const submitBtn = $('#submit-btn');
+    const progress = (numFiles / 2) * 100;
+    progressBar.css('width', `${progress}%`);
+    progressBar.attr('aria-valuenow', progress);
+
+    if (progress === 100) {
+        progressBar.addClass('bg-success');
+        submitBtn.addClass('bg-success');
+    } else {
+        progressBar.removeClass('bg-success');
+        submitBtn.removeClass('bg-success');
+    }
+}
+
 function handleFiles(files) {
     const $fileList = $('#file-list');
     

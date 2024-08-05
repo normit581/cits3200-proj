@@ -109,6 +109,20 @@
     border-radius: 5px;
 }
 
-.progress-bar {
+#progress-bar {
+    background-color: #007bff;
     transition: width 0.6s ease;
+}
+
+#upload-progress {
+    background-color: #28a745;
+    transition: width 0.6s ease;
+}
+
+#file-status-bar {
+    margin-bottom: 20px;
+}
+
+#upload-progress-bar {
+    margin-top: 20px;
 }
