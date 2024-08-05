@@ -1,0 +1,49 @@
+{% if not divId %}
+    {% set divId = '#AlertModalDiv' %}
+{% endif %}
+
+{% with errors = get_flashed_messages(category_filter=["error"]) %}
+    {% if errors or (form and form.errors) %}
+        <div class="alert alert-danger alert-dismissible">
+            <button type="button" class="close" aria-hidden="true" onclick="CloseAlertDiv('{{divId}}')">&times;</button>
+            <h4><i class="icon fa fa-ban me-2"></i>Failed</h4>
+            {% for msg in errors %}
+                <div class="mb-1">{{ msg }}</div>
+            {% endfor %}
+            {% if form %}
+                {% for field, errors in form.errors.items() %}
+                    {% if errors %}
+                        {% for msg in errors %}
+                            <div class="mb-1">{{ msg }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        </div>
+    {% endif %}
+{% endwith %}
+
+{% with successes = get_flashed_messages(category_filter=["success"]) %}
+    {% if successes %}
+        <div class="alert alert-success alert-dismissible">
+            <button type="button" class="close" aria-hidden="true" onclick="CloseAlertDiv('{{divId}}')">&times;</button>
+            <h4><i class="icon fa fa-check me-2"></i>Success</h4>
+            {% for msg in successes %}
+                <div class="mb-1">{{ msg }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+
+{% with infos = get_flashed_messages(category_filter=["info"]) %}
+    {% if infos %}
+        <div class="alert alert-info alert-dismissible">
+            <button type="button" class="close" aria-hidden="true" onclick="CloseAlertDiv('{{divId}}')">&times;</button>
+            <h4><i class="icon fa fa-info-circle me-2"></i>Info</h4>
+            {% for msg in infos %}
+                <div class="mb-1">{{ msg }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+

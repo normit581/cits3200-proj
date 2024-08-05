@@ -9,14 +9,25 @@
 {% endblock %}
 
 {% block content %}
+<div class="container">
+    <div id="AlertModalDiv"> 
+        {% include "/layout/alert_modal.html" %}
+    </div>
+</div>
 <div class="container mt-5">
   <h2 id="upload-header" class="mb-4">Upload Your .docx  Files</h2>
-  <div class="d-flex flex-row">
-    <aside id="file-list" class="flex-column"></aside>
-    <div id="drop-zone" class="drop-zone">
-      Drag and drop .docx files here or click to upload.
+  <form action="/home"  method="POST" enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+    <div class="d-flex flex-row">
+      <aside id="file-list" class="flex-column"></aside>
+      <div id="drop-zone" class="drop-zone">
+        Drag and drop .docx files here or click to upload.
+      </div>
+      {{ form.files(class="hidden", multiple=True, accept=".docx", required=False) }}
     </div>
-    <input class="hidden" type="file" id="file-input" multiple accept=".docx">
-  </div>
+    <div class="row m-0">
+      {{ form.submit(class="btn btn-primary mt-2") }}
+    </div>
+  </form>
 </div>
 {% endblock %}
