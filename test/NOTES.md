@@ -22,5 +22,5 @@ options:
     e <input .docx> <output .docx>          -----   randomly edit <input .docx> and save the result to newly created <output .docx> in /testdocs
     rsid <document.docx>                    -----   extract and print rsid of <document.docx> in /testdocs
     rsid_all                                -----   extract and print rsid details of  .docx in /testdocs, only works went filename is document_<int>.docx
-    (TBD)rsid_s <1.docx> <2.docx>           -----   calculate similarities between <1.docx> and <2.docx>
-    (TBD)clean                              -----   delete all contents in /testdocs
+    rsid_sim <1.docx> <2.docx>              -----   calculate similarities between <1.docx> and <2.docx>
+    clean                                   -----   delete all contents in /testdocs
