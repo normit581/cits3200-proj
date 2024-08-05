@@ -68,7 +68,7 @@ function applyConfirmAnimation() {
 }
 
 function handleFiles(files) {
-    var $fileList = $('#file-list');
+    const $fileList = $('#file-list');
     $.each(files, function(index, file) {
         if (file.type === docxExtension) {
             if (file.size > maxFileSize) {
@@ -83,7 +83,7 @@ function handleFiles(files) {
 
             handleFileList(1);
             currentFiles.set(fileId, file);
-            let item = createListItem(file.name);
+            const item = createListItem(file.name);
             $fileList.append(item);
             updateFileInput();
             applyConfirmAnimation();
@@ -93,13 +93,13 @@ function handleFiles(files) {
     });
 }
 
-function setFileEvents(){
-    let $fileInput = $('#files');
+function setFileEvents() {
+    const $fileInput = $('#files');
     $fileInput.on('change', function(e) {
         handleFiles(e.target.files);
     });
 
-    let $dropZone = $('#drop-zone');
+    const $dropZone = $('#drop-zone');
     $dropZone.on('click', function() {
         $fileInput.click();
     });
@@ -120,7 +120,7 @@ function setFileEvents(){
         e.preventDefault();
         e.stopPropagation();
         $dropZone.removeClass('dragover');
-        var files = e.originalEvent.dataTransfer.files;
+        const files = e.originalEvent.dataTransfer.files;
         handleFiles(files);
     });
 }
