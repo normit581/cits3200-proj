@@ -2,6 +2,7 @@ const docxExtension = "application/vnd.openxmlformats-officedocument.wordprocess
 let numFiles = 0;
 let fileId = 0;
 let currentFiles = new Map();
+const maxFileSize = 100 * 1024 * 1024; //100MB
 
 function openFileList() {
     $("#file-list").css("width", "15%");
@@ -62,8 +63,13 @@ function handleFiles(files) {
     var $fileList = $('#file-list');
     $.each(files, function(index, file) {
         if (file.type === docxExtension) {
+            if (file.size > maxFileSize) {
+                alert(`File ${file.name} exceeds the maximum size of 100MB.`);
+                return;
+            }
+
             if (numFiles === 2) {
-                alert("Maximum of 2 files")
+                alert("Maximum of 2 files");
                 return;
             }
 
