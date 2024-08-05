@@ -36,3 +36,17 @@ def team():
 @app.route('/error')
 def error(error = None):
     return render_template('/layout/page_not_found.html'), 404
+
+@app.errorhandler(413)
+def request_entity_too_large(error):
+    return jsonify({'error': f'The uploaded file is too large. Maximum allowed size is {app.config["MAX_CONTENT_LENGTH"] // (1024 * 1024)}MB.'}), 413
+
+@app.errorhandler(500)
+def internal_server_error(error):
+    app.logger.error('Server Error: %s', (error))
+    return jsonify({'error': 'Internal Server Error'}), 500
+
+@app.errorhandler(Exception)
+def unhandled_exception(e):
+    app.logger.error('Unhandled Exception: %s', (e))
+    return jsonify({'error': 'An unexpected error has occurred'}), 500
