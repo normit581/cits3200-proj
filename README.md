@@ -9,7 +9,7 @@ Sprints: 3
 
 Team Members:  
 - 23335907 (Elijah Mullens)
-- [student no] [name]  
+- 23326698 (Jack Blackwood)
 - [student no] [name]  
 - [student no] [name]  
 - [student no] [name]  
