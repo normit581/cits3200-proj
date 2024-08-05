@@ -103,3 +103,12 @@
 .hidden {
     display: none;
 }
+
+.progress {
+    height: 20px;
+    border-radius: 5px;
+}
+
+.progress-bar {
+    transition: width 0.6s ease;
+}
