@@ -24,3 +24,4 @@ options:
     rsid_all                                -----   extract and print rsid details of  .docx in /testdocs, only works went filename is document_<int>.docx
     rsid_sim <1.docx> <2.docx>              -----   calculate similarities between <1.docx> and <2.docx>
     clean                                   -----   delete all contents in /testdocs
+
