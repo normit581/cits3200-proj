@@ -5,8 +5,6 @@ from werkzeug.utils import secure_filename
 from werkzeug.exceptions import RequestEntityTooLarge
 from app.utilities.rsid import *
 
-files_rsid = {}
-
 @app.context_processor
 def inject_global_variable():
     return dict(project_name="DocuMatcher")
@@ -21,6 +19,7 @@ def home():
         
         if form.validate_on_submit():
             try:
+                files_rsid = {}
                 for file in form.files.data:
                     filename = secure_filename(file.filename)
                     print(f"Processing file: {filename}")
