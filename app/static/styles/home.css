@@ -1,25 +1,58 @@
 .drop-zone {
     border: 2px dashed #007bff;
-    border-radius: 5px;
-    padding: 7rem 0rem;
+    border-radius: 10px;
+    padding: 7rem 0;
     text-align: center;
     color: #6c757d;
     cursor: pointer;
     width: 100%;
     margin: 2px;
-    transition: 0.4s;
+    transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out;
+    position: relative;
+    background-color: #f8f9fa;
 }
 
 .drop-zone.dragover {
     background-color: #e9ecef;
+    transform: scale(1.02);
+}
+
+.drop-zone .fa-upload {
+    transition: transform 0.3s ease-in-out, color 0.3s ease-in-out;
+    color: #007bff;
+}
+
+.drop-zone:hover .fa-upload {
+    transform: scale(1.1);
+    color: #0056b3;
+}
+
+.drop-zone.confirm-animation {
+    animation: confirm-animation 0.5s forwards;
+}
+
+@keyframes confirm-animation {
+    0% {
+        transform: scale(1);
+        background-color: #fff;
+    }
+    50% {
+        transform: scale(1.05);
+        background-color: #ecf0f1;
+    }
+    100% {
+        transform: scale(1);
+        background-color: #fff;
+    }
 }
 
 #file-list {
-    background-color: var(--bs-secondary-bg);
+    background-color: #f8f9fa;
     min-height: 100%;
     border-radius: 5px;
-    overflow-y: scroll;
-    transition: width 0.4s ease-in-out;
+    overflow-y: auto;
+    transition: width 0.3s ease-in-out;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
 #file-list span {
@@ -29,9 +62,12 @@
 
 #file-list p {
     overflow-x: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
     min-height: 24px;
     width: 100%;
+    color: #333;
+
 }
 
 #file-list i {
@@ -40,12 +76,46 @@
     margin-left: 0.35rem;
     height: 24px;
     width: 16px;
+    cursor: pointer;
+    transition: color 0.3s ease-in-out, transform 0.3s ease-in-out;
 }
 
 #file-list i:hover {
-    cursor: pointer;
+    color: #ff4d4d;
+    transform: scale(1.2);
 }
 
 .main-container {
     min-width: 100%;
+}
+
+.toast {
+    min-width: 200px;
+}
+
+.hidden {
+    display: none;
+}
+
+.progress {
+    height: 20px;
+    border-radius: 5px;
+}
+
+#progress-bar {
+    background-color: #007bff;
+    transition: width 0.6s ease;
+}
+
+#upload-progress {
+    background-color: #28a745;
+    transition: width 0.6s ease;
+}
+
+#file-status-bar {
+    margin-bottom: 20px;
+}
+
+#upload-progress-bar {
+    margin-top: 20px;
 }
