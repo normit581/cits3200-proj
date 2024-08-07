@@ -11,6 +11,14 @@ function setLogo() {
     );
 }
 
+function CloseAlertDiv(divId) {
+    if (!divId) {
+        divId = "#AlertModalDiv";
+    }
+
+    window.$(divId).addClass("d-none");
+}
+
 $(() => {
     setLogo();
 });

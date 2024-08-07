@@ -1,6 +1,7 @@
 const docxExtension = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 let numFiles = 0;
 let fileId = 0;
+let currentFiles = new Map();
 
 function openFileList() {
     $("#file-list").css("width", "15%");
@@ -25,9 +26,13 @@ function handleFileList(change) {
 }
 
 function deleteListItem(e) {
-    $(`#list-item-${e.data.itemId}`).tooltip('dispose');
-    $(`#list-item-${e.data.itemId}`).remove();
+    const itemId = e.data.itemId;
+    $(`#list-item-${itemId}`).tooltip('dispose');
+    $(`#list-item-${itemId}`).remove();
     handleFileList(-1);
+
+    currentFiles.delete(itemId);
+    updateFileInput();
 }
 
 function createListItem(name) {
@@ -49,7 +54,6 @@ function createListItem(name) {
         .attr('id', `list-item-${fileId}`)
         .append(para)
         .append(delIcon);
-
     fileId++;
     return item
 }
@@ -64,6 +68,7 @@ function handleFiles(files) {
             }
 
             handleFileList(1);
+            currentFiles.set(fileId, file);
             let item = createListItem(file.name);
             $fileList.append(item);
         } else {
@@ -73,7 +78,7 @@ function handleFiles(files) {
 }
 
 function setFileEvents(){
-    let $fileInput = $('#file-input');
+    let $fileInput = $('#files');
     $fileInput.on('change', function(e) {
         handleFiles(e.target.files);
     });
@@ -103,6 +108,14 @@ function setFileEvents(){
         handleFiles(files);
     });
 
+}
+
+function updateFileInput() {
+    const dataTransfer = new DataTransfer();
+    currentFiles.forEach(file => {
+        dataTransfer.items.add(file);
+    });
+    $('#files')[0].files = dataTransfer.files;
 }
 
 $(() => {
