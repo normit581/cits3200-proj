@@ -21,6 +21,7 @@
     <div class="d-flex flex-row">
       <aside id="file-list" class="flex-column"></aside>
       <div id="drop-zone" class="drop-zone">
+        <i class="fa-solid fa-upload fa-5x mb-3 d-block"></i>
         Drag and drop .docx files here or click to upload.
       </div>
       {{ form.files(class="hidden", multiple=True, accept=".docx", required=False) }}

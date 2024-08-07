@@ -17,19 +17,12 @@
     transform: scale(1.02);
 }
 
-.drop-zone::before {
-    content: '\f093';
-    font-family: 'Font Awesome 5 Free';
-    font-weight: 900;
-    font-size: 5rem;
-    color: #007bff;
-    display: block;
-    margin-bottom: 1rem;
+.drop-zone .fa-upload {
     transition: transform 0.3s ease-in-out, color 0.3s ease-in-out;
-    transform-origin: center;
+    color: #007bff;
 }
 
-.drop-zone:hover::before {
+.drop-zone:hover .fa-upload {
     transform: scale(1.1);
     color: #0056b3;
 }
