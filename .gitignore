@@ -12,3 +12,4 @@
 
 # Cache
 *__pycache__*
+/app/temp/

@@ -1,6 +1,5 @@
 import os
 
-
 class Config(object):
     UPLOAD_EXTENSIONS = ['.docx']
     MAX_CONTENT_LENGTH = 210 * 1024 * 1024 #For additional headers

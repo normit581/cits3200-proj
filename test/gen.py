@@ -2,6 +2,7 @@ import os
 import sys
 from utility.rsid import *
 from utility.gen import *
+from utility.log import *
 
 def usage() :
     print("\nusage: $ python gen.py <option>\n")
@@ -65,15 +66,13 @@ if __name__ == "__main__" :
         docx2 = sys.argv[3]
         docx1_path = os.path.join(testdocx_dir, docx1)
         docx2_path = os.path.join(testdocx_dir, docx2)
-        similarity = rsid_simof2(docx1_path, docx2_path) * 100
-        print(f"Similarity between {docx1} and {docx2}: {similarity:.03f}%")
+        similarity = rsid_simof2(docx1_path, docx2_path)
+        print(f"{docx1} ~ {docx2}\t-----\t{similarity:.03f}%")
         exit()
         
     if option == 'clean' :
         clean()
         exit()
-        
-    usage()
         
         
         

@@ -3,7 +3,7 @@ import xml.etree.ElementTree as ET
 import sys
 import os
 
-from log import Log
+# from log import Log
 
 # Function to extract RSID from a .docx file
 def rsid_extract(docx_path) :
@@ -45,13 +45,12 @@ def rsid_simof2(docx1, docx2) :
     
     # calculate similarity
     similarity = 100 * common_rsid_count / total_rsid
-    logger = Log('../logs', 'rsid_similarities.log')
-    logger.log(f"{docx1} ~ {docx2} -----\t{similarity:.08} %", 'info')
     
     return similarity
 
 # if __name__ == '__main__':
-#     docx1 = "../testdocs/document_4.docx"
-#     docx2 = "../testdocs/document_5.docx"
-#     rsid_simof2(docx1, docx2)
+#     docx1 = "../testdocs/document_0.docx"
+#     docx2 = "../testdocs/document_1.docx"
+#     similarity = rsid_simof2(docx1, docx2)
+#     print(f"Similarity between {docx1} and {docx2}: {similarity:.03f}%")
     

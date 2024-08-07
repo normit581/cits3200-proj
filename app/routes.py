@@ -3,6 +3,9 @@ from app import app
 from app.forms import MatchDocumentForm
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import RequestEntityTooLarge
+from app.utilities.rsid import *
+
+files_rsid = {}
 
 @app.context_processor
 def inject_global_variable():
@@ -21,6 +24,25 @@ def home():
                 for file in form.files.data:
                     filename = secure_filename(file.filename)
                     print(f"Processing file: {filename}")
+                    
+                    rsid_numbers, rsid_count = rsid_extract(file)
+                    
+                    # print(f"{filename}\trsid_count: {rsid_count}\t{rsid_numbers}")
+                    files_rsid[filename] = (rsid_count, rsid_numbers)
+                
+                print("Files processed successfully.")
+
+#   TODO make brunch comparison--------------------------------------------------------------------------
+                #   Calculate similarity between two files
+                file_1 = form.files.data[0].filename    # retrive from wtform
+                file_2 = form.files.data[1].filename
+                file_1_rsid = files_rsid[file_1][1]      # access {file_rsid}
+                file_2_rsid = files_rsid[file_2][1]
+                similarity = rsid_simof2(file_1_rsid, file_2_rsid)
+                msg = f"{file_1} ~ {file_2}: {similarity:.3f}%"
+                app.temp.log(msg, 'info')               # save output to /temp prepare for download
+#   -----------------------------------------------------------------------------------------------------
+                
                 return jsonify({'message': 'Files processed successfully.'})
             except Exception as e:
                 app.logger.error(f"Error processing files: {str(e)}")
