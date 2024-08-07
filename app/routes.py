@@ -31,7 +31,7 @@ def home():
                 
                 print("Files processed successfully.")
 
-#   TODO make brunch comparison--------------------------------------------------------------------------
+#   make brunch comparison, sort by simiarity  ---------------------------------------------------------
                 #   Calculate similarity between two files
                 file_1 = form.files.data[0].filename    # retrive from wtform
                 file_2 = form.files.data[1].filename
