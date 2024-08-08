@@ -8,6 +8,8 @@
 # Test Suite
 /test/testdocs/
 /test/env/
+/test/logs/
 
 # Cache
 *__pycache__*
+/app/temp/
