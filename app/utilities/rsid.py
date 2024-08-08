@@ -49,7 +49,8 @@ from app.utilities.temp import TEMP
 def rsid_sim(files) :
     file_rsid_dict = {}
     file_count = 0
-    similarity_result = {}
+    similarity_result_map = {}
+    similarity_result_lst = []
     
     temp = TEMP()
     temp.set_log_path('app/temp', 'similarity_result.log')
@@ -64,12 +65,19 @@ def rsid_sim(files) :
             if file_1 == file_2 :
                 continue
             
-            if (file_1, file_2) not in similarity_result and (file_2, file_1) not in similarity_result :
-                similarity = rsid_simof2(file_rsid_dict[file_1][1], file_rsid_dict[file_2][1])
-                similarity_result[(file_1, file_2)] = similarity
-                msg = f"{file_1} ~ {file_2}: {similarity:.3f}%"
+            if (file_1, file_2) in similarity_result_map or (file_2, file_1) in similarity_result_map :
+                continue
+            
+            # dict[file] = (rsid_count, rsid_numbers)
+            similarity = rsid_simof2(file_rsid_dict[file_1][1], file_rsid_dict[file_2][1])
+            similarity_result_map[(file_1, file_2)] = similarity
+            similarity_result_lst.append(((file_1, file_2),  similarity))
 
-                temp.log(msg, 'info')   # need to move outside the loop, sort ->
+    similarity_result_lst.sort(key=lambda x: x[1], reverse=True)
 
-    return similarity_result
+    for entry in similarity_result_lst:
+        msg = f"{entry[0][0]} ~ {entry[0][1]} : {similarity:.3f}%"
+        temp.log(msg, 'info')
+
+    return similarity_result_map, similarity_result_lst
                 
