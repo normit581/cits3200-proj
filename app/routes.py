@@ -4,6 +4,9 @@ from app.forms import MatchDocumentForm
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import RequestEntityTooLarge
 
+from app.utilities.rsid import *
+from app.utilities.temp import TEMP
+
 @app.context_processor
 def inject_global_variable():
     return dict(project_name="DocuMatcher")
@@ -21,6 +24,10 @@ def home():
                 for file in form.files.data:
                     filename = secure_filename(file.filename)
                     print(f"Processing file: {filename}")
+
+                # extract rsid and calculate similarity
+                similarity_result_map, similarity_result_lst = rsid_sim(form.files)
+                
                 return jsonify({'message': 'Files processed successfully.'})
             except Exception as e:
                 app.logger.error(f"Error processing files: {str(e)}")
