@@ -75,8 +75,7 @@ def visualise():
             
             # error check
             if len(files) < 2:
-                print('error')
-                return
+                return jsonify({'error': 'At least two files required for comparison.'}), 400
 
             if len(files) == 2:
                 file1 = files[0]
