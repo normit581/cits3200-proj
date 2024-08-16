@@ -19,10 +19,6 @@ app = create_app(Config)
 
 # signal handler to clean up temporary files
 def signal_handler(sig, frame):
-    print("cleaning up temporary files")
-    cleaner = TEMP()
-    cleaner.set_log_path('app/temp', 'similarity_result.log')
-    cleaner.clean('similarity_result.log')
     sys.exit(0)
 
 signal.signal(signal.SIGINT, signal_handler)  # Handle Ctrl+C
