@@ -1,7 +1,7 @@
 services:
   app:
     container_name: DocuMatcher
-    restart: always
+    restart: no
     build:
       context: ./
       dockerfile: Dockerfile
