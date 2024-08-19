@@ -9,6 +9,7 @@ from app.utilities.temp import TEMP
 
 
 import docx
+from io import BytesIO
 from itertools import combinations
 
 
@@ -31,7 +32,7 @@ def home():
                     print(f"Processing file: {filename}")
 
                 # extract rsid and calculate similarity
-
+                similarity_result_map, similarity_result_lst = rsid_match2(form.files)
                 
                 return jsonify({'message': 'Files processed successfully.'})
             except Exception as e:
@@ -72,7 +73,7 @@ def visualise():
         if form.validate_on_submit():
             files = form.files.data
             # Create loop that will iterate for the number of files in files
-            
+
             # error check
             if len(files) < 2:
                 return jsonify({'error': 'At least two files required for comparison.'}), 400
@@ -80,23 +81,24 @@ def visualise():
             if len(files) == 2:
                 file1 = files[0]
                 file2 = files[1]
-                
-                doc1 = docx.Document(file1)
-                doc2 = docx.Document(file2)
 
-                similarity = rsid_simof2(doc1, doc2)
+                rsid1 = rsid_extract(file1)
+                rsid2 = rsid_extract(file2)
 
+                similarity = rsid_match2(rsid1, rsid2)
+                print(f"Similarity: {similarity:.03f}%")
                 return render_template('visualise.html', file1_name=file1.filename, file2_name=file2.filename, similarity=similarity)
             
             ## make loop for combinations to main file
             else:
                 file1 = files[0]
-                main_doc = docx.Document(file1)
+                rsid1 = rsid_extract(file1)
                 similarity_results = []
 
                 for file in files[1:]:
-                    compare_doc = docx.Document(file)
-                    similarity = rsid_simof2(main_doc, compare_doc)
+                    file2 = files[0]
+                    rsid2 = rsid_extract(file2)
+                    similarity = rsid_match2(rsid1, rsid2)
                     similarity_results.append({"file": file.filename, "similarity": similarity})
                 return render_template('visualise.html', form=form, similarity=similarity_results)
                 
