@@ -249,7 +249,7 @@ function appendMatchResults(similarityResults){
             .attr('id', radioId)
             .attr('autocomplete', 'off')
             .attr('data-target', keyId);
-        var radioLabel = $('<label class="btn btn-outline-secondary text-truncate"></label>')
+        var radioLabel = $('<label class="btn btn-outline-secondary text-truncate mt-0"></label>')
             .attr('for', radioId)
             .text(key);
     
@@ -303,6 +303,7 @@ $(document).ready(function() {
         $('#upload-container').show();
         $("#similarity-result").hide();
         $("#reupload-container").hide();
+        ScrollToTopPage();
     });
     $('#reupload-container').hide()
 });
