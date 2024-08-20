@@ -105,11 +105,22 @@ def visualise():
             else:
                 file1 = files[0]
                 rsid1 = rsid_extract(file1)
+                metadata1 = extract_metadata(file1)
+                metadata_list.append({
+                    'file_name': file1.filename,
+                    'metadata': metadata1
+                })
                 similarity_results = []
 
                 for file in files[1:]:
-                    file2 = files[0]
-                    rsid2 = rsid_extract(file2)
+                    rsid2 = rsid_extract(file)
+                    metadata2 = extract_metadata(file)
+                    # add metadata for compared file
+                    metadata_list.append({
+                        'filename': file.filename,
+                        'metadata': metadata2
+                    })
+
                     similarity = rsid_match2(rsid1, rsid2)
                     similarity_results.append({"file": file.filename, "similarity": similarity})
                 return render_template('visualise.html', form=form, similarity=similarity_results)
