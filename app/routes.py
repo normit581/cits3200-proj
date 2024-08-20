@@ -16,6 +16,25 @@ from itertools import combinations
 def inject_global_variable():
     return dict(project_name="DocuMatcher")
 
+dummy_json_result = {
+    "doc1Student": [
+        {"filename": "doc2Student", "value": 35.32, "count":3200}, 
+        {"filename": "doc3Student", "value": 0.5, "count":98}, 
+        {"filename": "doc4Student", "value": 0.000, "count":3}
+    ]*10,
+    "doc2Student": [
+        {"filename": "doc1Student", "value": 20.55, "count":2000},
+        {"filename": "doc4Student", "value": 0.000, "count":1}
+    ],
+    "doc3Student": [
+        {"filename": "doc1Student", "value": 0.1, "count":20},
+    ],
+    "doc4Student": [
+        {"filename": "doc3Student", "value": 0.5, "count":98}, 
+        {"filename": "doc4Student", "value": 0.000, "count":3}
+    ]
+}
+
 @app.route('/', methods=['GET'])
 @app.route('/home', methods=['GET', 'POST'])
 def home():
@@ -33,7 +52,7 @@ def home():
                 # extract rsid and calculate similarity
 
                 
-                return jsonify({'message': 'Files processed successfully.'})
+                return jsonify({'message': 'Files processed successfully.', 'data' : dummy_json_result, 'success': True})
             except Exception as e:
                 app.logger.error(f"Error processing files: {str(e)}")
                 return jsonify({'error': 'An error occurred while processing the files.'}), 500

@@ -14,7 +14,18 @@
         {% include "/layout/alert_modal.html" %}
     </div>
 </div>
-<div class="container mt-5">
+
+<div id="reupload-container" class="container">
+  <div class="d-grid col-12 justify-content-end">
+    <button type="button" class="btn btn-lg btn-outline-primary rounded-pill">
+      <i class="fa-solid fa-arrow-up-from-bracket mr-2"></i> Reupload
+    </button>
+  </div>
+</div>
+
+<div id="similarity-result" class="container"></div>
+
+<div id="upload-container" class="container mt-5">
   <h2 id="upload-header" class="mb-4">Upload Your .docx  Files</h2>
   <form id="match-form" action="{{ url_for('home') }}" method="POST" enctype="multipart/form-data">
     {{ form.hidden_tag() }}

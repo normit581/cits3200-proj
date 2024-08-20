@@ -70,13 +70,37 @@ function applyConfirmAnimation() {
     }, 500);
 }
 
+function validateMatchForm(){
+    const formData = new FormData();
+    let isValid = true;
+    
+    currentFiles.forEach((file, id) => {
+        if (validateFile(file)) {
+            formData.append('files', file);
+        } else {
+            isValid = false;
+            currentFiles.delete(id);
+            $(`#list-item-${id}`).remove();
+            handleFileList(-1);
+        }
+    });
+
+    if (!isValid) {
+        GenerateDangerAlertDiv('Failed!', 'Some files were removed due to validation errors. Please check and try again.');
+        updateProgressBar();
+        return;
+    }
+    formData.append('csrf_token', $('input[name=csrf_token]').val());
+    return formData;
+}
+
 function validateFile(file) {
     if (file.type !== docxExtension) {
-        alert('Only .docx files are allowed.');
+        GenerateDangerAlertDiv("Failed!", 'Only .docx files are allowed.');
         return false;
     }
     if (file.size > maxFileSize) {
-        alert(`File ${file.name} exceeds the maximum size of 100MB.`);
+        GenerateDangerAlertDiv("Failed!", `File ${file.name} exceeds the maximum size of 100MB.`);
         return false;
     }
     return true;
@@ -169,74 +193,116 @@ function updateFileInput() {
     $('#files')[0].files = dataTransfer.files;
 }
 
+var onXhrMatch = () => {
+    var xhr = new window.XMLHttpRequest();
+    xhr.upload.addEventListener("progress", function(evt) {
+        if (evt.lengthComputable) {
+            var percentComplete = evt.loaded / evt.total * 100;
+            $('#upload-progress').css('width', percentComplete + '%').attr('aria-valuenow', percentComplete);
+        }
+    }, false);
+    return xhr;
+}
+
+var onErrorMatch = (xhr) => {
+    let responseText = "";
+    if(xhr.status === 404) {
+        responseText = 'The uploaded files are too large. Please try again with smaller files.'
+    } else if (xhr.status === 400) {
+        responseText = 'Invalid request. Please check your files and try again.';
+    }
+    GenerateDangerAlertDiv("Failed!",`ErrorCode: ${xhr.status}. ${responseText}`);
+};
+
+var onSuccessMatch = (response) => {
+    if (response.success) {
+        appendMatchResults(response.data);
+        GenerateSuccessAlertDiv("Success!", response.message);
+        $("#reupload-container").show()
+        $("#upload-container").hide()
+    } else {
+        GenerateDangerAlertDiv("Failed!", response.message);
+    }
+}
+
+function match() {
+    if (!confirm(`Are you sure you want to MATCH documents?`))
+        return;
+
+    if (currentFiles.size === 0) {
+        GenerateDangerAlertDiv('Failed!', 'Please add at least one file.');
+        return;
+    }
+    $('#similarity-result').empty()
+    CallPost(`/home`, validateMatchForm(), onSuccessMatch, onErrorMatch, onXhrMatch);
+}
+
+function appendMatchResults(similarityResults){
+    var row = $('<div class="row mt-4"></div>');
+    var aside = $('<aside class="col-2"><div class="btn-group-vertical col-12 shaded" role="group" aria-label="Vertical radio toggle button group"></div></aside>');
+    var mainContent = $('<div class="col-10"><div class="row card-docx-container"></div></div>');
+    $.each(similarityResults, function(key, values) {
+        var keyId = `${key}-${Object.keys(similarityResults).indexOf(key)}`;
+        var radioId = `vbtn-radio-${keyId}`;
+        var radioInput = $('<input type="radio" class="btn-check">')
+            .attr('name', 'vbtn-radio')
+            .attr('id', radioId)
+            .attr('autocomplete', 'off')
+            .attr('data-target', keyId);
+        var radioLabel = $('<label class="btn btn-outline-secondary text-truncate"></label>')
+            .attr('for', radioId)
+            .text(key);
+    
+        aside.find('.btn-group-vertical').append(radioInput).append(radioLabel);
+
+        $.each(values, function(i, item) {
+            var card = $(`<div class="card-docx-display card col-3 hidden" data-id="${keyId}"></div>`);
+            card.append(
+                $('<div class="card shaded"></div>').append(
+                    $('<div class="card-body"></div>').append(
+                        $('<h4 class="text-truncate"></h4>').append(
+                            $('<span class="text-truncate"></span>').text(item.filename)
+                        ),
+                        $('<hr>'),
+                        $('<div class="d-flex justify-content-between"></div>').append(
+                            $('<span></span>').text(item.value.toFixed(1) + '%'),
+                            $('<div class="text-truncate"></div>').append(
+                                $('<i class="fa-solid fa-hashtag"></i>'),
+                                $('<span></span>').text(item.count)
+                            )
+                        )
+                    )
+                )
+            );
+            mainContent.find('.card-docx-container').append(card);
+        });
+    });
+    
+    row.append(aside).append(mainContent);
+    $('#similarity-result').append(row);
+    $("#similarity-result").show();
+
+    $('.btn-group-vertical input').click(function() {
+        var target = $(this).data('target');
+        console.log(target)
+        $('.card-docx-display[data-id]').addClass('hidden'); // Hide all cards
+        $(`.card-docx-display[data-id="${target}"]`).toggleClass('hidden'); // Toggle the clicked card
+    });
+}
+
 $(document).ready(function() {
     setFileEvents();
     closeFileList();
-
     $('#match-form').on('submit', function(e) {
-    e.preventDefault();
-    
-    if (currentFiles.size === 0) {
-        alert('Please add at least one file.');
-        return;
-    }
-
-    const formData = new FormData();
-    let isValid = true;
-
-    currentFiles.forEach((file, id) => {
-        if (validateFile(file)) {
-            formData.append('files', file);
-        } else {
-            isValid = false;
-            currentFiles.delete(id);
-            $(`#list-item-${id}`).remove();
-            handleFileList(-1);
-        }
+        e.preventDefault();
+        match();
     });
 
-    if (!isValid) {
-        
-        alert('Some files were removed due to validation errors. Please check and try again.');
-        updateProgressBar();
-        return;
-    }
-    formData.append('csrf_token', $('input[name=csrf_token]').val());
-
-    $.ajax({
-        url: $(this).attr('action'),
-        type: 'POST',
-        data: formData,
-        processData: false,
-        contentType: false,
-        xhr: function() {
-            var xhr = new window.XMLHttpRequest();
-            xhr.upload.addEventListener("progress", function(evt) {
-                if (evt.lengthComputable) {
-                    var percentComplete = evt.loaded / evt.total * 100;
-                    $('#upload-progress').css('width', percentComplete + '%').attr('aria-valuenow', percentComplete);
-                }
-            }, false);
-            return xhr;
-        },
-        success: function(response) {
-            if (response.message) {
-                alert(response.message);
-                // Do what we need to do here
-            } else if (response.error) {
-                alert(response.error);
-            }
-        },
-        error: function(xhr, status, error) {
-            if (xhr.status === 413) {
-                alert('The uploaded files are too large. Please try again with smaller files.');
-            } else if (xhr.status === 400) {
-                alert('Invalid request. Please check your files and try again.');
-            } else {
-                alert('An error occurred while uploading the files. Please try again.');
-            }
-            console.error(xhr.responseText);
-        }
+    $('#reupload-container button').on('click', function(){
+        CloseAlertDiv()
+        $('#upload-container').show();
+        $("#similarity-result").hide();
+        $("#reupload-container").hide();
     });
-});
+    $('#reupload-container').hide()
 });
