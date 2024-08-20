@@ -6,11 +6,8 @@ from werkzeug.exceptions import RequestEntityTooLarge
 
 from app.utilities.rsid import *
 from app.utilities.temp import TEMP
+from app.utilities.metadata import *
 
-
-import docx
-from io import BytesIO
-from itertools import combinations
 
 
 @app.context_processor
@@ -78,6 +75,7 @@ def visualise():
             if len(files) < 2:
                 return jsonify({'error': 'At least two files required for comparison.'}), 400
 
+            metadata_list = []
             if len(files) == 2:
                 file1 = files[0]
                 file2 = files[1]
@@ -87,7 +85,21 @@ def visualise():
 
                 similarity = rsid_match2(rsid1, rsid2)
                 print(f"Similarity: {similarity:.03f}%")
-                return render_template('visualise.html', file1_name=file1.filename, file2_name=file2.filename, similarity=similarity)
+
+                metadata1, metadata2 = extract_metadata(file1), extract_metadata(file2)
+
+                metadata_list.append({
+                    'file_name': file1.filename,
+                    'metadata': metadata1
+                })
+
+                metadata_list.append({
+                    'file_name': file2.filename,
+                    'metadata': metadata2
+                })
+                print('metadata list:', metadata_list)
+                
+                return render_template('visualise.html', file1_name=file1.filename, file2_name=file2.filename, similarity=similarity, metadata_list=metadata_list)
             
             ## make loop for combinations to main file
             else:
