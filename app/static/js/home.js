@@ -267,7 +267,7 @@ function appendMatchResults(similarityResults){
                         $('<div class="d-flex justify-content-between"></div>').append(
                             $('<span></span>').text(item.value.toFixed(1) + '%'),
                             $('<div class="text-truncate"></div>').append(
-                                $('<i class="fa-solid fa-hashtag"></i>'),
+                                $('<i class="fa-solid fa-hashtag me-1"></i>'),
                                 $('<span></span>').text(item.count)
                             )
                         )
