@@ -6,6 +6,7 @@ from werkzeug.exceptions import RequestEntityTooLarge
 
 from app.utilities.rsid import *
 from app.utilities.temp import TEMP
+from app.utilities.metadata import *
 
 
 import docx, datetime
@@ -67,7 +68,7 @@ def home():
                     print(f"Processing file: {filename}")
 
                 # extract rsid and calculate similarity
-
+                similarity_result_map, similarity_result_lst = rsid_match2(form.files)
                 
                 return jsonify({'message': 'Files processed successfully.', 'data' : dummy_json_result, 'success': True})
             except Exception as e:
@@ -117,32 +118,59 @@ def visualise():
             files = [form.base_file.data, form.compare_file.data]
 
             # Create loop that will iterate for the number of files in files
-            
+
             # error check
             if len(files) < 2:
                 flash('At least two files required for comparison.' ,'error')
                 return redirect('home')
 
+            metadata_list = []
             if len(files) == 2:
                 file1 = files[0]
                 file2 = files[1]
+
+                rsid1 = rsid_extract(file1)
+                rsid2 = rsid_extract(file2)
+
+                similarity = rsid_match2(rsid1, rsid2)
+                print(f"Similarity: {similarity:.03f}%")
+
+                metadata1, metadata2 = extract_metadata(file1), extract_metadata(file2)
+
+                metadata_list.append({
+                    'file_name': file1.filename,
+                    'metadata': metadata1
+                })
+
+                metadata_list.append({
+                    'file_name': file2.filename,
+                    'metadata': metadata2
+                })
+                print('metadata list:', metadata_list)
                 
-                # doc1 = docx.Document(file1)
-                # doc2 = docx.Document(file2)
-
-                # similarity = rsid_match2(doc1, doc2)
-
-                return render_template('visualise.html', results=dummy_visualise_result)
+                return render_template('visualise.html', results=dummy_visualise_result, similarity=similarity, metadata_list=metadata_list)
             
             ## make loop for combinations to main file
             else:
                 file1 = files[0]
-                main_doc = docx.Document(file1)
+                rsid1 = rsid_extract(file1)
+                metadata1 = extract_metadata(file1)
+                metadata_list.append({
+                    'file_name': file1.filename,
+                    'metadata': metadata1
+                })
                 similarity_results = []
 
                 for file in files[1:]:
-                    compare_doc = docx.Document(file)
-                    similarity = rsid_match2(main_doc, compare_doc)
+                    rsid2 = rsid_extract(file)
+                    metadata2 = extract_metadata(file)
+                    # add metadata for compared file
+                    metadata_list.append({
+                        'filename': file.filename,
+                        'metadata': metadata2
+                    })
+
+                    similarity = rsid_match2(rsid1, rsid2)
                     similarity_results.append({"file": file.filename, "similarity": similarity})
                 return render_template('visualise.html', form=form, similarity=similarity_results)
     return render_template('visualise.html', form=form)
