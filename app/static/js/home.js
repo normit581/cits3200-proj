@@ -33,8 +33,7 @@ function deleteListItem(e) {
     $(`#list-item-${itemId}`).tooltip('dispose');
     $(`#list-item-${itemId}`).remove();
     handleFileList(-1);
-
-    currentFiles.delete(itemId);
+    currentFiles.delete(e.data.filename);
     updateFileInput();
     updateProgressBar();
 }
@@ -43,7 +42,7 @@ function createListItem(name) {
     let delIcon = $('<i>')
         .addClass('bi')
         .addClass('bi-trash3')
-        .click({itemId: fileId}, deleteListItem)
+        .click({itemId: fileId, filename:fileNameWithoutExt(name)}, deleteListItem)
     
     let para = $('<p>')
         .text(name);
@@ -70,16 +69,20 @@ function applyConfirmAnimation() {
     }, 500);
 }
 
+function fileNameWithoutExt(fileName){
+    return fileName.replace(/\.[^/.]+$/, "");
+}
+
 function validateMatchForm(){
     const formData = new FormData();
     let isValid = true;
     
-    currentFiles.forEach((file, id) => {
+    currentFiles.forEach((file, idx) => {
         if (validateFile(file)) {
             formData.append('files', file);
         } else {
             isValid = false;
-            currentFiles.delete(id);
+            currentFiles.delete(fileNameWithoutExt(file.name));
             $(`#list-item-${id}`).remove();
             handleFileList(-1);
         }
@@ -143,7 +146,7 @@ function handleFiles(files) {
             }
 
             handleFileList(1);
-            currentFiles.set(fileId, file);
+            currentFiles.set(fileNameWithoutExt(file.name), file);
             const item = createListItem(file.name);
             $fileList.append(item);
             updateFileInput();
@@ -193,18 +196,18 @@ function updateFileInput() {
     $('#files')[0].files = dataTransfer.files;
 }
 
-var onXhrMatch = () => {
-    var xhr = new window.XMLHttpRequest();
+const onXhrMatch = () => {
+    let xhr = new window.XMLHttpRequest();
     xhr.upload.addEventListener("progress", function(evt) {
         if (evt.lengthComputable) {
-            var percentComplete = evt.loaded / evt.total * 100;
+            let percentComplete = evt.loaded / evt.total * 100;
             $('#upload-progress').css('width', percentComplete + '%').attr('aria-valuenow', percentComplete);
         }
     }, false);
     return xhr;
 }
 
-var onErrorMatch = (xhr) => {
+const onErrorMatch = (xhr) => {
     let responseText = "";
     if(xhr.status === 404) {
         responseText = 'The uploaded files are too large. Please try again with smaller files.'
@@ -214,9 +217,10 @@ var onErrorMatch = (xhr) => {
     GenerateDangerAlertDiv("Failed!",`ErrorCode: ${xhr.status}. ${responseText}`);
 };
 
-var onSuccessMatch = (response) => {
+const onSuccessMatch = (response) => {
     if (response.success) {
         appendMatchResults(response.data);
+        setupVisualiseForm();
         GenerateSuccessAlertDiv("Success!", response.message);
         $("#reupload-container").show()
         $("#upload-container").hide()
@@ -238,25 +242,30 @@ function match() {
 }
 
 function appendMatchResults(similarityResults){
-    var row = $('<div class="row mt-4"></div>');
-    var aside = $('<aside class="col-2"><div class="btn-group-vertical col-12 shaded" role="group" aria-label="Vertical radio toggle button group"></div></aside>');
-    var mainContent = $('<div class="col-10"><div class="row card-docx-container"></div></div>');
+    let row = $('<div class="row mt-4"></div>');
+    let aside = $('<aside class="col-2"><div class="btn-group-vertical col-12 shaded" role="group" aria-label="Vertical radio toggle button group"></div></aside>');
+    let mainContent = $('<div class="col-10"><div class="row card-docx-container"></div></div>');
     $.each(similarityResults, function(key, values) {
-        var keyId = `${key}-${Object.keys(similarityResults).indexOf(key)}`;
-        var radioId = `vbtn-radio-${keyId}`;
-        var radioInput = $('<input type="radio" class="btn-check">')
+        let keyId = `${key}-${Object.keys(similarityResults).indexOf(key)}`;
+        let radioId = `vbtn-radio-${keyId}`;
+        let radioInput = $('<input type="radio" class="btn-check">')
             .attr('name', 'vbtn-radio')
             .attr('id', radioId)
             .attr('autocomplete', 'off')
             .attr('data-target', keyId);
-        var radioLabel = $('<label class="btn btn-outline-secondary text-truncate mt-0"></label>')
+        let radioLabel = $('<label class="btn btn-outline-secondary text-truncate mt-0"></label>')
             .attr('for', radioId)
             .text(key);
     
         aside.find('.btn-group-vertical').append(radioInput).append(radioLabel);
 
         $.each(values, function(i, item) {
-            var card = $(`<div class="card-docx-display card col-3 hidden" data-id="${keyId}"></div>`);
+            let card = $(`<div class="card-docx-display card col-3 hidden"></div>`)
+                .attr({
+                    'data-id': keyId,
+                    'data-base-file': key,
+                    'data-compare-file': item.filename
+                });
             card.append(
                 $('<div class="card shaded"></div>').append(
                     $('<div class="card-body"></div>').append(
@@ -283,14 +292,45 @@ function appendMatchResults(similarityResults){
     $("#similarity-result").show();
 
     $('.btn-group-vertical input').click(function() {
-        var target = $(this).data('target');
-        console.log(target)
+        let target = $(this).data('target');
         $('.card-docx-display[data-id]').addClass('hidden'); // Hide all cards
         $(`.card-docx-display[data-id="${target}"]`).toggleClass('hidden'); // Toggle the clicked card
     });
 }
 
+function setupVisualiseForm(){
+    $('.card-docx-container > .card').on('click', function() {
+        const $card_docx = $(this);
+        const setBaseFile = setFileInput($card_docx.data("base-file"), "#base_file")
+        const setCompareFile = setFileInput($card_docx.data("compare-file"), "#compare_file")
+        if(setBaseFile && setCompareFile){
+            $("#visualise-form").submit()
+        }
+    });
+}
+
+function setFileInput(filename, inputID){
+    const fileData = currentFiles.get(filename);
+    if (!fileData){
+        GenerateDangerAlertDiv("Failed!", `File: ${filename} not found. Please try reupload.`);
+        return false;
+    }
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(fileData);
+    $(`${inputID}`)[0].files = dataTransfer.files;
+    return true;
+}
+
+function showRefreshAlert(event) {
+    const message = "Changes you made may not be saved.";
+    event.preventDefault();
+    event.returnValue = message;
+    return message;
+}
+
 $(document).ready(function() {
+    $(window).on('beforeunload', showRefreshAlert);
+
     setFileEvents();
     closeFileList();
     $('#match-form').on('submit', function(e) {
