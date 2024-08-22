@@ -29,13 +29,15 @@ def rsid_extract(docx_path) :
     return rsid_dict, rsid_count
 
 def rsid_match2(rsid1, rsid2) :
+    dict1, total1 = rsid1
+    dict2, total2 = rsid2
     common_rsid_count = 0
     
-    for rsid in rsid1 :
-        if rsid in rsid2 :
-            common_rsid_count += min(rsid1[rsid], rsid2[rsid])
+    for rsid in dict1 :
+        if rsid in dict2 :
+            common_rsid_count += min(dict1[rsid], dict2[rsid])
 
-    rsid_match = 100 * common_rsid_count / sum(rsid1.values())
+    rsid_match = 100 * common_rsid_count / total1
     
     return rsid_match
 
