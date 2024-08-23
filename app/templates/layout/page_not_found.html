@@ -3,6 +3,11 @@
 {% block title %}ERROR Page {% endblock %}
 
 {% block content %}
+    <div class="container">
+        <div id="AlertModalDiv"> 
+            {% include "/layout/alert_modal.html" %}
+        </div>
+    </div>
     <div class="text-center">
         <div class="error mx-auto">404</div>
         <p class="lead text-gray-800 mb-5">Page Not Found</p>

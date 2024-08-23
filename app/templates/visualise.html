@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Visualise{% endblock %}
+
+{% block head %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/visualise.css')}}">
+  <script src="{{ url_for('static', filename='js/visualise.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/setting-bar.js') }}" defer></script>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div id="AlertModalDiv"> 
+        {% include "/layout/alert_modal.html" %}
+    </div>
+</div>
+
+<div class="container mb-4 px-1">
+  <div class="row mx-auto settings-bg-color">
+    <div class="collapse settings-bar container-fluid show col-11" id="settingsBar">
+      <div class="row justify-content-center">
+        <div class="col-auto my-2">
+          <button class="btn btn-outline-primary" type="button" onclick="rsid_hide_all()">Hide all</button>
+        </div>
+        <div class="col-auto my-2">
+          <button class="btn btn-outline-primary" type="button" onclick="rsid_unhide_all()">Unhide all</button>
+        </div>
+        <div class="col-auto my-2 btn-group" role="group" aria-label="Font size adjustment">
+            <button class="btn btn-outline-primary" id="decrease-btn" type="button" onclick="decreaseFontSize()">-</button>
+            <button class="btn btn-outline-primary" type="button" onclick="resetFontSize()">Font Size</button>
+            <button class="btn btn-outline-primary" id="increase-btn" type="button"onclick="increaseFontSize()">+</button>
+        </div>
+        <div class="col-auto my-2">
+          <input class="form-control col-auto" type="number" id="cardHeightInput" oninput="adjustCardHeight()" placeholder="Adjust height(px): 600">
+        </div>
+      </div>
+    </div>
+    <div class="d-flex justify-content-end px-2 col-1 py-3">
+      <button id="settingsBarCollapseBtn" class="btn active border-0" type="button" data-bs-toggle="collapse" data-bs-target="#settingsBar" aria-expanded="true" aria-controls="settingsBar">
+        <i class="fa-solid fa-gear fa-2x"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+      {% for document in results %}
+        <div class="col-6 ps-1 pe-1">
+            <div class="card">
+                <div class="card-header">
+                    <h5>{{ document.metadata.title }}</h5>
+                    <small>Created on: {{ document.metadata.created.strftime('%Y-%m-%d %H:%M:%S') }}</small>
+                </div>
+                <div class="card-body" style="overflow-y: auto;" id="card-body-{{ loop.index }}">
+                    {% for paragraph in document.metadata.paragraphs %}
+                      <p>{{ paragraph }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+      {% endfor %}
+  </div>
+</div>
+
+{% endblock %}

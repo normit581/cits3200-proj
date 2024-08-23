@@ -82,7 +82,7 @@ footer.page-footer {
 }
 
 .hidden {
-  display: none;
+  display: none !important;
 }
 
 .alert-dismissible .close {
@@ -108,4 +108,34 @@ button.close {
   color: #000;
   text-shadow: 0 1px 0 #fff;
   opacity: 0.5;
+}
+
+.settings-bg-color {
+  background-color: #f8f9fa;
+}
+
+.settings-bar {
+  padding: 10px;
+}
+
+
+.sticky-settings-bar {
+  position: fixed;
+}
+
+.row .col-auto {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.col-auto + .col-auto {
+  padding-left: 0px;
+  padding-right: 10px;
+}
+
+.row:has(> .settings-bar) {
+  z-index: 999;
+  width: 100%;
+  top: 0;
+  left: 0;
 }
