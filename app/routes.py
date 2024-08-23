@@ -68,7 +68,7 @@ def home():
                     print(f"Processing file: {filename}")
 
                 # extract rsid and calculate similarity
-                similarity_result_map, similarity_result_lst = rsid_match2(form.files)
+                # similarity_result_map, similarity_result_lst = rsid_match2(form.files)
                 
                 return jsonify({'message': 'Files processed successfully.', 'data' : dummy_json_result, 'success': True})
             except Exception as e:
