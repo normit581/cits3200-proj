@@ -1,6 +1,6 @@
 function setLogo() {
     $(".my-logo").replaceWith(
-        `<span class="fa-stack fa-2xl">
+        `<span class="fa-stack fa-xl">
             <i class="fa-brands fa-searchengin fa-stack-1x fa-beat-fade" style="--fa-animation-duration: 2s; --fa-beat-fade-opacity: 0.5; --fa-beat-fade-scale: 1.1;"></i>
             <i class="fa-regular fa-file fa-stack-2x"></i>
             <span class="fa-layers fa-2x">

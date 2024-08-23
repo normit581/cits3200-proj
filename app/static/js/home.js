@@ -219,10 +219,11 @@ const onErrorMatch = (xhr) => {
 
 const onSuccessMatch = (response) => {
     if (response.success) {
+        ScrollToTopPage();
         appendMatchResults(response.data);
         setupVisualiseForm();
-        GenerateSuccessAlertDiv("Success!", response.message);
-        $("#reupload-container").show()
+        // GenerateSuccessAlertDiv("Success!", response.message);
+        $("#setting-bar-container").show()
         $("#upload-container").hide()
     } else {
         GenerateDangerAlertDiv("Failed!", response.message);
@@ -244,6 +245,7 @@ function match() {
 function appendMatchResults(similarityResults){
     let row = $('<div class="row mt-4"></div>');
     let aside = $('<aside class="col-2"><div class="btn-group-vertical col-12 shaded" role="group" aria-label="Vertical radio toggle button group"></div></aside>');
+    
     let mainContent = $('<div class="col-10"><div class="row card-docx-container"></div></div>');
     $.each(similarityResults, function(key, values) {
         let keyId = `${key}-${Object.keys(similarityResults).indexOf(key)}`;
@@ -328,6 +330,15 @@ function showRefreshAlert(event) {
     return message;
 }
 
+function reuploadFiles(){
+    CloseAlertDiv()
+    $('#upload-container').show();
+    $("#similarity-result").hide();
+    $("#reupload-container").hide();
+    $('#setting-bar-container').hide()
+    ScrollToTopPage();
+}
+
 $(document).ready(function() {
     $(window).on('beforeunload', showRefreshAlert);
 
@@ -338,12 +349,5 @@ $(document).ready(function() {
         match();
     });
 
-    $('#reupload-container button').on('click', function(){
-        CloseAlertDiv()
-        $('#upload-container').show();
-        $("#similarity-result").hide();
-        $("#reupload-container").hide();
-        ScrollToTopPage();
-    });
-    $('#reupload-container').hide()
+    $('#setting-bar-container').hide()
 });

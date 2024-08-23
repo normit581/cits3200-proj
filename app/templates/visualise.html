@@ -5,6 +5,7 @@
 {% block head %}
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/visualise.css')}}">
   <script src="{{ url_for('static', filename='js/visualise.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/setting-bar.js') }}" defer></script>
 {% endblock %}
 
 {% block content %}
@@ -19,7 +20,7 @@
     <div class="collapse settings-bar container-fluid show col-11" id="settingsBar">
       <div class="row justify-content-center">
         <div class="col-auto my-2">
-          <button class="col-auto btn btn-outline-primary" type="button" onclick="rsid_hide_all()">Hide all</button>
+          <button class="btn btn-outline-primary" type="button" onclick="rsid_hide_all()">Hide all</button>
         </div>
         <div class="col-auto my-2">
           <button class="btn btn-outline-primary" type="button" onclick="rsid_unhide_all()">Unhide all</button>

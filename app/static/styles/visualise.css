@@ -1,33 +1,4 @@
-.row:has(> .settings-bar) {
-    z-index: 999;
-    width: 100%;
-    top: 0;
-    left: 0;
-}
-
-.settings-bg-color {
-    background-color: #f8f9fa;
-}
-
-.settings-bar {
-    padding: 10px;
-}
-
 .card-body {
     height: auto;
     transition: height 0.3s ease;
-}
-
-.sticky-settings-bar {
-    position: fixed;
-}
-
-.row .col-auto {
-    padding-left: 10px;
-    padding-right: 10px;
-}
-
-.col-auto + .col-auto {
-    padding-left: 0px;
-    padding-right: 10px;
 }
