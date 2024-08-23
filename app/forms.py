@@ -16,4 +16,4 @@ class MatchDocumentForm(FlaskForm):
 
 class VisualiseDocumentForm(FlaskForm):
     base_file = WordFileField('File')
-    compare_file = WordFilesField('File')
+    compare_file = WordFileField('File')
