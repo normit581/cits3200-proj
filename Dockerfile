@@ -1,11 +1,18 @@
 FROM python:3.12-slim
 
-EXPOSE 5000/tcp
+RUN apt update
+RUN apt install -y nginx systemctl
+
+EXPOSE 80/tcp
+
+COPY deployment/nginx.conf /etc/nginx/nginx.conf
+RUN systemctl enable nginx
 
 COPY requirements.txt .
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
 COPY app/ /app/
+COPY deployment/entry.sh /entry.sh
 
-CMD [ "flask", "--app", "app", "run" ]
+ENTRYPOINT [ "entry.sh" ]
