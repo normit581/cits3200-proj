@@ -91,7 +91,7 @@ def add_paragraph(doc, text):
 def edit_docx(input_file, output_file) :   
     input_path = os.path.join(testdocx_dir, input_file)
     output_path = os.path.join(testdocx_dir, output_file)
-
+    
     # Start MS Word and open the document
     word = win32.Dispatch('Word.Application')
     word.Visible = False
@@ -110,7 +110,7 @@ def edit_docx(input_file, output_file) :
 
     # Quit Word
     word.Quit()
-    # print(f'Successfully saved the modified document as {output_path}')
+    print(f'modified {input_file} save as {output_file}')
     
 def clean() :
     for f in os.listdir(testdocx_dir):
