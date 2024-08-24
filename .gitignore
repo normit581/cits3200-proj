@@ -9,6 +9,7 @@
 /test/testdocs/
 /test/env/
 /test/logs/
+/test/test_logs/
 
 # Cache
 *__pycache__*
