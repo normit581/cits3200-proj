@@ -28,7 +28,7 @@ class TestRsidMethods(unittest.TestCase):
             generate_docx(2)
         
         # generate randomly edited .docx from current.docx
-        test_depth = 5      # edit to increase or decrease
+        test_depth = 5     # edit to increase or decrease
         current = cls.current
         for i in range(1, test_depth + 1) :
             edited = f'edited{i}_{cls.current}'

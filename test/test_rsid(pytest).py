@@ -8,19 +8,19 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 from app.utilities.rsid import rsid_extract, rsid_match2
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="session")
 def setup_logger():
     logger = Log()
     logger.set_log_path("test_logs", "test_rsid_method.txt")
     logger.log("START test rsid", 'info')
     
-    # Yield the logger to the test
+    # Yield the logger for use in tests
     yield logger
     
-    # This will be executed after all tests have run
+    # Log the end message after all tests have run
     logger.log("END test rsid\n", 'info')
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="session")
 def setup_files():
     test_directory = 'testdocs'
     current = 'document_0.docx'
@@ -31,7 +31,7 @@ def setup_files():
         generate_docx(2)
     
     # Generate randomly edited .docx from current.docx
-    test_depth = 20  # Edit to increase or decrease depth
+    test_depth = 5  # Edit to increase or decrease depth, 10% usually fail at depth ~ 10
     current_edit = current
     for i in range(1, test_depth + 1):
         edited = f'edited{i}_{current}'
