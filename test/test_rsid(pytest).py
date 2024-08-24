@@ -72,7 +72,7 @@ def test_rsid_match2(setup_logger, setup_files):
             continue
         
         if file.startswith('edited'):
-            assert output >= 10
+            assert output >= 10         # change the number
         else:
             assert output <= 60
         

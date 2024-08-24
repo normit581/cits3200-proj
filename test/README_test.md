@@ -28,11 +28,19 @@ put <sample.docx> into /test/testdocs, then edit /test/test_rsid(pytest).py line
 if not using <sample.docx>, test will generate 2 random .docx for testing
 
 edit /test/test_rsid(pytest).py line 34:
-    test_depth = <depth>  # Edit to increase or decrease depth, 10% usually fail at depth ~ 10
+    test_depth = <depth>  # Edit to increase or decrease depth
     to simulate how many time <sample.docx> will be edited.
     
 for each depth, an "edited<depth>_<sample.docx>" will be created
 After that, the test will call rsid_extract() and rsid_match2()
+
+edit /test/test_rsid(pytest).py line 75:
+        if file.startswith('edited'):
+            assert output >= 10         # change the number
+        else:
+            assert output <= 60
+
+"edited<depth>_<sample.docx>" should has hiher matching result, 10% usually fail at depth ~ 10
 
 # gen.py
 gen.py only works on windows cmd
