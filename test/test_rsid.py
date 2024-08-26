@@ -1,46 +1,14 @@
 import os
-import pytest
-from utility.log import Log
-from utility.gen import *
+from test_config import *
 
 import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from app.utilities.rsid import rsid_extract, rsid_match2
 
-@pytest.fixture(scope="session")
-def setup_logger():
-    logger = Log()
-    logger.set_log_path("test_logs", "test_rsid_method.txt")
-    logger.log("START test rsid", 'info')
-    
-    # Yield the logger for use in tests
-    yield logger
-    
-    # Log the end message after all tests have run
-    logger.log("END test rsid\n", 'info')
-
-@pytest.fixture(scope="session")
-def setup_files():
-    test_directory = 'testdocs'
-    current = 'document_0.docx'
-    current_file = os.path.join(test_directory, current)
-    
-    # Generate random .docx if current not in test_directory
-    if current not in os.listdir(test_directory):
-        generate_docx(2)
-    
-    # Generate randomly edited .docx from current.docx
-    test_depth = 5  # Edit to increase or decrease depth, 10% usually fail at depth ~ 10
-    current_edit = current
-    for i in range(1, test_depth + 1):
-        edited = f'edited{i}_{current}'
-        if edited not in os.listdir(test_directory):
-            edit_docx(current_edit, edited)
-        current_edit = edited
-    
-    return test_directory, current, current_file
-
+# test /app/utilities/rsid.py function rsid_extract()
+# check if the function return a dict is not None
+# check sum of values in dict equals to rsid count
 def test_rsid_extract(setup_logger, setup_files):
     logger = setup_logger
     test_directory, current, current_file = setup_files
@@ -57,6 +25,9 @@ def test_rsid_extract(setup_logger, setup_files):
             test_log = f"{file} - RSID count: {rsid_count} - RSID dictionary: {rsid_dict}"
             logger.log(test_log, 'info')
 
+# test /app/utilities/rsid.py function rsid_match()
+# edited_docx file assume to has (matching result > 60) with original
+# different docx files should has (mathcing result < 60)
 def test_rsid_match2(setup_logger, setup_files):
     logger = setup_logger
     test_directory, current, current_file = setup_files
