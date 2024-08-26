@@ -24,8 +24,11 @@ function rsidHideAll(btn) {
     }
 }
 
-function rsid_unhide_all() {
-    document.querySelectorAll('.card-body p').forEach(p => p.style.display = 'block');
+function switchVisualiseDocx(){
+    const $visualiseDocxs = $('#visualise-result-container > .row > div')
+    const firstDocx = $visualiseDocxs[0]
+    const secondDocx = $visualiseDocxs[1]
+    $(firstDocx).insertAfter($(secondDocx));
 }
 
 function adjustFontSize() {

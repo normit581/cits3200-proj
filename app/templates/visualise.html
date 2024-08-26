@@ -29,6 +29,11 @@
             <i class="fa-solid fa-file-export"></i> PDF
           </button>
         </div>
+        <div class="col-auto my-2">
+          <button type="button" class="btn btn-outline-primary" onclick="switchVisualiseDocx()">
+            <i class="fa-solid fa-right-left"></i> Switch
+          </button>
+        </div>
         <div class="col-auto my-2 btn-group" role="group" aria-label="Font size adjustment">
             <button class="btn btn-outline-primary" id="decrease-btn" type="button" onclick="decreaseFontSize()">-</button>
             <button class="btn btn-outline-primary" type="button" onclick="resetFontSize()">
@@ -51,11 +56,11 @@
 
 <div class="container" id="visualise-result-container">
   <div class="row mt-4">
-      {% for document in results %}
+      {% for document in metadata_list %}
         <div class="col-6 ps-1 pe-1">
             <div class="card">
                 <div class="card-header">
-                    <h5>{{ document.metadata.title }}</h5>
+                    <h5>{{ document.file_name }}</h5>
                     <small>Created on: {{ document.metadata.created.strftime('%Y-%m-%d %H:%M:%S') }}</small>
                 </div>
                 <div class="card-body" style="overflow-y: auto;" id="card-body-{{ loop.index }}">
