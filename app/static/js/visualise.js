@@ -6,7 +6,7 @@ function adjustCardHeight() {
     const height = document.getElementById('cardHeightInput').value;
     const cardBodies = document.querySelectorAll('.card-body');
     cardBodies.forEach(cardBody => {
-        cardBody.style.height = height ? height + 'px' : 'auto';
+        cardBody.style.height = height > 0 ? height + 'px' : 'auto';
     });
 }
 
