@@ -10,8 +10,18 @@ function adjustCardHeight() {
     });
 }
 
-function rsid_hide_all() {
-    document.querySelectorAll('.card-body p').forEach(p => p.style.display = 'none');
+function rsidHideAll(btn) {
+    const $btn = $(btn);
+    const $icon = $btn.find('i');
+    if ($icon.hasClass('fa-eye-slash')){
+        $icon.removeClass('fa-eye-slash').addClass('fa-eye')
+        $btn.html($btn.html().replace('Hide All','Unhide All'))
+        document.querySelectorAll('.card-body p').forEach(p => p.style.display = 'none');
+    } else{
+        $icon.removeClass('fa-eye').addClass('fa-eye-slash')
+        $btn.html($btn.html().replace('Unhide All','Hide All'))
+        document.querySelectorAll('.card-body p').forEach(p => p.style.display = 'block');
+    }
 }
 
 function rsid_unhide_all() {
@@ -43,6 +53,31 @@ function handleLongPress(action) {
 
 function clearLongPress() {
     clearInterval(longPressInterval);
+}
+
+function toggleElementsVisibility(isVisible) {
+    const $navBar = $("nav");
+    const $settingBar = $("#setting-bar-container");
+    const $visualiseResult = $("#visualise-result-container");
+
+    const action = isVisible ? 'show' : 'hide';
+    const containerClass = isVisible ? "container" : "container-fluid";
+    
+    $navBar[action]();
+    $settingBar[action]();
+    $visualiseResult.attr("class", containerClass);
+    $visualiseResult.find(".card-body")
+        .toggleClass('pdf', !isVisible)
+}
+
+function exportPDF() {
+    toggleElementsVisibility(false);
+    window.print();
+    toggleElementsVisibility(true);
+}
+
+function exportSinglePDF() {
+    exportPDF();
 }
 
 $(document).ready(function() {

@@ -139,3 +139,7 @@ button.close {
   top: 0;
   left: 0;
 }
+
+.disable-hover {
+    pointer-events: none;
+}

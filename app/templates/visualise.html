@@ -15,19 +15,25 @@
     </div>
 </div>
 
-<div class="container mb-4 px-1">
+<div class="container mb-4 px-1" id="setting-bar-container">
   <div class="row mx-auto settings-bg-color">
     <div class="collapse settings-bar container-fluid show col-11" id="settingsBar">
       <div class="row justify-content-center">
         <div class="col-auto my-2">
-          <button class="btn btn-outline-primary" type="button" onclick="rsid_hide_all()">Hide all</button>
+          <button class="btn btn-outline-primary" type="button" onclick="rsidHideAll(this)">
+            <i class="fa-solid fa-eye-slash"></i> Hide All
+          </button>
         </div>
         <div class="col-auto my-2">
-          <button class="btn btn-outline-primary" type="button" onclick="rsid_unhide_all()">Unhide all</button>
+          <button type="button" class="btn btn-outline-primary" onclick="exportSinglePDF()">
+            <i class="fa-solid fa-file-export"></i> PDF
+          </button>
         </div>
         <div class="col-auto my-2 btn-group" role="group" aria-label="Font size adjustment">
             <button class="btn btn-outline-primary" id="decrease-btn" type="button" onclick="decreaseFontSize()">-</button>
-            <button class="btn btn-outline-primary" type="button" onclick="resetFontSize()">Font Size</button>
+            <button class="btn btn-outline-primary" type="button" onclick="resetFontSize()">
+              <i class="fa-solid fa-arrows-rotate"></i> Font Size
+            </button>
             <button class="btn btn-outline-primary" id="increase-btn" type="button"onclick="increaseFontSize()">+</button>
         </div>
         <div class="col-auto my-2">
@@ -43,8 +49,8 @@
   </div>
 </div>
 
-<div class="container">
-  <div class="row">
+<div class="container" id="visualise-result-container">
+  <div class="row mt-4">
       {% for document in results %}
         <div class="col-6 ps-1 pe-1">
             <div class="card">
