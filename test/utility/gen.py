@@ -15,6 +15,9 @@ def generate_docx(num_files) :
     # Generate .docx files and edit them multiple times
     for i in range(num_files):
         filename = os.path.join(testdocx_dir, f'document_{i}.docx')
+        
+        if filename in os.listdir(testdocx_dir) :
+            continue
 
         # Start MS Word
         word = win32.gencache.EnsureDispatch('Word.Application')
@@ -48,7 +51,7 @@ def generate_docx(num_files) :
 
             # Save the document, overwriting the original file
             doc.SaveAs(os.path.abspath(filename), FileFormat=win32.constants.wdFormatXMLDocument)
-            print(f'Edited {filename} - Edit {edit + 1}')
+            # print(f'Edited {filename} - Edit {edit + 1}')
 
         # Close the document
         doc.Close()
@@ -88,9 +91,9 @@ def add_paragraph(doc, text):
 def edit_docx(input_file, output_file) :   
     input_path = os.path.join(testdocx_dir, input_file)
     output_path = os.path.join(testdocx_dir, output_file)
-
+    
     # Start MS Word and open the document
-    word = win32.gencache.EnsureDispatch('Word.Application')
+    word = win32.Dispatch('Word.Application')
     word.Visible = False
     doc = word.Documents.Open(os.path.abspath(input_path))
 
@@ -107,7 +110,7 @@ def edit_docx(input_file, output_file) :
 
     # Quit Word
     word.Quit()
-    print(f'Successfully saved the modified document as {output_path}')
+    print(f'modified {input_file} save as {output_file}')
     
 def clean() :
     for f in os.listdir(testdocx_dir):

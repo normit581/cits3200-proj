@@ -25,3 +25,4 @@ options:
     rsid_sim <1.docx> <2.docx>              -----   calculate similarities between <1.docx> and <2.docx>
     clean                                   -----   delete all contents in /testdocs
 
+

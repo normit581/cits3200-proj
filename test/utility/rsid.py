@@ -1,24 +1,16 @@
 import zipfile
 import xml.etree.ElementTree as ET
-import sys
-import os
-
-# from log import Log
 
 # Function to extract RSID from a .docx file
 def rsid_extract(docx_path) :
     rsid_dict = {}
     rsid_count = 0
     
-    # Open .docx file as a zip archive
     with zipfile.ZipFile(docx_path, 'r') as docx:
-        # Read the document.xml file
         document_xml = docx.read('word/document.xml')
-        
-        # Parse the XML content
+
         root = ET.fromstring(document_xml)
     
-        # Find all elements with RSID attributes
         for elem in root.iter():
             for attrib in elem.attrib:
                 if attrib.startswith('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}rsid'):
@@ -30,27 +22,16 @@ def rsid_extract(docx_path) :
     
     return rsid_dict, rsid_count
 
-def rsid_simof2(docx1, docx2) :
-    rsid1, rsid_count1 = rsid_extract(docx1)
-    rsid2, rsid_count2 = rsid_extract(docx2)
-
+def rsid_match2(rsid1, rsid2) :
+    dict1, total1 = rsid1
+    dict2, total2 = rsid2
     common_rsid_count = 0
     
-    for rsid in rsid1 :
-        if rsid in rsid2 :
-            common_rsid_count += min(rsid1[rsid], rsid2[rsid])
+    for rsid in dict1 :
+        if rsid in dict2 :
+            common_rsid_count += min(dict1[rsid], dict2[rsid])
 
-    # number of total rsid
-    total_rsid = rsid_count1 + rsid_count2 - common_rsid_count
+    rsid_match = 100 * common_rsid_count / total1
     
-    # calculate similarity
-    similarity = 100 * common_rsid_count / total_rsid
-    
-    return similarity
+    return rsid_match
 
-# if __name__ == '__main__':
-#     docx1 = "../testdocs/document_0.docx"
-#     docx2 = "../testdocs/document_1.docx"
-#     similarity = rsid_simof2(docx1, docx2)
-#     print(f"Similarity between {docx1} and {docx2}: {similarity:.03f}%")
-    
