@@ -2,3 +2,7 @@
     height: auto;
     transition: height 0.3s ease;
 }
+
+.card-body.pdf {
+    height: auto !important;
+}
