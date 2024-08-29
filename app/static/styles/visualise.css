@@ -6,3 +6,7 @@
 .card-body.pdf {
     height: auto !important;
 }
+
+#setting-bar-container .input-group input{
+    width: 80px;
+}

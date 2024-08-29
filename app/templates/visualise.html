@@ -19,14 +19,14 @@
   <div class="row mx-auto settings-bg-color">
     <div class="collapse settings-bar container-fluid show col-11" id="settingsBar">
       <div class="row justify-content-center">
+        <div class="input-group w-auto col-auto my-2">
+          <button type="button" class="input-group-text sharp-color btn btn-outline-primary" disabled>Height:</button>
+          <input type="number" class="form-control col-auto text-end" aria-label="Height (px)" id="cardHeightInput" oninput="adjustCardHeight()">
+          <button type="button" class="input-group-text sharp-color btn btn-outline-primary" disabled>px</button>
+        </div>
         <div class="col-auto my-2">
           <button class="btn btn-outline-primary" type="button" onclick="rsidHideAll(this)">
             <i class="fa-solid fa-eye-slash"></i> Hide All
-          </button>
-        </div>
-        <div class="col-auto my-2">
-          <button type="button" class="btn btn-outline-primary" onclick="exportSinglePDF()">
-            <i class="fa-solid fa-file-export"></i> PDF
           </button>
         </div>
         <div class="col-auto my-2">
@@ -42,7 +42,9 @@
             <button class="btn btn-outline-primary" id="increase-btn" type="button"onclick="increaseFontSize()">+</button>
         </div>
         <div class="col-auto my-2">
-          <input class="form-control col-auto" type="number" id="cardHeightInput" oninput="adjustCardHeight()" placeholder="Adjust height(px): 600">
+          <button type="button" class="btn btn-outline-primary" onclick="exportSinglePDF()">
+            <i class="fa-solid fa-file-export"></i> PDF
+          </button>
         </div>
       </div>
     </div>
