@@ -33,25 +33,6 @@ dummy_json_result = {
     ]
 }
 
-dummy_visualise_result = [
-    {
-        'file_name': 'doc1Student', 
-        'metadata': {
-            'title': 'doc1',
-            'created': datetime.datetime.now(), 
-            'paragraphs': ['This is text from doc1Student', 'I got another text']*30
-        }
-    }, 
-    {
-        'file_name': 'doc2Student', 
-        'metadata': {
-            'title': 'doc2',
-            'created': datetime.datetime.now(), 
-            'paragraphs': ['This is text from doc2Student', 'I now presented out']*50
-        }
-    }
-]
-
 @app.route('/', methods=['GET'])
 @app.route('/home', methods=['GET', 'POST'])
 def home():
@@ -144,9 +125,8 @@ def visualise():
                     'file_name': file2.filename,
                     'metadata': metadata2
                 })
-                print('metadata list:', metadata_list)
                 
-                return render_template('visualise.html', results=dummy_visualise_result, matching_rsid=matching_rsid, similarity=similarity, metadata_list=metadata_list, rsid_metadata=rsid_metadata)
+                return render_template('visualise.html', matching_rsid=matching_rsid, similarity=similarity, metadata_list=metadata_list, rsid_metadata=rsid_metadata)
             
             ## make loop for combinations to main file
             else:
