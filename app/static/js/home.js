@@ -238,7 +238,7 @@ function appendMatchResults(similarityResults) {
 
         $.each(values, (i, item) => {
             const card = $(`<div class="card-docx-display card col-3"></div>`)
-                .attr({ 'data-base-file': key, 'data-compare-file': item.filename });
+                .attr({ 'data-base-file': key, 'data-compare-file': item.filename, 'data-match-percent': item.value});
             card.append(
                 $('<div class="card shaded"></div>').append(
                     $('<div class="card-body"></div>').append(
@@ -390,3 +390,24 @@ $(document).ready(function() {
 
     $('#setting-bar-container').hide()
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    const slider = document.getElementById('matchSlider');
+    const sliderValue = document.getElementById('sliderValue');
+  
+    slider.addEventListener('input', function() {
+      const minValue = parseFloat(this.value);
+      sliderValue.textContent = minValue;
+  
+      const cards = document.querySelectorAll('#similarity-result .card-docx-display');
+  
+      cards.forEach(card => {
+        const matchPercent = parseFloat(card.getAttribute('data-match-percent'));
+        if (matchPercent >= minValue) {
+          card.style.display = '';  // Show the card
+        } else {
+          card.style.display = 'none';  // Hide the card
+        }
+      });
+    });
+  });
