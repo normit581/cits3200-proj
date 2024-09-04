@@ -393,11 +393,12 @@ $(document).ready(function() {
 
 document.addEventListener('DOMContentLoaded', function() {
     const slider = document.getElementById('matchSlider');
-    const sliderValue = document.getElementById('sliderValue');
+    const inputBox = document.getElementById('matchInput');
   
-    slider.addEventListener('input', function() {
-      const minValue = parseFloat(this.value);
-      sliderValue.textContent = minValue;
+    function updateFilter(value) {
+      const minValue = parseFloat(value);
+      inputBox.value = minValue;
+      slider.value = minValue;
   
       const cards = document.querySelectorAll('#similarity-result .card-docx-display');
   
@@ -409,5 +410,13 @@ document.addEventListener('DOMContentLoaded', function() {
           card.style.display = 'none';  // Hide the card
         }
       });
+    }
+  
+    slider.addEventListener('input', function() {
+      updateFilter(this.value);
+    });
+  
+    inputBox.addEventListener('input', function() {
+      updateFilter(this.value);
     });
   });
