@@ -65,12 +65,11 @@ function toggleElementsVisibility(isVisible) {
 
     const action = isVisible ? 'show' : 'hide';
     const containerClass = isVisible ? "container" : "container-fluid";
-    
+
     $navBar[action]();
     $settingBar[action]();
     $visualiseResult.attr("class", containerClass);
-    $visualiseResult.find(".card-body")
-        .toggleClass('pdf', !isVisible)
+    $visualiseResult.find(".card-body").toggleClass('pdf', !isVisible)
 }
 
 function exportPDF() {
@@ -91,4 +90,13 @@ $(document).ready(function() {
     $('#increase-btn').on('mousedown', function() {
         handleLongPress(increaseFontSize);
     }).on('mouseup mouseleave', clearLongPress);
+
+    $('p[data-colour]').each(function() {
+        const colour = $(this).data('colour');
+        const cssStyle = colour === 'red' ? 'color' : 'background-color';
+        const cssColour = colour === 'red' ? 'red' : `light${colour}`;
+        $(this).css(cssStyle, cssColour);
+        $(this).css('text-shadow', 'black 0px 0px 1px')
+        $(this).css('display', 'inline')
+    });
 });
