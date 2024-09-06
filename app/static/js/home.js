@@ -237,6 +237,14 @@ function match() {
         GenerateDangerAlertDiv('Failed!', 'Please add at least one file.');
         return;
     }
+    
+    const $warningItems = $('aside span').find('i.fa-triangle-exclamation');
+    if ($warningItems.length > 0) {
+        if(!confirm("Duplicate detected. Do you wish to continue?")){
+            return false; // Cancel form submission
+        }
+    }
+
     $('#similarity-result').empty();
     CallPost(`/home`, validateMatchForm(), onSuccessMatch, onErrorMatch, onXhrMatch);
 }
