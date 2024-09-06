@@ -112,8 +112,10 @@ function configureContextMenuButtons(){
         .on('mousedown', () => handleLongPress(() => adjustFontSize(1)))
         .on('mouseup mouseleave', clearLongPress);
 
-    $('#adjust-height-btn #cardHeightInput')
-        .on('input', () => adjustCardHeight() );
+    $('#custom-context-menu .input-group')
+        .on('mouseenter', function() { $(this).find('button').addClass('active'); })
+        .on('mouseleave', function() { $(this).find('button').removeClass('active'); });
+
 
     $('#hide-all-colour-btn').on('click', function() { 
         const $target = $('.card-body p');

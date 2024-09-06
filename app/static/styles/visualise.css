@@ -26,3 +26,7 @@ p[data-colour] {
     position: absolute;
     z-index : 999;
 }
+
+#custom-context-menu .input-group input {
+    width: 100px;
+}
