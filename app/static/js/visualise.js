@@ -91,4 +91,8 @@ $(document).ready(function() {
     $('#increase-btn').on('mousedown', function() {
         handleLongPress(increaseFontSize);
     }).on('mouseup mouseleave', clearLongPress);
+
+    const $heightInput = $('#cardHeightInput')
+    $heightInput.val(700)
+    $heightInput.trigger('oninput')
 });
