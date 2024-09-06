@@ -34,9 +34,13 @@ function rsidColourToggleVisibility(btn, target, isAll = false, hideText = 'Hide
 
 function switchVisualiseDocx(){
     const $visualiseDocxs = $('#visualise-result-container > .row > div')
-    const firstDocx = $visualiseDocxs[0]
-    const secondDocx = $visualiseDocxs[1]
+    const firstDocx = $visualiseDocxs[0];
+    const secondDocx = $visualiseDocxs[1];
+    const firstScrollPosition = $(firstDocx).find('.card-body').scrollTop();
+    const secondScrollPosition = $(secondDocx).find('.card-body').scrollTop();
     $(firstDocx).insertAfter($(secondDocx));
+    $(firstDocx).find('.card-body').scrollTop(firstScrollPosition);
+    $(secondDocx).find('.card-body').scrollTop(secondScrollPosition);
 }
 
 function adjustFontSize(direction) {
@@ -116,6 +120,11 @@ function configureContextMenuButtons(){
         .on('mouseenter', function() { $(this).find('button').addClass('active'); })
         .on('mouseleave', function() { $(this).find('button').removeClass('active'); });
 
+    $('#cardHeightInput')
+        .val(700)
+        .on('input', () => adjustCardHeight() )
+        .trigger('oninput');
+    adjustCardHeight();
 
     $('#hide-all-colour-btn').on('click', function() { 
         const $target = $('.card-body p');
