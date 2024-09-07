@@ -32,15 +32,22 @@ function rsidColourToggleVisibility(btn, target, isAll = false, hideText = 'Hide
     }
 }
 
+function scrollAdjustPosition(targets, func) {
+    const scrollPositions = targets.map(target => $(target).scrollTop());
+    func();
+    targets.forEach((target, index) => {
+        $(target).scrollTop(scrollPositions[index]);
+    });
+}
+
 function switchVisualiseDocx(){
-    const $visualiseDocxs = $('#visualise-result-container > .row > div')
+    const $visualiseDocxs = $('#visualise-result-container > .row > div');
     const firstDocx = $visualiseDocxs[0];
     const secondDocx = $visualiseDocxs[1];
-    const firstScrollPosition = $(firstDocx).find('.card-body').scrollTop();
-    const secondScrollPosition = $(secondDocx).find('.card-body').scrollTop();
-    $(firstDocx).insertAfter($(secondDocx));
-    $(firstDocx).find('.card-body').scrollTop(firstScrollPosition);
-    $(secondDocx).find('.card-body').scrollTop(secondScrollPosition);
+    const targets = [$($visualiseDocxs[0]).find('.card-body'), $($visualiseDocxs[1]).find('.card-body')];
+    scrollAdjustPosition(targets, function() {
+        $(firstDocx).insertAfter($(secondDocx));
+    });
 }
 
 function adjustFontSize(direction) {
@@ -66,9 +73,13 @@ function pdfToggleElementsVisibility(isVisible) {
 }
 
 function exportPDF() {
-    pdfToggleElementsVisibility(false);
-    window.print();
-    pdfToggleElementsVisibility(true);
+    const $visualiseDocxs = $('#visualise-result-container > .row > div .card-body');
+    const targets = [$visualiseDocxs[0], $visualiseDocxs[1]];
+    scrollAdjustPosition(targets, function() {
+        pdfToggleElementsVisibility(false);
+        window.print();
+        pdfToggleElementsVisibility(true);
+    });
 }
 
 function exportSinglePDF() {
