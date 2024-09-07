@@ -13,7 +13,9 @@ def extract_metadata(docx):
     return metadata
 
 
+
 def rsid_with_metadata(metadata, rsid1, rsid2, matching_rsid):
+
     # comparison dict with title and paragraphs[{rsid:, text:}]
     comparison_meta = {
         'title': metadata.get('title'),
@@ -50,3 +52,4 @@ def rsid_with_metadata(metadata, rsid1, rsid2, matching_rsid):
                 added_text.add((rsid,text))
     print(comparison_meta)
     return comparison_meta
+

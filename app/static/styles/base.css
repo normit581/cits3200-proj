@@ -1,3 +1,10 @@
+@media print {
+  body {
+    -webkit-print-color-adjust: exact; /* For WebKit browsers (Chrome, Safari, Edge) */
+    print-color-adjust: exact; /* For Firefox and standard-compliant browsers */
+  }
+}
+  
 body {
   font-family: "Nunito", sans-serif !important;
   font-style: normal;
@@ -155,7 +162,15 @@ input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+
 /* Firefox */
-input[type=number] {
+input[type="number"] {
   -moz-appearance: textfield;
+  appearance: none; /* General fallback for older browsers */
+}
+
+/* IE10+ and Edge (non-WebKit) */
+input[type="number"] {
+  -ms-appearance: none;
+  appearance: none;
 }
