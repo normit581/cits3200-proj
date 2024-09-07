@@ -27,6 +27,9 @@ function deleteListItem(e) {
     });
 
     if ($matchingWarnings.length > 1) {
+        if(!confirm("Note that all duplicated file name with warning will be removed. Continue?")){
+            return false;
+        }
         $matchingWarnings.last().find('i.fa-triangle-exclamation').remove();
         // Remove all but the last one
         $matchingWarnings.slice(0, -1).each(function() {
