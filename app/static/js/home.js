@@ -5,6 +5,7 @@ let currentFiles = new Map();
 const maxFiles = 2;
 const maxFileSize = 100 * 1024 * 1024; //100MB
 const maxTotalSize = maxFiles * maxFileSize;
+const contextMenuID = 'custom-context-menu';
 
 function toggleFileList(isOpen) {
     const fileListWidth = isOpen ? "15%" : "0%";
@@ -205,6 +206,7 @@ const onSuccessMatch = (response) => {
         setupVisualiseForm();
         $("#setting-bar-container").show();
         $("#upload-container").hide();
+        triggerContextMenuEvent($('main'), true);
     } else {
         GenerateDangerAlertDiv("Failed!", response.message);
     }
@@ -274,8 +276,8 @@ function appendMatchResults(similarityResults) {
 }
 
 function setupVisualiseForm() {
-    $('.card-docx-container > .card').on('click', function() {
-        const $card_docx = $(this);
+    $('.card-docx-container .card-body').on('click', function() {
+        const $card_docx = $(this).parents('.card-docx-display').first();
         const setBaseFile = setFileInput($card_docx.data("base-file"), "#base_file");
         const setCompareFile = setFileInput($card_docx.data("compare-file"), "#compare_file");
 
@@ -311,6 +313,7 @@ function reuploadFiles() {
     $("#reupload-container").hide();
     $('#setting-bar-container').hide();
     ScrollToTopPage();
+    triggerContextMenuEvent($('main'), false);
 }
 
 function toggleElementsVisibility(isVisible) {
@@ -319,6 +322,7 @@ function toggleElementsVisibility(isVisible) {
     const $similarityResult = $("#similarity-result");
     const $similarityResultAside = $similarityResult.find("aside");
     const $similarityResultDiv = $similarityResultAside.next();
+    const $contextMenu = $(`#${contextMenuID}`);
     
     const action = isVisible ? 'show' : 'hide';
     const containerClass = isVisible ? "container" : "container-fluid";
@@ -333,6 +337,7 @@ function toggleElementsVisibility(isVisible) {
         .find("> div")
         .toggleClass('pdf disable-hover', !isVisible);
     $similarityResultAside[action]();
+    $contextMenu[action]();
 }
 
 function exportPDF() {
@@ -380,13 +385,29 @@ function generateTitlePDF(element) {
 
 $(document).ready(function() {
     $(window).on('beforeunload', showRefreshAlert);
-
+    configureContextMenuButtons();
     setFileEvents();
     toggleFileList(false);
+
     $('#match-form').on('submit', function(e) {
         e.preventDefault();
         match();
     });
 
-    $('#setting-bar-container').hide()
 });
+
+// Context Menu functions
+function configureContextMenuButtons(){
+    $('#reupload-btn').on('click', () => reuploadFiles() );
+    
+    $('#pdf-btn').on('click', () => exportSinglePDF() );
+
+    $('#all-pdf-btn').on('click', () => exportAllPDF() );
+}
+
+const customFunc = function(e) {
+    e.preventDefault();
+    const selectedLabel = $('#similarity-result aside input:checked').next().text();
+    $('#pdf-btn').html(`<i class="fa-solid fa-file-export"></i> ${selectedLabel} PDF`);
+    showContextMenu(e);
+};
