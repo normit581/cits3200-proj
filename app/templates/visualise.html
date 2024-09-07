@@ -5,7 +5,6 @@
 {% block head %}
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/visualise.css')}}">
   <script src="{{ url_for('static', filename='js/visualise.js') }}" defer></script>
-  <script src="{{ url_for('static', filename='js/setting-bar.js') }}" defer></script>
 {% endblock %}
 
 {% block content %}
@@ -15,51 +14,40 @@
     </div>
 </div>
 
-<div class="container mb-4 px-1" id="setting-bar-container">
-  <div class="row mx-auto settings-bg-color">
-    <div class="collapse settings-bar container-fluid show col-11" id="settingsBar">
-      <div class="row justify-content-center">
-        <div class="input-group w-auto col-auto my-2">
-          <button type="button" class="input-group-text sharp-color btn btn-outline-primary" disabled>Height:</button>
-          <input type="number" class="form-control col-auto text-end" aria-label="Height (px)" id="cardHeightInput" oninput="adjustCardHeight()">
-          <button type="button" class="input-group-text sharp-color btn btn-outline-primary" disabled>px</button>
-        </div>
-        <div class="col-auto my-2">
-          <button class="btn btn-outline-primary" type="button" onclick="rsidHideAll(this)">
-            <i class="fa-solid fa-eye-slash"></i> Hide All
-          </button>
-        </div>
-        <div class="col-auto my-2">
-          <button type="button" class="btn btn-outline-primary" onclick="switchVisualiseDocx()">
-            <i class="fa-solid fa-right-left"></i> Switch
-          </button>
-        </div>
-        <div class="col-auto my-2 btn-group" role="group" aria-label="Font size adjustment">
-            <button class="btn btn-outline-primary" id="decrease-btn" type="button" onclick="decreaseFontSize()">-</button>
-            <button class="btn btn-outline-primary" type="button" onclick="resetFontSize()">
-              <i class="fa-solid fa-arrows-rotate"></i> Font Size
-            </button>
-            <button class="btn btn-outline-primary" id="increase-btn" type="button"onclick="increaseFontSize()">+</button>
-        </div>
-        <div class="col-auto my-2">
-          <button type="button" class="btn btn-outline-primary" onclick="exportSinglePDF()">
-            <i class="fa-solid fa-file-export"></i> PDF
-          </button>
-        </div>
-      </div>
+<div id="custom-context-menu">
+  <div class="btn-group-vertical" role="group" aria-label="Vertical button group">
+    <button id="pdf-btn" type="button" class="btn btn-light text-start">
+      <i class="fa-solid fa-file-export"></i> PDF
+    </button>
+    <button id="switch-card-btn" type="button" class="btn btn-light text-start" onclick="">
+      <i class="fa-solid fa-right-left"></i> Switch
+    </button>
+    <div class="btn-group" role="group" aria-label="Font size adjustment">
+        <button id="decrease-btn" class="btn btn-light text-start" id="" type="button">
+          <i class="fa-solid fa-minus"></i>
+        </button>
+        <button id="reset-btn" class="btn btn-light" type="button">
+          <i class="fa-solid fa-arrows-rotate"></i> Font Size
+        </button>
+        <button  id="increase-btn" class="btn btn-light text-end" type="button">
+          <i class="fa-solid fa-plus"></i>
+        </button>
     </div>
-    <div class="d-flex justify-content-end px-2 col-1 py-3">
-      <button id="settingsBarCollapseBtn" class="btn active border-0" type="button" data-bs-toggle="collapse" data-bs-target="#settingsBar" aria-expanded="true" aria-controls="settingsBar">
-        <i class="fa-solid fa-gear fa-2x"></i>
-      </button>
+    <div class="input-group">
+      <button type="button" class="rounded-0 sharp-color btn btn-light">Height:</button>
+      <input id="cardHeightInput" type="number" class="form-control text-end" aria-label="Height (px)">
+      <button type="button" class="rounded-0 sharp-color btn btn-light">px</button>
     </div>
+    <button id="hide-all-colour-btn" class="btn btn-light text-start" type="button">
+      <i class="fa-solid fa-eye-slash"></i> Hide All Colour
+    </button>
   </div>
 </div>
 
-<div class="container" id="visualise-result-container">
-  <div class="row mt-4">
+<div class="container-fluid" id="visualise-result-container">
+  <div class="row mt-4 justify-content-around">
       {% for document in metadata_list %}
-        <div class="col-6 ps-1 pe-1">
+        <div class="fluid-col-6 ps-1 pe-1">
             <div class="card">
                 <div class="card-header">
                     <h5>{{ document.file_name }}</h5>
@@ -67,7 +55,9 @@
                 </div>
                 <div class="card-body" style="overflow-y: auto;" id="card-body-{{ loop.index }}">
                     {% for paragraph in document.metadata.paragraphs %}
-                      <p>{{ paragraph }}</p>
+                      <div class="my-2">
+                        <p data-colour="{{document.metadata.colours[loop.index] }}">{{ paragraph }}</p>
+                      </div>
                     {% endfor %}
                 </div>
             </div>

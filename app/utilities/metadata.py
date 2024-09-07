@@ -1,5 +1,5 @@
 from docx import Document
-
+import random
 def extract_metadata(docx):
     doc = Document(docx)
     # metadata for display
@@ -8,8 +8,10 @@ def extract_metadata(docx):
         'created': doc.core_properties.created,
         'paragraphs': [para.text for para in doc.paragraphs if para.text.strip()]
     }
-    
+
+    metadata["colours"] = [['red', 'blue', 'green', 'yellow', 'cyan', 'grey'][random.randint(0,5)] for i in range(-1, len(metadata["paragraphs"]))]
     return metadata
+
 
 def rsid_with_metadata(metadata, matching_rsid):
     # comparison dict with title and paragraphs[{rsid:, text:}]
@@ -27,3 +29,4 @@ def rsid_with_metadata(metadata, matching_rsid):
             })
 
     return comparison_meta
+

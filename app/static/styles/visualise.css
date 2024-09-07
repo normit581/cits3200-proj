@@ -7,6 +7,26 @@
     height: auto !important;
 }
 
-#setting-bar-container .input-group input{
-    width: 80px;
+.fluid-col-6 {
+    flex: 0 0 auto;
+    width: 48.5%;
+}
+
+p[data-colour] {
+    text-shadow: black 0px 0px 1px;
+    display: inline;
+}
+
+.hidden-colour {
+    background-color: white !important;
+    color: black !important;
+}
+
+#custom-context-menu {
+    position: absolute;
+    z-index : 999;
+}
+
+#custom-context-menu .input-group input {
+    width: 100px;
 }
