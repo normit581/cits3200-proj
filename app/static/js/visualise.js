@@ -59,6 +59,9 @@ function clearLongPress() {
 function pdfToggleElementsVisibility(isVisible) {
     const $contextMenu = $(`#${contextMenuID}`);
     const action = isVisible ? 'show' : 'hide';
+    const $visualiseResult = $("#visualise-result-container");
+
+    $visualiseResult.find(".card-body").toggleClass('pdf', !isVisible)
     $contextMenu[action]();
 }
 
