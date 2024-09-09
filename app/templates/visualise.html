@@ -4,6 +4,7 @@
 
 {% block head %}
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/visualise.css')}}">
+  <script src="{{ url_for('static', filename='js/context-menu.js') }}" defer></script>
   <script src="{{ url_for('static', filename='js/visualise.js') }}" defer></script>
 {% endblock %}
 
@@ -19,7 +20,7 @@
     <button id="pdf-btn" type="button" class="btn btn-light text-start">
       <i class="fa-solid fa-file-export"></i> PDF
     </button>
-    <button id="switch-card-btn" type="button" class="btn btn-light text-start" onclick="">
+    <button id="switch-card-btn" type="button" class="btn btn-light text-start">
       <i class="fa-solid fa-right-left"></i> Switch
     </button>
     <div class="btn-group" role="group" aria-label="Font size adjustment">

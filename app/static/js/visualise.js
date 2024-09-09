@@ -32,15 +32,22 @@ function rsidColourToggleVisibility(btn, target, isAll = false, hideText = 'Hide
     }
 }
 
+function scrollAdjustPosition(targets, func) {
+    const scrollPositions = targets.map(target => $(target).scrollTop());
+    func();
+    targets.forEach((target, index) => {
+        $(target).scrollTop(scrollPositions[index]);
+    });
+}
+
 function switchVisualiseDocx(){
-    const $visualiseDocxs = $('#visualise-result-container > .row > div')
+    const $visualiseDocxs = $('#visualise-result-container > .row > div');
     const firstDocx = $visualiseDocxs[0];
     const secondDocx = $visualiseDocxs[1];
-    const firstScrollPosition = $(firstDocx).find('.card-body').scrollTop();
-    const secondScrollPosition = $(secondDocx).find('.card-body').scrollTop();
-    $(firstDocx).insertAfter($(secondDocx));
-    $(firstDocx).find('.card-body').scrollTop(firstScrollPosition);
-    $(secondDocx).find('.card-body').scrollTop(secondScrollPosition);
+    const targets = [$($visualiseDocxs[0]).find('.card-body'), $($visualiseDocxs[1]).find('.card-body')];
+    scrollAdjustPosition(targets, function() {
+        $(firstDocx).insertAfter($(secondDocx));
+    });
 }
 
 function adjustFontSize(direction) {
@@ -59,46 +66,42 @@ function clearLongPress() {
 function pdfToggleElementsVisibility(isVisible) {
     const $contextMenu = $(`#${contextMenuID}`);
     const action = isVisible ? 'show' : 'hide';
+    const $visualiseResult = $("#visualise-result-container");
+
+    $visualiseResult.find(".card-body").toggleClass('pdf', !isVisible)
     $contextMenu[action]();
 }
 
 function exportPDF() {
-    pdfToggleElementsVisibility(false);
-    window.print();
-    pdfToggleElementsVisibility(true);
+    const $visualiseDocxs = $('#visualise-result-container > .row > div .card-body');
+    const targets = [$visualiseDocxs[0], $visualiseDocxs[1]];
+    scrollAdjustPosition(targets, function() {
+        pdfToggleElementsVisibility(false);
+        window.print();
+        pdfToggleElementsVisibility(true);
+    });
 }
 
 function exportSinglePDF() {
     exportPDF();
 }
 
-function showContextMenu(e){
-    const $contextMenu = $(`#${contextMenuID}`);
-    const mouseX = e.pageX;
-    const mouseY = e.pageY;
-    const contextMenuHeight = $contextMenu.outerHeight();
-    const contextMenuWidth = $contextMenu.outerWidth();
-    const windowHeight = window.innerHeight;
-    const windowWidth = window.innerWidth;
-    
-    const availableSpaceBelow = windowHeight - (mouseY - window.scrollY);
-    const availableSpaceRight = windowWidth - mouseX;
+$(document).ready(function() {
+    $(`nav`).hide();
 
-    let topPosition = mouseY;
-    if (availableSpaceBelow < contextMenuHeight) {
-        topPosition = mouseY - contextMenuHeight;
-    }
+    configureContextMenuButtons();
 
-    let leftPosition = mouseX;
-    if (availableSpaceRight < contextMenuWidth) {
-        leftPosition = mouseX - contextMenuWidth;
-    }
+    $('p[data-colour]').each(function() {
+        const colour = $(this).data('colour');
+        const cssStyle = colour === 'red' ? 'color' : 'background-color';
+        const cssColour = colour === 'red' ? 'red' : `light${colour}`;
+        $(this).css(cssStyle, cssColour);
+    });
 
-    $contextMenu
-        .css({ top: `${topPosition}px`, left: `${leftPosition}px` })
-        .show();
-}
+    triggerContextMenuEvent($('.card-body > div'), true);
+});
 
+// Context Menu functions
 function configureContextMenuButtons(){
     $('#pdf-btn').on('click', () => exportSinglePDF() );
 
@@ -132,50 +135,31 @@ function configureContextMenuButtons(){
     });
 }
 
-$(document).ready(function() {
-    $(`nav, #${contextMenuID}`).hide();
+const customFunc = function(e) {
+    e.preventDefault();
 
-    configureContextMenuButtons();
+    const $divContainer = $(this);
+    const $btnGroup = $(`#${contextMenuID} .btn-group-vertical`);
+    $btnGroup.find('.rsidButton').remove();
 
-    $('p[data-colour]').each(function() {
-        const colour = $(this).data('colour');
-        const cssStyle = colour === 'red' ? 'color' : 'background-color';
-        const cssColour = colour === 'red' ? 'red' : `light${colour}`;
-        $(this).css(cssStyle, cssColour);
-    });
-
-    $(document).on('contextmenu', '.card-body > div', function (e) {
-        e.preventDefault();
-
-        const $divContainer = $(this);
-        const $btnGroup = $(`#${contextMenuID} .btn-group-vertical`);
-        $btnGroup.find('.rsidButton').remove();
-
-        $divContainer.find('p').each(function() {
-            const $pTarget = $(this);
-            const isVisible = $pTarget.hasClass('hidden-colour');
-            const buttonHTML = isVisible 
-                ? `<i class="fa-solid fa-eye ps-2"></i> Unhide Colour ${$pTarget.data('colour')}` 
-                : `<i class="fa-solid fa-eye-slash ps-2"></i> Hide Colour ${$pTarget.data('colour')}`;
-            
-            const $button = $('<button>', {
-                class: 'btn btn-light text-start rsidButton',
-                type: 'button',
-                html: buttonHTML
-            });
-
-            $button.click(function() {
-                rsidColourToggleVisibility(this, $pTarget);
-            });
-            $btnGroup.append($button);
+    $divContainer.find('p').each(function() {
+        const $pTarget = $(this);
+        const isVisible = $pTarget.hasClass('hidden-colour');
+        const buttonHTML = isVisible 
+            ? `<i class="fa-solid fa-eye ps-2"></i> Unhide Colour ${$pTarget.data('colour')}` 
+            : `<i class="fa-solid fa-eye-slash ps-2"></i> Hide Colour ${$pTarget.data('colour')}`;
+        
+        const $button = $('<button>', {
+            class: 'btn btn-light text-start rsidButton',
+            type: 'button',
+            html: buttonHTML
         });
 
-        showContextMenu(e);
+        $button.click(function() {
+            rsidColourToggleVisibility(this, $pTarget);
+        });
+        $btnGroup.append($button);
     });
 
-    $(document).on('click', function(e) {
-        if (!$(e.target).closest(`#${contextMenuID}`).length) {
-            $(`#${contextMenuID}`).hide();
-        }
-    });
-});
+    showContextMenu(e);
+};

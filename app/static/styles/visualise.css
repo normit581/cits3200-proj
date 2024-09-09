@@ -21,12 +21,3 @@ p[data-colour] {
     background-color: white !important;
     color: black !important;
 }
-
-#custom-context-menu {
-    position: absolute;
-    z-index : 999;
-}
-
-#custom-context-menu .input-group input {
-    width: 100px;
-}
