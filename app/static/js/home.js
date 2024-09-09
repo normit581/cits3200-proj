@@ -21,13 +21,29 @@ function handleFileList(change) {
 
 function deleteListItem(e) {
     const { itemId, filename } = e.data;
-    const listItem = $(`#list-item-${itemId}`);
-    
-    listItem.tooltip('dispose');
-    listItem.remove();
+    const $listItem = $(`#list-item-${itemId}`);
+
+    const $matchingWarnings = $('aside span').filter(function() {
+        return $(this).find('p').text().trim() === $listItem.find('p').text().trim();
+    });
+
+    if ($matchingWarnings.length > 1) {
+        if(!confirm("Note that all duplicated file name with warning will be removed. Continue?")){
+            return false;
+        }
+        $matchingWarnings.last().find('i.fa-triangle-exclamation').remove();
+        // Remove all but the last one
+        $matchingWarnings.slice(0, -1).each(function() {
+            $(this).tooltip('dispose'); // Dispose tooltips before removing
+            $(this).remove(); // Remove the element
+        });
+    } else{
+        $listItem.tooltip('dispose');
+        $listItem.remove();
+        currentFiles.delete(filename);
+    }
     
     handleFileList(-1);
-    currentFiles.delete(filename);
     updateFileInput();
     updateProgressBar();
 }
@@ -41,6 +57,13 @@ function createListItem(name) {
     
     const para = $('<p>').text(name);
     
+    let warningIcon = '';
+    if (currentFiles.has(filename)){
+        warningIcon = $('<i>')
+            .attr('title', 'duplicate file detected')
+            .addClass('fa-solid fa-triangle-exclamation text-warning mt-1 mx-auto text-center');
+    }
+
     const item = $('<span>')
         .attr({
             'data-bs-toggle': 'tooltip',
@@ -50,8 +73,8 @@ function createListItem(name) {
         })
         .addClass('d-flex justify-content-between')
         .tooltip()
-        .append(para, delIcon);
-    
+        .append(warningIcon, para, delIcon);
+
     fileId++;
     return item;
 }
@@ -140,9 +163,11 @@ function handleFiles(files) {
         }
 
         handleFileList(1);
-        currentFiles.set(fileNameWithoutExt(file.name), file);
         const item = createListItem(file.name);
         $fileList.append(item);
+
+        currentFiles.set(fileNameWithoutExt(file.name), file);
+
         updateFileInput();
         applyConfirmAnimation();
         updateProgressBar();
@@ -217,6 +242,14 @@ function match() {
         GenerateDangerAlertDiv('Failed!', 'Please add at least one file.');
         return;
     }
+    
+    const $warningItems = $('aside span').find('i.fa-triangle-exclamation');
+    if ($warningItems.length > 0) {
+        if(!confirm("Duplicate detected. Do you wish to continue?")){
+            return false; // Cancel form submission
+        }
+    }
+
     $('#similarity-result').empty();
     CallPost(`/home`, validateMatchForm(), onSuccessMatch, onErrorMatch, onXhrMatch);
 }
