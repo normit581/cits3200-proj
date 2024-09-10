@@ -48,12 +48,10 @@ the deployment script.
 The config file that is parsed during deployment is `app.env`, so it has to
 contain all the following variables.
 
-| Variable Name    | Description                                                                                                 |
-|:----------------:|:------------------------------------------------------------------------------------------------------------|
-| `FLASK_DEBUG`    | A flag that starts the app in debug mode. Should be set to `False` for production and `True` during testing |
-| `FLASK_RUN_HOST` | should only be needed for development server and be set to `0.0.0.0`                                        |
-| `FLASK_RUN_PORT` | should only be needed for a development server and be set to `5000`                                         |
-| `SECRET_KEY`     | A key that can be used to protect the website. Follow (these steps)[#Generating A Key] to configure a key   |
+| Variable Name | Required | Description                                                                                                 |
+|:-------------:|:--------:|:------------------------------------------------------------------------------------------------------------|
+| `FLASK_DEBUG` | Optional | should only be set to `True` during development                                                             |
+| `SECRET_KEY`  | Required | A key that can be used to protect the website. Follow [these steps](#Generating-A-Key) to configure a key   |
 
 ## Generating A Key
 
@@ -74,7 +72,5 @@ this (the SECRET_KEY used is just an example)
 
 ```env
 FLASK_DEBUG=False
-FLASK_RUN_HOST=0.0.0.0
-FLASK_RUN_PORT=5000
 SECRET_KEY=06ca425d9bc0b3375983f595c849d4ff755d9dd727a4f98bd40d3c6fb6957a87
 ```
