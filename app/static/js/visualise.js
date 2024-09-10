@@ -1,4 +1,5 @@
 const defaultFontSize = 16; // Default font size
+const defaultTextColour = 'red'; // Default font size
 let currentFontSize = defaultFontSize;
 let longPressInterval;
 const contextMenuID = 'custom-context-menu';
@@ -93,8 +94,8 @@ $(document).ready(function() {
 
     $('p[data-colour]').each(function() {
         const colour = $(this).data('colour');
-        const cssStyle = colour === 'red' ? 'color' : 'background-color';
-        const cssColour = colour === 'red' ? 'red' : `light${colour}`;
+        const cssStyle = colour === defaultTextColour ? 'color' : 'background-color';
+        const cssColour = colour === defaultTextColour ? defaultTextColour : `light${colour}`;
         $(this).css(cssStyle, cssColour);
     });
 
@@ -145,20 +146,56 @@ const customFunc = function(e) {
     $divContainer.find('p').each(function() {
         const $pTarget = $(this);
         const isVisible = $pTarget.hasClass('hidden-colour');
-        const buttonHTML = isVisible 
-            ? `<i class="fa-solid fa-eye ps-2"></i> Unhide Colour ${$pTarget.data('colour')}` 
-            : `<i class="fa-solid fa-eye-slash ps-2"></i> Hide Colour ${$pTarget.data('colour')}`;
+        const colourName = $pTarget.data('colour');
+        const isMatchTextColour = colourName === defaultTextColour;
+        const colourHEX = colourNameToHex(isMatchTextColour ? defaultTextColour : `light${colourName}`)
         
+        const $icon = $('<i>', {
+            'data-id': `${contextMenuID}-colour-btn`,
+            class: `fa-solid ${isVisible ? 'fa-eye' : 'fa-eye-slash'}`
+        });
+
+        const $text = $('<div>', {
+            class: 'col-auto',
+            text: `${isVisible ? 'Hide' : 'Unhide'} Colour ${colourName}`
+        });
+
+        const $colorInput = $('<input>', {
+            type: 'color',
+            'data-id': 'color-picker',
+            class: 'mt-1',
+            value: colourHEX
+        });
+
+        const $row = $('<div>', {
+            class: 'row',
+            html: $('<div>', { class: 'col-auto ps-4' }).append($icon)
+                .add($text)
+                .add($('<div>', { class: 'col-auto' }).append($colorInput))
+        });
+
         const $button = $('<button>', {
             class: 'btn btn-light text-start rsidButton',
             type: 'button',
-            html: buttonHTML
+            html: $row
         });
 
-        $button.click(function() {
-            rsidColourToggleVisibility(this, $pTarget);
-        });
         $btnGroup.append($button);
+        
+        $colorInput.on('input', function(){
+            const cssStyle = isMatchTextColour ? 'color' : 'background-color';
+            $pTarget.css(cssStyle, $(this).val());
+        });
+
+        $button.click(function(e) {
+            if (!$(e.target).closest("[data-id='color-picker']").length) {
+                rsidColourToggleVisibility(this, $pTarget);
+                forceOpenContextMenu = true;
+                setTimeout(function() {
+                    forceOpenContextMenu = false;
+                }, 100); // Delay of 100ms
+            }
+        });
     });
 
     showContextMenu(e);
