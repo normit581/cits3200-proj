@@ -1,5 +1,3 @@
-let forceOpenContextMenu = false;
-
 function showContextMenu(e){
     const $contextMenu = $(`#${contextMenuID}`);
     const mouseX = e.pageX;
@@ -37,7 +35,7 @@ $(document).ready(function() {
     $(`#${contextMenuID}`).hide();
 
     $(document).on('click', function(e) {
-        if (!forceOpenContextMenu && !$(e.target).closest(`#${contextMenuID}`).length) {
+        if (!$(e.target).closest(`#${contextMenuID}`).length) {
             $(`#${contextMenuID}`).hide();
         }
     });

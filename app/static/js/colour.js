@@ -19,3 +19,16 @@ function colourNameToHex(colourName) {
     }
     return null; // Return null if the colour couldn't be determined
 }
+
+function rgbToHex(r, g, b) {
+    return "#" + [r, g, b].map(x => {
+        const hex = x.toString(16);
+        return hex.length === 1 ? "0" + hex : hex;
+    }).join('');
+}
+
+function rgbStringToHex(rgb) {
+    // Extract the numbers from the RGB string
+    const result = rgb.match(/\d+/g).map(Number);
+    return rgbToHex(result[0], result[1], result[2]);
+}

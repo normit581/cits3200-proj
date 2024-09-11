@@ -3,6 +3,7 @@ const defaultTextColour = 'red'; // Default font size
 let currentFontSize = defaultFontSize;
 let longPressInterval;
 const contextMenuID = 'custom-context-menu';
+var x;
 
 function adjustCardHeight() {
     const height = document.getElementById('cardHeightInput').value;
@@ -12,24 +13,40 @@ function adjustCardHeight() {
     });
 }
 
+// Helper function to replace only the text content (ignoring HTML tags)
+function toggleButtonText(targetBtn, fromText, toText) {
+    targetBtn = targetBtn.hasClass('rsidButton') ? targetBtn.find('.text') : targetBtn;
+    x=targetBtn
+    $(targetBtn).contents().filter(function() {
+        return this.nodeType === 3;  // Node type 3 is a text node
+    }).each(function() {
+        this.textContent = this.textContent.replace(fromText, toText);
+    });
+}
+
 function rsidColourToggleVisibility(btn, target, isAll = false, hideText = 'Hide', showText = 'Unhide') {
     const $btn = $(btn);
     const $icon = $btn.find('i');
-
+    
     const isHidden = $icon.hasClass('fa-eye-slash');
     const action = isHidden ? 'addClass' : 'removeClass';
-    const reverse = isHidden ? 'removeClass' : 'addClass';
+    const reverseAction = isHidden ? 'removeClass' : 'addClass';
+    const hideAction = isHidden ? 'hide' : 'show';
     
-    $icon[action]('fa-eye')[reverse]('fa-eye-slash');
-    $btn.html($btn.html().replace(isHidden ? showText : hideText, isHidden ? hideText : showText));
+    $icon[action]('fa-eye')[reverseAction]('fa-eye-slash');
+
+    toggleButtonText($btn, isHidden ? hideText : showText, isHidden ? showText : hideText);
 
     $(target)[action]('hidden-colour');
 
-    if (isAll)
+    if (isAll) {
         $btn.siblings('button.rsidButton').each(function() {
-            $(this).find('i')[action]('fa-eye')[reverse]('fa-eye-slash');
-            $(this).html($(this).html().replace(isHidden ? showText : hideText, isHidden ? hideText : showText));
-        });{
+            const $siblingBtn = $(this);
+            const $siblingIcon = $siblingBtn.find('i');
+            toggleButtonText($siblingBtn, isHidden ? hideText : showText, isHidden ? showText : hideText);
+            $siblingBtn.find('[data-id=color-picker]')[hideAction]();
+            $siblingIcon[action]('fa-eye')[reverseAction]('fa-eye-slash');
+        });
     }
 }
 
@@ -95,8 +112,8 @@ $(document).ready(function() {
     $('p[data-colour]').each(function() {
         const colour = $(this).data('colour');
         const cssStyle = colour === defaultTextColour ? 'color' : 'background-color';
-        const cssColour = colour === defaultTextColour ? defaultTextColour : `light${colour}`;
-        $(this).css(cssStyle, cssColour);
+        const cssColourHEX = colourNameToHex(colour === defaultTextColour ? defaultTextColour : `light${colour}`)
+        $(this).css(cssStyle, cssColourHEX);
     });
 
     triggerContextMenuEvent($('.card-body > div'), true);
@@ -146,9 +163,14 @@ const customFunc = function(e) {
     $divContainer.find('p').each(function() {
         const $pTarget = $(this);
         const isVisible = $pTarget.hasClass('hidden-colour');
-        const colourName = $pTarget.data('colour');
-        const isMatchTextColour = colourName === defaultTextColour;
-        const colourHEX = colourNameToHex(isMatchTextColour ? defaultTextColour : `light${colourName}`)
+        const isMatchTextColour = $pTarget.data('colour') === defaultTextColour;
+        const cssStyle = isMatchTextColour ? 'color' : 'background-color';
+        let colourRGB = $pTarget.css(cssStyle);
+        if (isVisible) {
+            colourRGB = $pTarget.toggleClass('hidden-colour').css(cssStyle);
+            $pTarget.toggleClass('hidden-colour');;
+        }
+        const colourHEX = rgbStringToHex(colourRGB)
         
         const $icon = $('<i>', {
             'data-id': `${contextMenuID}-colour-btn`,
@@ -156,8 +178,8 @@ const customFunc = function(e) {
         });
 
         const $text = $('<div>', {
-            class: 'col-auto',
-            text: `${isVisible ? 'Hide' : 'Unhide'} Colour ${colourName}`
+            class: 'col-auto text',
+            text: `${isVisible ? 'Unhide' : 'Hide'} Colour ${colourHEX}`
         });
 
         const $colorInput = $('<input>', {
@@ -175,26 +197,24 @@ const customFunc = function(e) {
         });
 
         const $button = $('<button>', {
-            class: 'btn btn-light text-start rsidButton',
+            class: 'btn btn-light text-start rsidButton py-0',
             type: 'button',
             html: $row
         });
 
         $btnGroup.append($button);
-        
+
+        $colorInput[isVisible ? 'hide': 'show']();
         $colorInput.on('input', function(){
-            const cssStyle = isMatchTextColour ? 'color' : 'background-color';
+            toggleButtonText($text, rgbStringToHex($pTarget.css(cssStyle)), $(this).val())
             $pTarget.css(cssStyle, $(this).val());
         });
 
         $button.click(function(e) {
             if (!$(e.target).closest("[data-id='color-picker']").length) {
                 rsidColourToggleVisibility(this, $pTarget);
-                forceOpenContextMenu = true;
-                setTimeout(function() {
-                    forceOpenContextMenu = false;
-                }, 100); // Delay of 100ms
             }
+            $button.find('[data-id=color-picker]')[$pTarget.hasClass('hidden-colour') ? 'hide': 'show']();
         });
     });
 
