@@ -1,6 +1,7 @@
 from flask import render_template, flash, request, jsonify, redirect
 from app import app
 from app.forms import MatchDocumentForm, VisualiseDocumentForm
+from app.helper import FileHelper
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import RequestEntityTooLarge
 
@@ -16,22 +17,6 @@ from itertools import combinations
 @app.context_processor
 def inject_global_variable():
     return dict(project_name="DocuMatcher")
-
-dummy_json_result = {
-    "doc1Student": [
-        {"filename": "doc2Student", "value": 35.32, "count":3200}, 
-    ]*30,
-    "doc2Student": [
-        {"filename": "doc1Student", "value": 20.55, "count":2000},
-    ],
-    "doc3Student": [
-        {"filename": "doc1Student", "value": 0.1, "count":20},
-    ],
-    "doc4Student": [
-        {"filename": "doc3Student", "value": 0.5, "count":98}, 
-        {"filename": "doc4Student", "value": 0.000, "count":3}
-    ]
-}
 
 @app.route('/', methods=['GET'])
 @app.route('/home', methods=['GET', 'POST'])
@@ -58,8 +43,10 @@ def home():
                     for j, file2 in enumerate(file_data):
                         if i != j:
                             similarity, matching_rsid = rsid_match2(file1['rsid'], file2['rsid'])
-                            comparisons.append({'filename': file2['filename'], 'value': similarity, 'count': file2['rsid'][-1]})
-                    result[file1['filename']] = comparisons
+                            file_without_est = FileHelper.remove_extension(file2['filename'])
+                            comparisons.append({'filename': file_without_est, 'value': similarity, 'count': file2['rsid'][-1]})
+                    file_without_est = FileHelper.remove_extension(file1['filename'])
+                    result[file_without_est] = comparisons
 
                 print(f"Processed results: {result}")
                 
