@@ -4,14 +4,19 @@ from utility.log import Log
 from utility.gen import *
 
 import sys
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
 from app.utilities.rsid import rsid_extract, rsid_match2
+
+TEST_DIRECTORY = 'testdocs'         # change this to the directory palcing docx files
+TEST_DOCUMENT = 'document_0.docx'   # change this to sample .docx file
+LOG_DIRECTORY = "logs"
+LOG_FILE = "test_log.txt"
 
 @pytest.fixture(scope="class")
 def setup_logger():
     logger = Log()
-    logger.set_log_path("test_logs", "test_rsid_method.txt")
+    logger.set_log_path(LOG_DIRECTORY, LOG_FILE) 
     logger.log("START test", 'info')
     
     # Yield the logger for use in tests
@@ -22,9 +27,10 @@ def setup_logger():
 
 @pytest.fixture(scope="class")
 def setup_files():
-    test_directory = 'testdocs'
-    current = 'document_0.docx' # change this to sample .docx file
+    test_directory = TEST_DIRECTORY
+    current = TEST_DOCUMENT 
     current_file = os.path.join(test_directory, current)
+    print(current_file)
     
     # Generate random .docx if current not in test_directory
     if current not in os.listdir(test_directory):
