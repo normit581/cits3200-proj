@@ -26,7 +26,7 @@ def test_rsid_extract(setup_logger, setup_files):
     
             assert rsid_count == count
             
-            test_log = f"{file} - RSID count: {rsid_count} - RSID dictionary: {rsid_dict}"
+            test_log = f"{file} - RSID count: {rsid_count}"
             logger.log(test_log, 'info')
 
 # test /app/utilities/rsid.py function rsid_match()
