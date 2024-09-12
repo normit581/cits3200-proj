@@ -151,6 +151,11 @@ function configureContextMenuButtons(){
         const $target = $('.card-body p');
         rsidColourToggleVisibility(this, $target, isAll = true);
     });
+
+    $('#hide-individual-colour-btn').on('click', function() { 
+        const $target = $('.card-body p').not(`[data-colour="${defaultTextColour}"]`);
+        rsidColourToggleVisibility(this, $target, true, hideText='Hide', showText='Show');
+    });
 }
 
 const customFunc = function(e) {
