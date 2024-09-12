@@ -41,17 +41,29 @@ def home():
     if request.method == 'POST':
         if request.content_length and request.content_length > app.config['MAX_CONTENT_LENGTH']:
             return jsonify({'error': f'File size exceeds the maximum limit of {app.config["MAX_CONTENT_LENGTH"] // (1024 * 1024)}MB.'}), 413
-        
         if form.validate_on_submit():
             try:
+                file_data = []
+                # process file by extracting filename and rsid, count
                 for file in form.files.data:
                     filename = secure_filename(file.filename)
-                    print(f"Processing file: {filename}")
+                    rsid = rsid_extract(file)
+                    file_data.append({'filename': filename, 'rsid': rsid, 'count': rsid[-1]})
+                # result dict for comparison loop
+                result = {}
+                # loop through files, if file isnt current one then add filename, similarity and rsid count.
+                for i, file1 in enumerate(file_data):
+                    comparisons = []
+                    print(f"Comparing file: {file1['filename']}")
+                    for j, file2 in enumerate(file_data):
+                        if i != j:
+                            similarity, matching_rsid = rsid_match2(file1['rsid'], file2['rsid'])
+                            comparisons.append({'filename': file2['filename'], 'value': similarity, 'count': file2['rsid'][-1]})
+                    result[file1['filename']] = comparisons
 
-                # extract rsid and calculate similarity
-                # similarity_result_map, similarity_result_lst = rsid_match2(form.files)
+                print(f"Processed results: {result}")
                 
-                return jsonify({'message': 'Files processed successfully.', 'data' : dummy_json_result, 'success': True})
+                return jsonify({'message': 'Files processed successfully.', 'data' : result, 'success': True})
             except Exception as e:
                 app.logger.error(f"Error processing files: {str(e)}")
                 return jsonify({'error': 'An error occurred while processing the files.'}), 500
@@ -106,14 +118,15 @@ def visualise():
 
                 rsid1 = rsid_extract(file1)
                 rsid2 = rsid_extract(file2)
-
+                print(rsid1)
+                print('here')
                 similarity, matching_rsid = rsid_match2(rsid1, rsid2)
                 # print(f"Similarity: {similarity:.03f}%")
                 # print('matching_rsid:', matching_rsid)
         
                 # extract data
                 metadata1, metadata2 = extract_metadata(file1), extract_metadata(file2)
-
+                print(metadata1)
                 # rsid associated with text function call
                 rsid_metadata = rsid_with_metadata(metadata1, matching_rsid)
                 metadata_list.append({
@@ -127,34 +140,4 @@ def visualise():
                 })
                 
                 return render_template('visualise.html', matching_rsid=matching_rsid, similarity=similarity, metadata_list=metadata_list, rsid_metadata=rsid_metadata)
-            
-            ## make loop for combinations to main file
-            else:
-                file1 = files[0]
-                rsid1 = rsid_extract(file1)
-                metadata1 = extract_metadata(file1)
-                metadata_list.append({
-                    'file_name': file1.filename,
-                    'metadata': metadata1
-                })
-                
-                similarity_results = []
-                rsid_metadata_list = []
-
-                for file in files[1:]:
-                    rsid2 = rsid_extract(file)
-
-                    similarity, matching_rsid= rsid_match2(rsid1, rsid2)
-
-                    metadata2 = extract_metadata(file)
-                    # add metadata for compared file
-                    metadata_list.append({
-                        'filename': file.filename,
-                        'metadata': metadata2
-                    })
-                    #calc rsid for text
-                    rsid_metadata = rsid_with_metadata(metadata1, matching_rsid)
-                    rsid_metadata_list.append(rsid_metadata)
-                    similarity_results.append({"file": file.filename, "similarity": similarity})
-                return render_template('visualise.html', form=form, similarity=similarity_results, metadata_list=metadata_list, rsid_metadata_list=rsid_metadata_list)
     return render_template('visualise.html', form=form)
