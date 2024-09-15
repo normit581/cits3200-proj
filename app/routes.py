@@ -29,6 +29,9 @@ def home():
                     file_data.append({'filename': filename, 'rsid': rsid, 'count': rsid[-1]})
                 # result dict for comparison loop
                 result = {}
+
+                # print("meta", metadata_list)
+                # print("rsid:", rsid_extracts)
                 # loop through files, if file isnt current one then add filename, similarity and rsid count.
                 for i, file1 in enumerate(file_data):
                     comparisons = []
@@ -88,7 +91,7 @@ def visualise():
         # Get the data from the form
         if form.validate_on_submit():
             files = [form.base_file.data, form.compare_file.data]
-
+            
             # Create loop that will iterate for the number of files in files
             # error check
             metadata_list = []
@@ -105,10 +108,10 @@ def visualise():
                 # print('matching_rsid:', matching_rsid)
         
                 # extract data
-                metadata1, metadata2 = extract_metadata(file1), extract_metadata(file2)
+                metadata1, metadata2 = extract_metadata(file1, rsid1, rsid2, matching_rsid)
                 print(metadata1)
                 # rsid associated with text function call
-                rsid_metadata = rsid_with_metadata(metadata1, matching_rsid)
+
                 metadata_list.append({
                     'file_name': file1.filename,
                     'metadata': metadata1
