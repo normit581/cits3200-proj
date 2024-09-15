@@ -57,7 +57,7 @@
                 <div class="card-body" style="overflow-y: auto;" id="card-body-{{ loop.index }}">
                     {% for paragraph in document.metadata.paragraphs %}
                       <div class="my-2">
-                        <p data-colour="{{document.metadata.colours[loop.index] }}">{{ paragraph }}</p>
+                        <p data-colour="{{ paragraph.colour }}">{{ paragraph.text }}</p>
                       </div>
                     {% endfor %}
                 </div>
