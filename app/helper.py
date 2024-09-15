@@ -1,5 +1,4 @@
-import os
-import zipfile
+import os, zipfile, random
 from bs4 import BeautifulSoup
 from docx import Document
 from app.utilities.metadata import PROPERTY
@@ -9,6 +8,22 @@ class FileHelper:
     def remove_extension(filename: str) -> str:
         """Removes the extension from the provided filename."""
         return os.path.splitext(filename)[0]
+
+
+class ColourHelper:
+    @staticmethod    
+    def random_standard_rgb_str():
+        colours = [
+            [255, 0, 0], [255, 255, 0], [139, 0, 0], [139, 139, 0], 
+            [128, 0, 0], [128, 128, 0], [100, 0, 0], [100, 100, 0],
+            [255, 165, 0], [255, 140, 0], [255, 192, 203], [165, 42, 42]]
+        colour = random.choice(colours)
+        random.shuffle(colour)
+        return f"rgb({colour[0]},{colour[1]},{colour[2]})"
+    
+    @staticmethod    
+    def random_light_rgb_str():
+        return f"rgb({random.randint(200, 255)}, {random.randint(200, 255)}, {random.randint(200, 255)})" 
 
 
 class XMLHelper:

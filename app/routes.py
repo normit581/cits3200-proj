@@ -1,9 +1,8 @@
 from flask import render_template, flash, request, jsonify
+from werkzeug.utils import secure_filename
 from app import app
 from app.forms import MatchDocumentForm, VisualiseDocumentForm
-from app.helper import FileHelper, XMLHelper
-from werkzeug.utils import secure_filename
-
+from app.helper import FileHelper, XMLHelper, ColourHelper
 from app.utilities.rsid import *
 from app.utilities.metadata import *
 
@@ -125,15 +124,6 @@ def visualise():
                 return render_template('visualise.html', matching_rsid=matching_rsid, similarity=similarity, metadata_list=metadata_list, rsid_metadata=rsid_metadata)
     return render_template('visualise.html', form=form)
 
-def random_colour():
-    colours = [
-        [255, 0, 0], [255, 255, 0], [139, 0, 0], [139, 139, 0], 
-        [128, 0, 0], [128, 128, 0], [100, 0, 0], [100, 100, 0],
-        [255, 165, 0], [255, 140, 0], [255, 192, 203], [165, 42, 42]]
-    colour = random.choice(colours)
-    random.shuffle(colour)
-    return f"{colour[0]},{colour[1]},{colour[2]}"
-
 @app.route('/visualise2', methods=['POST'])
 def visualise2():
     form = VisualiseDocumentForm()
@@ -154,12 +144,12 @@ def visualise2():
 
         # Determine common RSIDs
         common_rsids = all_rsids[0].intersection(all_rsids[1])
-        shared_colours = {rsid: f"rgb({random_colour()})" for rsid in common_rsids}
+        shared_colours = {rsid: {ColourHelper.random_standard_rgb_str()} for rsid in common_rsids}
 
         # Process each document
         for i, docx in enumerate(docx_objects):
             filename = secure_filename(files[i].filename)
-            colours = {rsid: f"rgb({random.randint(200, 255)}, {random.randint(200, 255)}, {random.randint(200, 255)})" for rsid in docx.unique_rsid.keys()}
+            colours = {rsid: ColourHelper.random_light_rgb_str() for rsid in docx.unique_rsid.keys()}
             paragraphs = [
                 [
                     {
