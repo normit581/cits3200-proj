@@ -321,7 +321,9 @@ function setupVisualiseForm() {
 }
 
 function setFileInput(filename, inputID) {
-    const fileData = currentFiles.get(filename);
+    const key = filename.replace('.docx', '');
+    const fileData = currentFiles.get(key);
+    filename.replace('.docx', '');
     if (!fileData) {
         GenerateDangerAlertDiv("Failed!", `File: ${filename} not found. Please try reupload.`);
         return false;
