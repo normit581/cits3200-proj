@@ -17,6 +17,14 @@ p[data-colour] {
     display: inline;
 }
 
+p[data-is-match="true"] {
+    background-color: white !important;
+}
+
+p[data-is-match="false"] {
+    color: black !important;
+}
+
 .hidden-colour {
     background-color: white !important;
     color: black !important;
