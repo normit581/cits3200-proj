@@ -1,5 +1,6 @@
 import os
 import pytest
+from werkzeug.datastructures import FileStorage
 from utility.log import Log
 from utility.gen import *
 
@@ -9,6 +10,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../.
 from app.utilities.rsid import rsid_extract, rsid_match2
 from app import app
 
+# app.config['WTF_CSRF_ENABLED'] = False
 TEST_DIRECTORY = 'testdocs'         # change this to the directory palcing docx files
 TEST_DOCUMENT = 'document_0.docx'   # change this to sample .docx file
 LOG_DIRECTORY = "logs"
