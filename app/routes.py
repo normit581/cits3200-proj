@@ -166,8 +166,8 @@ def visualise2():
             result = {
                 "file_name": filename,
                 "metadata": {
-                    "title": docx.get_metadata(docx.TITLE),
-                    "created": docx.get_metadata(docx.DATE_CREATED),
+                    "title": docx.get_metadata(DOCX.TITLE),
+                    "created": docx.get_metadata(DOCX.DATE_CREATED),
                     "paragraphs": paragraphs
                 }
             }
