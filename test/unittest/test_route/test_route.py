@@ -55,7 +55,6 @@ def test_home_post_with_files(client, setup_files):
 
     assert response.status_code == 200
 
-@pytest.mark.usefixtures("setup_files")
 def test_file_too_large(client, setup_files):
     # Unpack the setup_files fixture
     _, _, _ = setup_files  # Not using these values in this test
