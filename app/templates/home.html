@@ -62,7 +62,7 @@
     </div>
   </form>
   
-  <form id="visualise-form" class="hidden" action="{{ url_for('visualise') }}" method="POST" enctype="multipart/form-data" target="_blank">
+  <form id="visualise-form" class="hidden" action="{{ url_for('visualise2') }}" method="POST" enctype="multipart/form-data" target="_blank">
     {{ visualise_form.csrf_token(id="visualise_form_csrf_token") }}
     {{ visualise_form.base_file(accept=".docx", required=False) }}
     {{ visualise_form.compare_file(accept=".docx", required=False) }}

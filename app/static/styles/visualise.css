@@ -17,7 +17,35 @@ p[data-colour] {
     display: inline;
 }
 
+p[data-is-match="true"] {
+    background-color: white !important;
+}
+
+p[data-is-match="false"] {
+    color: black !important;
+}
+
 .hidden-colour {
     background-color: white !important;
     color: black !important;
+}
+
+input[data-id=color-picker]{
+    height: 18px;
+    width: 18px;
+    padding: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+input[data-id=color-picker]::-webkit-color-swatch-wrapper {
+    padding: 0; 
+}
+
+input[data-id=color-picker]::-webkit-color-swatch {
+    border: none;
+    border-radius: 25%;
 }

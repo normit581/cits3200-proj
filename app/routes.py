@@ -1,18 +1,10 @@
-from flask import render_template, flash, request, jsonify, redirect
+from flask import render_template, flash, request, jsonify
+from werkzeug.utils import secure_filename
 from app import app
 from app.forms import MatchDocumentForm, VisualiseDocumentForm
-from app.helper import FileHelper
-from werkzeug.utils import secure_filename
-from werkzeug.exceptions import RequestEntityTooLarge
-
+from app.helper import FileHelper, XMLHelper, ColourHelper
 from app.utilities.rsid import *
-from app.utilities.temp import TEMP
 from app.utilities.metadata import *
-
-
-import docx, datetime
-from itertools import combinations
-
 
 @app.context_processor
 def inject_global_variable():
@@ -36,6 +28,9 @@ def home():
                     file_data.append({'filename': filename, 'rsid': rsid, 'count': rsid[-1]})
                 # result dict for comparison loop
                 result = {}
+
+                # print("meta", metadata_list)
+                # print("rsid:", rsid_extracts)
                 # loop through files, if file isnt current one then add filename, similarity and rsid count.
                 for i, file1 in enumerate(file_data):
                     comparisons = []
@@ -95,7 +90,7 @@ def visualise():
         # Get the data from the form
         if form.validate_on_submit():
             files = [form.base_file.data, form.compare_file.data]
-
+            
             # Create loop that will iterate for the number of files in files
             # error check
             metadata_list = []
@@ -112,10 +107,10 @@ def visualise():
                 # print('matching_rsid:', matching_rsid)
         
                 # extract data
-                metadata1, metadata2 = extract_metadata(file1), extract_metadata(file2)
+                metadata1, metadata2 = extract_metadata(file1, rsid1, rsid2, matching_rsid)
                 print(metadata1)
                 # rsid associated with text function call
-                rsid_metadata = rsid_with_metadata(metadata1, matching_rsid)
+
                 metadata_list.append({
                     'file_name': file1.filename,
                     'metadata': metadata1
@@ -127,4 +122,55 @@ def visualise():
                 })
                 
                 return render_template('visualise.html', matching_rsid=matching_rsid, similarity=similarity, metadata_list=metadata_list, rsid_metadata=rsid_metadata)
+    return render_template('visualise.html', form=form)
+
+@app.route('/visualise2', methods=['POST'])
+def visualise2():
+    form = VisualiseDocumentForm()
+
+    if form.validate_on_submit():
+        files = [form.base_file.data, form.compare_file.data]
+        results = []
+        all_rsids = [set(), set()]
+
+        # Extract content and gather RSIDs
+        docx_objects = []
+        for i, file in enumerate(files):
+            filename = secure_filename(file.filename)
+            docx = DOCX(filename)
+            XMLHelper(file).extract_to_docx(docx)
+            docx_objects.append(docx)
+            all_rsids[i] = set(docx.unique_rsid.keys())
+
+        # Determine common RSIDs
+        common_rsids = all_rsids[0].intersection(all_rsids[1])
+        shared_colours = {rsid: {ColourHelper.random_standard_rgb_str()} for rsid in common_rsids}
+
+        # Process each document
+        for i, docx in enumerate(docx_objects):
+            filename = secure_filename(files[i].filename)
+            colours = {rsid: ColourHelper.random_light_rgb_str() for rsid in docx.unique_rsid.keys()}
+            paragraphs = [
+                [
+                    {
+                        "rsid": rsid,
+                        "colour": shared_colours.get(rsid, colours.get(rsid)),
+                        "text": txt,
+                        "is_match": rsid in common_rsids
+                    }
+                    for txt, rsid in zip(para.txt_array, para.rsid_array)
+                ]
+                for para in docx.paragraphs.values()
+            ]
+
+            result = {
+                "file_name": filename,
+                "metadata": {
+                    "title": docx.get_metadata(DOCX.TITLE),
+                    "created": docx.get_metadata(DOCX.DATE_CREATED),
+                    "paragraphs": paragraphs
+                }
+            }
+            results.append(result)
+        return render_template('visualise.html', metadata_list=results)
     return render_template('visualise.html', form=form)

@@ -6,6 +6,8 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/visualise.css')}}">
   <script src="{{ url_for('static', filename='js/context-menu.js') }}" defer></script>
   <script src="{{ url_for('static', filename='js/visualise.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/colour.js') }}" defer></script>
+
 {% endblock %}
 
 {% block content %}
@@ -39,8 +41,11 @@
       <input id="cardHeightInput" type="number" class="form-control text-end" aria-label="Height (px)">
       <button type="button" class="rounded-0 sharp-color btn btn-light">px</button>
     </div>
-    <button id="hide-all-colour-btn" class="btn btn-light text-start" type="button">
-      <i class="fa-solid fa-eye-slash"></i> Hide All Colour
+    <button id="hide-individual-colour-btn" class="btn btn-light text-start" type="button">
+      <i class="fa-solid fa-eye-slash"></i> Show Matching Only
+    </button>
+    <button id="hide-matching-colour-btn" class="btn btn-light text-start" type="button">
+      <i class="fa-solid fa-eye-slash"></i> Show Individual Only
     </button>
   </div>
 </div>
@@ -57,7 +62,9 @@
                 <div class="card-body" style="overflow-y: auto;" id="card-body-{{ loop.index }}">
                     {% for paragraph in document.metadata.paragraphs %}
                       <div class="my-2">
-                        <p data-colour="{{document.metadata.colours[loop.index] }}">{{ paragraph }}</p>
+                        {% for para in paragraph %}
+                          <p data-colour="{{ para.colour }}" data-rsid="{{ para.rsid }}" data-is-match="{{ 'true' if para.is_match else 'false' }}">{{ para.text }}</p>
+                        {% endfor %}
                       </div>
                     {% endfor %}
                 </div>
