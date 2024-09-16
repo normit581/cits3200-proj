@@ -65,12 +65,16 @@ function switchVisualiseDocx(){
     const targets = [$($visualiseDocxs[0]).find('.card-body'), $($visualiseDocxs[1]).find('.card-body')];
     scrollAdjustPosition(targets, function() {
         $(firstDocx).insertAfter($(secondDocx));
+        $('[data-bs-toggle="tooltip"]').each(function() {
+            $(this).tooltip('update');
+        });
     });
 }
 
 function adjustFontSize(direction) {
     currentFontSize = direction === 0 ? defaultFontSize : Math.max(10, Math.min(35, currentFontSize + direction));
     $('.card-body p').css('font-size', currentFontSize + 'px');
+    $('.card-body span.pdf-rsid').css('font-size', currentFontSize + 'px');
 }
 
 function handleLongPress(action) {
@@ -83,11 +87,16 @@ function clearLongPress() {
 
 function pdfToggleElementsVisibility(isVisible) {
     const $contextMenu = $(`#${contextMenuID}`);
-    const action = isVisible ? 'show' : 'hide';
     const $visualiseResult = $("#visualise-result-container");
+    const $tooltipBootstrap = $('[role="tooltip"]');
+    const $pdfRsids = $('span.pdf-rsid');
+
+    const action = isVisible ? 'show' : 'hide';
 
     $visualiseResult.find(".card-body").toggleClass('pdf', !isVisible)
+    $pdfRsids.toggleClass('pdf', !isVisible)
     $contextMenu[action]();
+    $tooltipBootstrap[action]();
 }
 
 function exportPDF() {
@@ -112,9 +121,54 @@ $(document).ready(function() {
     $('p[data-colour]').each(function() {
         const colour = $(this).data('colour');
         const isMatch = $(this).data('is-match');
+        const rsid = $(this).data('rsid');
         const cssStyle = isMatch ? 'color' : 'background-color';
         const cssColourHEX = rgbStringToHex(colour)
         $(this).css(cssStyle, cssColourHEX);
+        $(this).attr('title', rsid);
+        $(this).attr('data-bs-toggle', 'tooltip');
+    });
+
+    // assign tooltip to each <p>
+    $('#visualise-result-container div[data-position]').each(function() {
+        const $div = $(this);
+        const position = $div.data('position');
+        $div.find('p').each(function(){
+            const $p = $(this);
+            const rsid = $(this).data('rsid');
+            $p.tooltip({
+                placement: position,
+                fallbackPlacements: ['right', 'left'],
+                trigger: 'manual',
+                html: true,
+                title: `<strong>${rsid}</strong>`
+            }).on('click', () => {
+                if(!getSelection().toString()){
+                    $(this).tooltip('toggle');
+                }
+            });
+        });
+    });
+
+    // assign rsid for export pdf
+    $('#visualise-result-container div.card-body > div').each(function() {
+        const $div = $(this);
+        const totalP =  $div.find('p').length;
+        let currentRsid = $div.find('p').first().data('rsid');
+
+        $div.find('p').each(function(idx){
+            const $p = $(this);
+            const rsid = $(this).data('rsid');
+            const $span = $('<span class="pdf-rsid">')
+            const $link = $('<a href="#"><i class="fa fa-2xs fa-external-link"></i></a>');
+
+            if (currentRsid !== rsid) {
+                $span.text(`[${currentRsid}]`).insertBefore($p).append($link);
+                currentRsid = rsid;
+            }else if(idx === totalP - 1){
+                $span.text(`[${rsid}]`).insertAfter($p).append($link);  
+            }
+        });
     });
 
     triggerContextMenuEvent($('.card-body > div'), true);
