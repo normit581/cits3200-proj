@@ -1,5 +1,4 @@
 from flask import render_template, flash, request, jsonify
-from werkzeug.utils import secure_filename
 from app import app
 from app.forms import MatchDocumentForm, VisualiseDocumentForm
 from app.helper import FileHelper, XMLHelper, ColourHelper
@@ -23,7 +22,7 @@ def home():
                 file_data = []
                 # process file by extracting filename and rsid, count
                 for file in form.files.data:
-                    filename = secure_filename(file.filename)
+                    filename = file.filename
                     rsid = rsid_extract(file)
                     file_data.append({'filename': filename, 'rsid': rsid, 'count': rsid[-1]})
                 # result dict for comparison loop
@@ -121,7 +120,7 @@ def visualise():
                     'metadata': metadata2
                 })
                 
-                return render_template('visualise.html', matching_rsid=matching_rsid, similarity=similarity, metadata_list=metadata_list, rsid_metadata=rsid_metadata)
+                return render_template('visualise.html', matching_rsid=matching_rsid, similarity=similarity, metadata_list=metadata_list)
     return render_template('visualise.html', form=form)
 
 @app.route('/visualise2', methods=['POST'])
@@ -136,7 +135,7 @@ def visualise2():
         # Extract content and gather RSIDs
         docx_objects = []
         for i, file in enumerate(files):
-            filename = secure_filename(file.filename)
+            filename = file.filename
             docx = DOCX(filename)
             XMLHelper(file).extract_to_docx(docx)
             docx_objects.append(docx)
@@ -148,7 +147,7 @@ def visualise2():
 
         # Process each document
         for i, docx in enumerate(docx_objects):
-            filename = secure_filename(files[i].filename)
+            filename = files[i].filename
             colours = {rsid: ColourHelper.random_light_rgb_str() for rsid in docx.unique_rsid.keys()}
             paragraphs = [
                 [
