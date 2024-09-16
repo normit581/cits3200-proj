@@ -231,7 +231,6 @@ const onSuccessMatch = (response) => {
         setupVisualiseForm();
         $("#setting-bar-container").show();
         $("#upload-container").hide();
-        $("#slide-container").show();
         triggerContextMenuEvent($('main'), true);
     } else {
         GenerateDangerAlertDiv("Failed!", response.message);
@@ -300,7 +299,7 @@ function appendMatchResults(similarityResults) {
     $('#similarity-result').append(row);
     $("#similarity-result").show();
 
-    $('.btn-group-vertical input').click(function() {
+    $('#similarity-result .btn-group-vertical input').click(function() {
         const target = $(this).data('target');
         $('.card-docx-container').addClass('hidden'); // Hide all cards
         $(`.card-docx-container[data-id="${target}"]`).removeClass('hidden'); // Show the selected card
@@ -418,6 +417,17 @@ function generateTitlePDF(element) {
     $(titleHTML).insertBefore(divId);
 }
 
+function updateFilter(value) {
+    const minValue = parseFloat(value);
+    $('#matchSlider').val(minValue);
+    $('#matchInput').val(minValue);
+    $('#similarity-result .card-docx-display').each(function() {
+        const matchPercent = parseFloat($(this).data('match-percent'));
+        const action = matchPercent >= minValue ? 'show' : 'hide';
+        $(this)[action]();
+    });
+};
+
 $(document).ready(function() {
     $(window).on('beforeunload', showRefreshAlert);
     configureContextMenuButtons();
@@ -430,35 +440,6 @@ $(document).ready(function() {
     });
 
     $('#setting-bar-container').hide()
-
-    
-    const slider = document.getElementById('matchSlider');
-    const inputBox = document.getElementById('matchInput');
-  
-    function updateFilter(value) {
-      const minValue = parseFloat(value);
-      inputBox.value = minValue;
-      slider.value = minValue;
-  
-      const cards = document.querySelectorAll('#similarity-result .card-docx-display');
-  
-      cards.forEach(card => {
-        const matchPercent = parseFloat(card.getAttribute('data-match-percent'));
-        if (matchPercent >= minValue) {
-          card.style.display = '';  // Show the card
-        } else {
-          card.style.display = 'none';  // Hide the card
-        }
-      });
-    }
-  
-    slider.addEventListener('input', function() {
-      updateFilter(this.value);
-    });
-  
-    inputBox.addEventListener('input', function() {
-      updateFilter(this.value);
-    });
 });
 
 // Context Menu functions
@@ -468,6 +449,13 @@ function configureContextMenuButtons(){
     $('#pdf-btn').on('click', () => exportSinglePDF() );
 
     $('#all-pdf-btn').on('click', () => exportAllPDF() );
+
+
+    $('#custom-context-menu .input-group')
+        .on('mouseenter', function() { $(this).find('button').addClass('active'); })
+        .on('mouseleave', function() { $(this).find('button').removeClass('active'); });
+    $('#matchSlider').on('input', (e) => updateFilter(e.target.value));
+    $('#matchInput').on('input', (e) => updateFilter(e.target.value));
 }
 
 const customFunc = function(e) {
