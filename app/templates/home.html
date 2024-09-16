@@ -35,11 +35,6 @@
             <i class="fa-solid fa-file-export"></i> All Results PDF
           </button>
         </div>
-        <div class="col-auto my-2 slidecontainer">
-          <input type="range" min="1" max="100" value="0" class="slider" id="matchSlider">
-          <input type="number" min="1" max="100" value="0" id="matchInput" class="form-control d-inline w-auto">
-          <span> Minimum Match %</span>
-        </div>
       </div>
     </div>
     <div class="d-flex justify-content-end px-2 col-1 py-3">
@@ -48,6 +43,12 @@
       </button>
     </div>
   </div>
+</div>
+
+<div id="slide-container" style="display: none;">
+  <input type="range" min="1" max="100" value="0" class="slider" id="matchSlider">
+  <input type="number" min="1" max="100" value="0" id="matchInput" class="form-control d-inline w-auto">
+  <span> Minimum Match %</span>
 </div>
 
 <div id="similarity-result" class="container"></div>

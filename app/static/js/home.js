@@ -205,6 +205,7 @@ const onSuccessMatch = (response) => {
         setupVisualiseForm();
         $("#setting-bar-container").show();
         $("#upload-container").hide();
+        $("#slide-container").show();
     } else {
         GenerateDangerAlertDiv("Failed!", response.message);
     }
