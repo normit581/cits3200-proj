@@ -5,6 +5,7 @@ let currentFiles = new Map();
 const maxFiles = 2;
 const maxFileSize = 100 * 1024 * 1024; //100MB
 const maxTotalSize = maxFiles * maxFileSize;
+const contextMenuID = 'custom-context-menu';
 
 function toggleFileList(isOpen) {
     const fileListWidth = isOpen ? "15%" : "0%";
@@ -20,13 +21,29 @@ function handleFileList(change) {
 
 function deleteListItem(e) {
     const { itemId, filename } = e.data;
-    const listItem = $(`#list-item-${itemId}`);
-    
-    listItem.tooltip('dispose');
-    listItem.remove();
+    const $listItem = $(`#list-item-${itemId}`);
+
+    const $matchingWarnings = $('aside span').filter(function() {
+        return $(this).find('p').text().trim() === $listItem.find('p').text().trim();
+    });
+
+    if ($matchingWarnings.length > 1) {
+        if(!confirm("Note that all duplicated file name with warning will be removed. Continue?")){
+            return false;
+        }
+        $matchingWarnings.last().find('i.fa-triangle-exclamation').remove();
+        // Remove all but the last one
+        $matchingWarnings.slice(0, -1).each(function() {
+            $(this).tooltip('dispose'); // Dispose tooltips before removing
+            $(this).remove(); // Remove the element
+        });
+    } else{
+        $listItem.tooltip('dispose');
+        $listItem.remove();
+        currentFiles.delete(filename);
+    }
     
     handleFileList(-1);
-    currentFiles.delete(filename);
     updateFileInput();
     updateProgressBar();
 }
@@ -40,6 +57,13 @@ function createListItem(name) {
     
     const para = $('<p>').text(name);
     
+    let warningIcon = '';
+    if (currentFiles.has(filename)){
+        warningIcon = $('<i>')
+            .attr('title', 'duplicate file detected')
+            .addClass('fa-solid fa-triangle-exclamation text-warning mt-1 mx-auto text-center');
+    }
+
     const item = $('<span>')
         .attr({
             'data-bs-toggle': 'tooltip',
@@ -49,8 +73,8 @@ function createListItem(name) {
         })
         .addClass('d-flex justify-content-between')
         .tooltip()
-        .append(para, delIcon);
-    
+        .append(warningIcon, para, delIcon);
+
     fileId++;
     return item;
 }
@@ -139,9 +163,11 @@ function handleFiles(files) {
         }
 
         handleFileList(1);
-        currentFiles.set(fileNameWithoutExt(file.name), file);
         const item = createListItem(file.name);
         $fileList.append(item);
+
+        currentFiles.set(fileNameWithoutExt(file.name), file);
+
         updateFileInput();
         applyConfirmAnimation();
         updateProgressBar();
@@ -206,6 +232,7 @@ const onSuccessMatch = (response) => {
         $("#setting-bar-container").show();
         $("#upload-container").hide();
         $("#slide-container").show();
+        triggerContextMenuEvent($('main'), true);
     } else {
         GenerateDangerAlertDiv("Failed!", response.message);
     }
@@ -216,6 +243,14 @@ function match() {
         GenerateDangerAlertDiv('Failed!', 'Please add at least one file.');
         return;
     }
+    
+    const $warningItems = $('aside span').find('i.fa-triangle-exclamation');
+    if ($warningItems.length > 0) {
+        if(!confirm("Duplicate detected. Do you wish to continue?")){
+            return false; // Cancel form submission
+        }
+    }
+
     $('#similarity-result').empty();
     CallPost(`/home`, validateMatchForm(), onSuccessMatch, onErrorMatch, onXhrMatch);
 }
@@ -275,8 +310,8 @@ function appendMatchResults(similarityResults) {
 }
 
 function setupVisualiseForm() {
-    $('.card-docx-container > .card').on('click', function() {
-        const $card_docx = $(this);
+    $('.card-docx-container .card-body').on('click', function() {
+        const $card_docx = $(this).parents('.card-docx-display').first();
         const setBaseFile = setFileInput($card_docx.data("base-file"), "#base_file");
         const setCompareFile = setFileInput($card_docx.data("compare-file"), "#compare_file");
 
@@ -287,7 +322,8 @@ function setupVisualiseForm() {
 }
 
 function setFileInput(filename, inputID) {
-    const fileData = currentFiles.get(filename);
+    const key = fileNameWithoutExt(filename);
+    const fileData = currentFiles.get(key);
     if (!fileData) {
         GenerateDangerAlertDiv("Failed!", `File: ${filename} not found. Please try reupload.`);
         return false;
@@ -312,6 +348,7 @@ function reuploadFiles() {
     $("#reupload-container").hide();
     $('#setting-bar-container').hide();
     ScrollToTopPage();
+    triggerContextMenuEvent($('main'), false);
 }
 
 function toggleElementsVisibility(isVisible) {
@@ -320,6 +357,7 @@ function toggleElementsVisibility(isVisible) {
     const $similarityResult = $("#similarity-result");
     const $similarityResultAside = $similarityResult.find("aside");
     const $similarityResultDiv = $similarityResultAside.next();
+    const $contextMenu = $(`#${contextMenuID}`);
     
     const action = isVisible ? 'show' : 'hide';
     const containerClass = isVisible ? "container" : "container-fluid";
@@ -334,6 +372,7 @@ function toggleElementsVisibility(isVisible) {
         .find("> div")
         .toggleClass('pdf disable-hover', !isVisible);
     $similarityResultAside[action]();
+    $contextMenu[action]();
 }
 
 function exportPDF() {
@@ -381,18 +420,18 @@ function generateTitlePDF(element) {
 
 $(document).ready(function() {
     $(window).on('beforeunload', showRefreshAlert);
-
+    configureContextMenuButtons();
     setFileEvents();
     toggleFileList(false);
+
     $('#match-form').on('submit', function(e) {
         e.preventDefault();
         match();
     });
 
     $('#setting-bar-container').hide()
-});
 
-document.addEventListener('DOMContentLoaded', function() {
+    
     const slider = document.getElementById('matchSlider');
     const inputBox = document.getElementById('matchInput');
   
@@ -420,4 +459,20 @@ document.addEventListener('DOMContentLoaded', function() {
     inputBox.addEventListener('input', function() {
       updateFilter(this.value);
     });
-  });
+});
+
+// Context Menu functions
+function configureContextMenuButtons(){
+    $('#reupload-btn').on('click', () => reuploadFiles() );
+    
+    $('#pdf-btn').on('click', () => exportSinglePDF() );
+
+    $('#all-pdf-btn').on('click', () => exportAllPDF() );
+}
+
+const customFunc = function(e) {
+    e.preventDefault();
+    const selectedLabel = $('#similarity-result aside input:checked').next().text();
+    $('#pdf-btn').html(`<i class="fa-solid fa-file-export"></i> ${selectedLabel} PDF`);
+    showContextMenu(e);
+};

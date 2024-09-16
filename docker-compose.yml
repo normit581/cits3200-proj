@@ -1,0 +1,12 @@
+services:
+  app:
+    container_name: DocuMatcher
+    restart: no
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    image: documatcher
+    ports:
+      - "80:80"
+    env_file:
+      - "deployment/app.env"

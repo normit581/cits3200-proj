@@ -1,3 +1,10 @@
+@media print {
+  body {
+    -webkit-print-color-adjust: exact; /* For WebKit browsers (Chrome, Safari, Edge) */
+    print-color-adjust: exact; /* For Firefox and standard-compliant browsers */
+  }
+}
+  
 body {
   font-family: "Nunito", sans-serif !important;
   font-style: normal;
@@ -142,4 +149,37 @@ button.close {
 
 .disable-hover {
     pointer-events: none;
+}
+
+.sharp-color[disabled] {
+  opacity: 1.0;
+}
+
+/* Hide Arrows From Input Number */
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: none; /* General fallback for older browsers */
+}
+
+/* IE10+ and Edge (non-WebKit) */
+input[type="number"] {
+  -ms-appearance: none;
+  appearance: none;
+}
+
+#custom-context-menu {
+    position: absolute;
+    z-index : 999;
+}
+
+#custom-context-menu .input-group input {
+    width: 100px;
 }
