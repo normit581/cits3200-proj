@@ -219,6 +219,10 @@ const onErrorMatch = (xhr) => {
             break;
         case 400:
             responseText = 'Invalid request. Please check your files and try again.';
+            const responseJSON = xhr.responseJSON;
+            if (responseJSON && responseJSON.message){
+                responseText = responseJSON.message;
+            }
             break;
     }
     GenerateDangerAlertDiv("Failed!", `ErrorCode: ${xhr.status}. ${responseText}`);

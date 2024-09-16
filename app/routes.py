@@ -1,7 +1,7 @@
 from flask import render_template, flash, request, jsonify
 from app import app
 from app.forms import MatchDocumentForm, VisualiseDocumentForm
-from app.helper import FileHelper, XMLHelper, ColourHelper
+from app.helper import FileHelper, FormHelper, XMLHelper, ColourHelper
 from app.utilities.rsid import *
 from app.utilities.metadata import *
 
@@ -49,7 +49,7 @@ def home():
                 app.logger.error(f"Error processing files: {str(e)}")
                 return jsonify({'error': 'An error occurred while processing the files.'}), 500
         else:
-            return jsonify({'error': form.errors}), 400
+            return jsonify({'message': FormHelper.errors_to_str(form), 'success':False}), 400
     return render_template('home.html', form=form, visualise_form=visualise_form)
 
 @app.route('/team', methods=['GET'])

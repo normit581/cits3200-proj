@@ -8,6 +8,15 @@ class FileHelper:
     def remove_extension(filename: str) -> str:
         """Removes the extension from the provided filename."""
         return os.path.splitext(filename)[0]
+    
+class FormHelper:
+    @staticmethod
+    def errors_to_str(form):
+        error_messages = []
+        for field, errors in form.errors.items():
+            for error in errors:
+                error_messages.append(f"<br>{field}: {error}")
+        return "".join(error_messages*2)
 
 
 class ColourHelper:
