@@ -22,14 +22,13 @@ function toggleButtonText(targetBtn, fromText, toText) {
     });
 }
 
-function rsidColourToggleVisibility(btn, target, hideText='Hide', showText='Show') {
+function rsidColourToggleVisibility(btn, target, isHideSiblings = false, hideText='Hide', showText='Show') {
     const $btn = $(btn);
     const $icon = $btn.find('i');
     
     const isHidden = $icon.hasClass('fa-eye-slash');
     const action = isHidden ? 'addClass' : 'removeClass';
     const reverseAction = isHidden ? 'removeClass' : 'addClass';
-    const hideAction = isHidden ? 'hide' : 'show';
     
     $icon[action]('fa-eye')[reverseAction]('fa-eye-slash');
 
@@ -37,15 +36,18 @@ function rsidColourToggleVisibility(btn, target, hideText='Hide', showText='Show
 
     $(target)[action]('hidden-colour');
 
-    // if (isAll) {
-    //     $btn.siblings('button.rsidButton').each(function() {
-    //         const $siblingBtn = $(this);
-    //         const $siblingIcon = $siblingBtn.find('i');
-    //         toggleButtonText($siblingBtn, isHidden ? hideText : showText, isHidden ? showText : hideText);
-    //         $siblingBtn.find('[data-id=color-picker]')[hideAction]();
-    //         $siblingIcon[action]('fa-eye')[reverseAction]('fa-eye-slash');
-    //     });
-    // }
+    if (isHideSiblings) {
+        $btn.siblings('button.rsidButton').each(function() {
+            if ($(this).data('is-match') === $(target).data('is-match')){
+                const hideAction = isHidden ? 'hide' : 'show';
+                const $siblingBtn = $(this);
+                const $siblingIcon = $siblingBtn.find('i');
+                toggleButtonText($siblingBtn, isHidden ? hideText : showText, isHidden ? showText : hideText);
+                $siblingBtn.find('[data-id=color-picker]')[hideAction]();
+                $siblingIcon[action]('fa-eye')[reverseAction]('fa-eye-slash');
+            }
+        });
+    }
 }
 
 function scrollAdjustPosition(targets, func) {
@@ -148,12 +150,12 @@ function configureContextMenuButtons(){
 
     $('#hide-matching-colour-btn').on('click', function() { 
         const $target = $('.card-body p').not(`[data-is-match="false"]`);
-        rsidColourToggleVisibility(this, $target);
+        rsidColourToggleVisibility(this, $target, isHideSiblings = true);
     });
 
     $('#hide-individual-colour-btn').on('click', function() { 
         const $target = $('.card-body p').not(`[data-is-match="true"]`);
-        rsidColourToggleVisibility(this, $target);
+        rsidColourToggleVisibility(this, $target, isHideSiblings = true);
     });
 }
 
@@ -168,27 +170,29 @@ const customFunc = function(e) {
     $divContainer.find('p').each(function() {
         const $pTarget = $(this);
         const rsid = $pTarget.data('rsid');
+        const $rsidTargets = $(`p[data-rsid='${rsid}']`);
         if (currentRSID === rsid){
             return true; // continue
         }
-        const isVisible = $pTarget.hasClass('hidden-colour');
+        const isHidden = $pTarget.hasClass('hidden-colour');
         const isMatch = $pTarget.data('is-match');
         const cssStyle = isMatch ? 'color' : 'background-color';
         let colourRGB = $pTarget.css(cssStyle);
-        if (isVisible) {
+        if (isHidden) {
+            // turn back visible to get correct colour
             colourRGB = $pTarget.toggleClass('hidden-colour').css(cssStyle);
-            $pTarget.toggleClass('hidden-colour');;
+            $pTarget.toggleClass('hidden-colour');
         }
         const colourHEX = rgbStringToHex(colourRGB)
         
         const $icon = $('<i>', {
             'data-id': `${contextMenuID}-colour-btn`,
-            class: `fa-solid ${isVisible ? 'fa-eye' : 'fa-eye-slash'}`
+            class: `fa-solid ${isHidden ? 'fa-eye' : 'fa-eye-slash'}`
         });
 
         const $text = $('<div>', {
             class: 'col-auto text',
-            text: `${isVisible ? 'Unhide' : 'Hide'} Colour ${colourHEX}`
+            text: `${isHidden ? 'Show' : 'Hide'} ${rsid} [${colourHEX}]`
         });
 
         const $colorInput = $('<input>', {
@@ -209,19 +213,21 @@ const customFunc = function(e) {
             class: 'btn btn-light text-start rsidButton py-0',
             type: 'button',
             html: $row
-        });
+        })
+        .attr('data-is-match', $pTarget.data('is-match'))
+        .attr('data-is-hidden', isHidden);
 
         $btnGroup.append($button);
 
-        $colorInput[isVisible ? 'hide': 'show']();
+        $colorInput[isHidden ? 'hide': 'show']();
         $colorInput.on('input', function(){
             toggleButtonText($text, rgbStringToHex($pTarget.css(cssStyle)), $(this).val())
-            $(`p[data-rsid='${rsid}']`).css(cssStyle, $(this).val());
+            $rsidTargets.css(cssStyle, $(this).val());
         });
 
         $button.click(function(e) {
             if (!$(e.target).closest("[data-id='color-picker']").length) {
-                rsidColourToggleVisibility(this, $pTarget);
+                rsidColourToggleVisibility(this, $rsidTargets);
             }
             $button.find('[data-id=color-picker]')[$pTarget.hasClass('hidden-colour') ? 'hide': 'show']();
         });

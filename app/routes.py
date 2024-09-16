@@ -144,7 +144,7 @@ def visualise2():
 
         # Determine common RSIDs
         common_rsids = all_rsids[0].intersection(all_rsids[1])
-        shared_colours = {rsid: {ColourHelper.random_standard_rgb_str()} for rsid in common_rsids}
+        shared_colours = {rsid: ColourHelper.random_standard_rgb_str() for rsid in common_rsids}
 
         # Process each document
         for i, docx in enumerate(docx_objects):
