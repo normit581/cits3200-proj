@@ -49,3 +49,11 @@ input[data-id=color-picker]::-webkit-color-swatch {
     border: none;
     border-radius: 25%;
 }
+
+span.pdf-rsid {
+    display: none;
+}
+
+p:not(.hidden-colour) + span.pdf {
+    display: inline !important;
+}
