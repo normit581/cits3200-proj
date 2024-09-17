@@ -6,6 +6,7 @@ const maxFiles = 2;
 const maxFileSize = 100 * 1024 * 1024; //100MB
 const maxTotalSize = maxFiles * maxFileSize;
 const contextMenuID = 'custom-context-menu';
+const dangerPercentage = 60, warningPercentage = 30
 
 function toggleFileList(isOpen) {
     const fileListWidth = isOpen ? "15%" : "0%";
@@ -272,15 +273,19 @@ function appendMatchResults(similarityResults) {
         aside.find('.btn-group-vertical').append(radioInput).append(radioLabel);
 
         $.each(values, (i, item) => {
+            const matchPercent = parseFloat(item.value);
+            const borderColour = 
+                matchPercent < warningPercentage ? 'border-success': 
+                matchPercent < dangerPercentage ? 'border-warning': 'border-danger';
             const card = $(`<div class="card-docx-display card col-3"></div>`)
                 .attr({ 'data-base-file': key, 'data-compare-file': item.filename });
             card.append(
                 $('<div class="card shaded"></div>').append(
-                    $('<div class="card-body"></div>').append(
+                    $(`<div class="card-body border border-4 rounded-1 ${borderColour}"></div>`).append(
                         $('<h4 class="text-truncate"></h4>').text(item.filename),
                         $('<hr>'),
                         $('<div class="d-flex justify-content-between"></div>').append(
-                            $('<span></span>').text(`${item.value.toFixed(1)}%`),
+                            $('<span></span>').text(`${matchPercent.toFixed(1)}%`),
                             $('<div class="text-truncate"></div>').append(
                                 $('<i class="fa-solid fa-hashtag me-1"></i>'),
                                 $('<span></span>').text(item.count)
