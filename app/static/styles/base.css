@@ -180,6 +180,10 @@ input[type="number"] {
     z-index : 999;
 }
 
-#custom-context-menu .input-group input {
+#custom-context-menu #cardHeightInput {
     width: 100px;
+}
+
+#custom-context-menu #matchInput {
+  width: 55px;
 }

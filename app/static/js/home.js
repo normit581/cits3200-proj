@@ -282,7 +282,7 @@ function appendMatchResults(similarityResults) {
                 matchPercent < warningPercentage ? 'border-success': 
                 matchPercent < dangerPercentage ? 'border-warning': 'border-danger';
             const card = $(`<div class="card-docx-display card col-3"></div>`)
-                .attr({ 'data-base-file': key, 'data-compare-file': item.filename });
+                .attr({ 'data-base-file': key, 'data-compare-file': item.filename, 'data-match-percent': item.value});
             card.append(
                 $('<div class="card shaded"></div>').append(
                     $(`<div class="card-body border border-4 rounded-1 ${borderColour}"></div>`).append(
@@ -308,7 +308,7 @@ function appendMatchResults(similarityResults) {
     $('#similarity-result').append(row);
     $("#similarity-result").show();
 
-    $('.btn-group-vertical input').click(function() {
+    $('#similarity-result .btn-group-vertical input').click(function() {
         const target = $(this).data('target');
         $('.card-docx-container').addClass('hidden'); // Hide all cards
         $(`.card-docx-container[data-id="${target}"]`).removeClass('hidden'); // Show the selected card
@@ -426,6 +426,17 @@ function generateTitlePDF(element) {
     $(titleHTML).insertBefore(divId);
 }
 
+function updateFilter(value) {
+    const minValue = parseFloat(value);
+    $('#matchSlider').val(minValue);
+    $('#matchInput').val(minValue);
+    $('#similarity-result .card-docx-display').each(function() {
+        const matchPercent = parseFloat($(this).data('match-percent'));
+        const action = matchPercent >= minValue ? 'show' : 'hide';
+        $(this)[action]();
+    });
+};
+
 $(document).ready(function() {
     $(window).on('beforeunload', showRefreshAlert);
     configureContextMenuButtons();
@@ -437,6 +448,7 @@ $(document).ready(function() {
         match();
     });
 
+    $('#setting-bar-container').hide()
 });
 
 // Context Menu functions
@@ -446,6 +458,13 @@ function configureContextMenuButtons(){
     $('#pdf-btn').on('click', () => exportSinglePDF() );
 
     $('#all-pdf-btn').on('click', () => exportAllPDF() );
+
+
+    $('#custom-context-menu .input-group')
+        .on('mouseenter', function() { $(this).find('button').addClass('active'); })
+        .on('mouseleave', function() { $(this).find('button').removeClass('active'); });
+    $('#matchSlider').on('input', (e) => updateFilter(e.target.value));
+    $('#matchInput').on('input', (e) => updateFilter(e.target.value));
 }
 
 const customFunc = function(e) {
