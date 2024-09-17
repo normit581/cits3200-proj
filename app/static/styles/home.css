@@ -162,6 +162,41 @@
             text-decoration: underline;
         }
 
+.card-docx-container-list {
+    overflow-y: scroll;
+    padding: 7px 15px;
+    height: 500px;
+    background-color: #e9ecef;
+}
+
+/* Base style for .border-thick elements */
+a.border-thick {
+    border-left-width: 3px;
+    border-right-width: 3px;
+    border-top-width: 1.5px !important;
+    border-bottom-width: 1.5px !important;
+}
+
+    /* First child with border thickness */
+    a.border-thick:first-child {
+        border-top-width: 3px !important;
+    }
+
+    /* Last child with border thickness */
+    a.border-thick:last-child {
+        border-bottom-width: 3px !important;
+    }
+
+    /* When .hidden is present, next sibling gets 3px top border */
+    .hidden + a.border-thick {
+        border-top-width: 3px !important;
+    }
+
+    /* When .hidden is present, the previous sibling gets 3px bottom border */
+    a.border-thick.hidden ~ a {
+        border-bottom-width: 3px !important;
+    }
+
 .card-docx-container.pdf {
     overflow-y: hidden !important;
     height: auto !important;
@@ -170,4 +205,14 @@
 
 .card-docx-display.pdf {
     padding: 3px 3px !important;
+} 
+
+.card-docx-container-list.pdf {
+    overflow-y: hidden !important;
+    height: auto !important;
+    padding: 15px !important;
+}
+
+#similarity-result .row > div[data-view-name="list"]{
+    padding: 0 !important;
 }
