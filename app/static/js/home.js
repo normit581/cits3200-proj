@@ -345,6 +345,10 @@ function appendMatchResults(similarityResults) {
             const borderColour =
                 matchPercent < warningPercentage ? 'border-success' :
                 matchPercent < dangerPercentage ? 'border-warning' : 'border-danger';
+
+            const badgeColour =
+                matchPercent < warningPercentage ? 'bg-success' :
+                matchPercent < dangerPercentage ? 'bg-warning' : 'bg-danger';
             const $row = $('<div>', {
                 class: `list-group-item d-flex justify-content-between align-items-center ${borderColour}`,
                 'data-base-file': key,
@@ -360,7 +364,7 @@ function appendMatchResults(similarityResults) {
                     $('<i>', { class: 'fa-solid fa-hashtag me-1' }),
                     matchCount
                 ),
-                $('<span>', { class: 'badge bg-primary me-2' }).text(matchPercent === 0 ? '00.0%' : `${matchPercent.toFixed(1)}%`) // Match percentage
+                $('<span>', { class: `badge bg-primary me-2 ${badgeColour}` }).text(matchPercent === 0 ? '00.0%' : `${matchPercent.toFixed(1)}%`) // Match percentage
             );
             $row.append($fileInfo, $matchInfo);
             $mainContent.append($row);

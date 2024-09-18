@@ -157,6 +157,7 @@
 
 .card-docx-display .card-body {
     padding: 10px;
+    cursor: pointer;
 }
 
 .card-docx-display:hover h4 {
@@ -175,11 +176,13 @@
     background-color: #fff;
     border: 1px solid #ddd;
     padding: 10px 15px;
-    margin-bottom: 1px;
     transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
 }
 
 .list-group-item:hover {
@@ -224,17 +227,43 @@
     border-bottom-right-radius: 0.25rem;
 }
 
-/* Border Styles for Success, Warning, Danger */
+/* Border/Badge Styles for Success, Warning, Danger */
 .border-success {
     border-left: 4px solid #28a745 !important;
+    border-top: 0.5px solid #28a745 !important;
+    z-index: 1;
 }
 
 .border-warning {
     border-left: 4px solid #ffc107 !important;
+    border-top: 1px solid #ffc107 !important;
+    z-index: 2;
+    margin-top: -2px;
 }
 
 .border-danger {
     border-left: 4px solid #dc3545 !important;
+    border-top: 2px solid #dc3545 !important;
+    border-bottom: 2px solid #dc3545 !important;
+    z-index: 3;
+    margin-top: -4px;
+}
+
+.border-warning + .border-success,
+.border-danger + .border-success {
+    margin-top: -4px;
+}
+
+.badge-success {
+    background-color: #28a745 ;
+}
+
+.badge-warning {
+    background-color: #ffc107 !important;
+}
+
+.badge-danger {
+    background-color: #dc3545 !important;
 }
 
 /* Base style for .border-thick elements */
