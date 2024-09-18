@@ -10,8 +10,8 @@ class MatchDocumentForm(FlaskForm):
     def validate_files(self, files):
         if not files.data:
             raise ValidationError('Please add at least 1 docx file.')
-        
-        if len(files.data) > 2:
+
+        if len(files.data) > 20:
             raise ValidationError('Maximum of 2 files allowed.')
 
 class VisualiseDocumentForm(FlaskForm):

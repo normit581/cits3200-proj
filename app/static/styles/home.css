@@ -166,7 +166,59 @@
     overflow-y: scroll;
     padding: 7px 15px;
     height: 500px;
-    background-color: #e9ecef;
+    background-color: #f8f9fa;
+}
+
+.list-group-item {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 0.375rem;
+    padding: 10px 20px;
+    margin-bottom: 5px;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.list-group-item:hover {
+    background-color: #e2e6ea;
+}
+
+.file-name {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #333;
+}
+
+.match-info .badge {
+    font-size: 0.9rem;
+    padding: 5px 10px;
+}
+
+.match-info .text-muted {
+    font-size: 0.9rem;
+    padding: 5px 10px;
+}
+
+.file-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 250px;
+}
+
+.list-group-item .d-flex {
+    align-items: center;
+}
+
+.border-success {
+    border-left: 4px solid #28a745 !important;
+}
+
+.border-warning {
+    border-left: 4px solid #ffc107 !important;
+}
+
+.border-danger {
+    border-left: 4px solid #dc3545 !important;
 }
 
 /* Base style for .border-thick elements */
@@ -205,7 +257,7 @@ a.border-thick {
 
 .card-docx-display.pdf {
     padding: 3px 3px !important;
-} 
+}
 
 .card-docx-container-list.pdf {
     overflow-y: hidden !important;

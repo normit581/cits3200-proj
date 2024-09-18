@@ -2,7 +2,7 @@ const docxExtension = "application/vnd.openxmlformats-officedocument.wordprocess
 let numFiles = 0;
 let fileId = 0;
 let currentFiles = new Map();
-const maxFiles = 2;
+const maxFiles = 20;
 const maxFileSize = 100 * 1024 * 1024; //100MB
 const maxTotalSize = maxFiles * maxFileSize;
 const contextMenuID = 'custom-context-menu';
@@ -43,7 +43,7 @@ function deleteListItem(e) {
         $listItem.remove();
         currentFiles.delete(filename);
     }
-    
+
     handleFileList(-1);
     updateFileInput();
     updateProgressBar();
@@ -55,9 +55,9 @@ function createListItem(name) {
     const delIcon = $('<i>')
         .addClass('bi bi-trash3')
         .click({ itemId: fileId, filename }, deleteListItem);
-    
+
     const para = $('<p>').text(name);
-    
+
     let warningIcon = '';
     if (currentFiles.has(filename)){
         warningIcon = $('<i>')
@@ -95,7 +95,7 @@ function fileNameWithoutExt(fileName){
 function validateMatchForm(){
     const formData = new FormData();
     let isValid = true;
-    
+
     currentFiles.forEach((file, idx) => {
         if (validateFile(file)) {
             formData.append('files', file);
@@ -247,7 +247,7 @@ function match() {
         GenerateDangerAlertDiv('Failed!', 'Please add at least one file.');
         return;
     }
-    
+
     const $warningItems = $('aside span').find('i.fa-triangle-exclamation');
     if ($warningItems.length > 0) {
         if(!confirm("Duplicate detected. Do you wish to continue?")){
@@ -296,10 +296,10 @@ function appendMatchResults(similarityResults) {
         $.each(values, (i, item) => {
             const matchPercent = parseFloat(item.value);
             const matchCount = item.count, fileName = item.filename;
-            const borderColour = 
-                matchPercent < warningPercentage ? 'border-success' : 
+            const borderColour =
+                matchPercent < warningPercentage ? 'border-success' :
                 matchPercent < dangerPercentage ? 'border-warning' : 'border-danger';
-            
+
             // Create card structure
             const $card = $('<div>', {
                 class: 'card-docx-display card col-3',
@@ -326,8 +326,8 @@ function appendMatchResults(similarityResults) {
         });
         $gridContainer.append($mainContent);
     });
-    
-    const $listContainer = $('<div>', { class: 'col-10', 'data-view-name' : "list"  });
+
+    const $listContainer = $('<div>', { class: 'col-10', 'data-view-name': "list" });
     $.each(similarityResults, (key, values) => {
         const keyId = `${key}-${Object.keys(similarityResults).indexOf(key)}`;
         const $mainContent = $('<div>', {
@@ -335,48 +335,31 @@ function appendMatchResults(similarityResults) {
             'data-id': keyId
         });
 
-        // Iterate over each value in the results
         $.each(values, (i, item) => {
             const matchPercent = parseFloat(item.value);
             const matchCount = item.count, fileName = item.filename;
-            const borderColour = 
-                matchPercent < warningPercentage ? 'border-success' : 
+            const borderColour =
+                matchPercent < warningPercentage ? 'border-success' :
                 matchPercent < dangerPercentage ? 'border-warning' : 'border-danger';
-            
-            const $a = $('<a>', {
-                href: '#',
-                class: `list-group-item list-group-item-action rounded-3 border-thick ${borderColour}`,
+            const $row = $('<div>', {
+                class: `list-group-item d-flex justify-content-between align-items-center ${borderColour}`,
                 'data-base-file': key,
                 'data-compare-file': fileName,
                 'data-match-percent': matchPercent
             });
-            const $row = $('<div>', { class: 'row' });
-            const $dFlexContainer = $('<div>', { class: 'd-flex' });
-            const $titleAndShopContainer = $('<div>', { class: 'd-flex justify-content-between me-2' });
-            const $productTitle = $('<h2>', {
-                class: 'text-truncate product-title col-9',
-                text: fileName
-            });
-            const $shopLocationInfo = $('<div>', { class: 'd-flex flex-column text-truncate' }).append(
-                $('<span>', { class: 'text-truncate' }).append(
-                    $('<i>', { class: 'fa-solid fa-shop me-1 mb-2' }),
-                    fileName
-                ),
-                $('<span>').append(
-                    $('<i>', { class: 'fa-solid fa-location-dot me-1' }),
+            const $fileInfo = $('<div>', { class: 'd-flex align-items-center' }).append(
+                $('<i>', { class: 'fa-solid fa-file me-3' }),
+                $('<span>', { class: 'file-name text-truncate' }).text(fileName)
+            );
+            const $matchInfo = $('<div>', { class: 'match-info d-flex align-items-center' }).append(
+                $('<span>', { class: 'text-muted' }).append(
+                    $('<i>', { class: 'fa-solid fa-hashtag me-1' }),
                     matchCount
-                )
+                ),
+                $('<span>', { class: 'badge bg-primary me-2' }).text(matchPercent === 0 ? '00.0%' : `${matchPercent.toFixed(1)}%`) // Match percentage
             );
-            const $priceAndQuantityContainer = $('<div>', { class: 'd-flex justify-content-between me-2' }).append(
-                $('<p>', { class: 'card-text m-0', text: `AUD ${matchCount}` }),
-                $('<span>', { class: 'mt-3', text: `Qty: ${matchCount}` })
-            );
-            const $description = $('<p>', { class: 'multi-line-text-truncate m-0', text: fileName });
-            $titleAndShopContainer.append($productTitle, $shopLocationInfo);
-            $dFlexContainer.append($titleAndShopContainer, $priceAndQuantityContainer, $('<hr>'), $description);
-            $row.append($dFlexContainer);
-            $a.append($row);
-            $mainContent.append($a);
+            $row.append($fileInfo, $matchInfo);
+            $mainContent.append($row);
         });
         $listContainer.append($mainContent);
     });
@@ -384,16 +367,15 @@ function appendMatchResults(similarityResults) {
     $row.append($aside).append($gridContainer).append($listContainer);
     $('#similarity-result').append($row);
     $("#similarity-result").show();
-    const $similarityResultView = $(`#similarity-result`)
+
+    const $similarityResultView = $('#similarity-result');
     $similarityResultView.find('.btn-group-vertical input').click(function() {
         const target = $(this).data('target');
-        $similarityResultView.find('.card-docx-container').addClass('hidden'); // Hide all card containers
-        $similarityResultView.find('.card-docx-container-list').addClass('hidden'); // Hide all card containers
-        $similarityResultView.find(`.card-docx-container[data-id="${target}"]`).removeClass('hidden'); // Show the selected container
-        $similarityResultView.find(`.card-docx-container-list[data-id="${target}"]`).removeClass('hidden'); // Show the selected container
+        $similarityResultView.find('.card-docx-container').addClass('hidden'); // Hide all grid containers
+        $similarityResultView.find('.card-docx-container-list').addClass('hidden'); // Hide all list containers
+        $similarityResultView.find(`.card-docx-container[data-id="${target}"]`).removeClass('hidden'); // Show the selected grid container
+        $similarityResultView.find(`.card-docx-container-list[data-id="${target}"]`).removeClass('hidden'); // Show the selected list container
     });
-
-    // Automatically click the first radio button
     $aside.find('input').first().click();
 }
 
@@ -407,11 +389,11 @@ function setupVisualiseForm() {
             $("#visualise-form").submit();
         }
     });
-    
-    $('.card-docx-container-list a').on('click', function() {
-        const $a = $(this);
-        const setBaseFile = setFileInput($a.data("base-file"), "#base_file");
-        const setCompareFile = setFileInput($a.data("compare-file"), "#compare_file");
+
+    $('.card-docx-container-list .list-group-item').on('click', function() {
+        const $row = $(this);
+        const setBaseFile = setFileInput($row.data("base-file"), "#base_file");
+        const setCompareFile = setFileInput($row.data("compare-file"), "#compare_file");
 
         if (setBaseFile && setCompareFile) {
             $("#visualise-form").submit();
@@ -457,11 +439,11 @@ function toggleElementsVisibility(isVisible) {
     const $similarityResultGridDiv = $similarityResultAside.next();
     const $similarityResultListDiv = $similarityResultGridDiv.next();
     const $contextMenu = $(`#${contextMenuID}`);
-    
+
     const action = isVisible ? 'show' : 'hide';
     const containerClass = isVisible ? "container" : "container-fluid";
     const colClass = isVisible ? "col-10" : "col-12";
-    
+
     $navBar[action]();
     $settingBar[action]();
     $similarityResult.attr("class", containerClass);
