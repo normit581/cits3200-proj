@@ -242,7 +242,7 @@
 }
 
 .border-danger {
-    border-left: 4px solid #dc3545 !important;
+    border-left: 6px solid #dc3545 !important;
     border-top: 2px solid #dc3545 !important;
     border-bottom: 2px solid #dc3545 !important;
     z-index: 3;

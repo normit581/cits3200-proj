@@ -528,7 +528,7 @@ function updateFilter(value) {
     const minValue = parseFloat(value);
     $('#matchSlider').val(minValue);
     $('#matchInput').val(minValue);
-    $('#similarity-result .card-docx-display, #similarity-result .card-docx-container-list > a').each(function() {
+    $('#similarity-result .card-docx-display, #similarity-result .card-docx-container-list > div').each(function() {
         const matchPercent = parseFloat($(this).data('match-percent'));
         const action = matchPercent >= minValue ? 'removeClass' : 'addClass';
         $(this)[action]('hidden');
