@@ -160,7 +160,7 @@ $(document).ready(function() {
             const $p = $(this);
             const rsid = $(this).data('rsid');
             const $span = $('<span class="pdf-rsid">')
-            const $link = $('<a href="#"><i class="fa fa-2xs fa-external-link"></i></a>');
+            const $link = $('<a href="#"><i class="pe-1 fa fa-2xs fa-external-link"></i></a>');
 
             if (currentRsid !== rsid) {
                 $span.text(`[${currentRsid}]`).insertBefore($p).append($link);
@@ -220,20 +220,23 @@ const customFunc = function(e) {
     const $btnGroup = $(`#${contextMenuID} .btn-group-vertical`);
     $btnGroup.find('.rsidButton').remove();
 
-    let currentRSID = '';
+    let RSIDs = []; // tracks encountered RSIDs
     $divContainer.find('p').each(function() {
         const $pTarget = $(this);
         const rsid = $pTarget.data('rsid');
         const $rsidTargets = $(`p[data-rsid='${rsid}']`);
-        if (currentRSID === rsid){
+
+        // if rsid has already been processed, skip to the next one
+        if (RSIDs.includes(rsid)) {
             return true; // continue
         }
+
         const isHidden = $pTarget.hasClass('hidden-colour');
         const isMatch = $pTarget.data('is-match');
         const cssStyle = isMatch ? 'color' : 'background-color';
         let colourRGB = $pTarget.css(cssStyle);
         if (isHidden) {
-            // turn back visible to get correct colour
+            // make visible to get the correct color, then hide again
             colourRGB = $pTarget.toggleClass('hidden-colour').css(cssStyle);
             $pTarget.toggleClass('hidden-colour');
         }
@@ -285,7 +288,7 @@ const customFunc = function(e) {
             }
             $button.find('[data-id=color-picker]')[$pTarget.hasClass('hidden-colour') ? 'hide': 'show']();
         });
-        currentRSID = rsid
+        RSIDs.push(rsid);
     });
 
     showContextMenu(e);
