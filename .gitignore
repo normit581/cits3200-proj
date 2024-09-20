@@ -8,9 +8,8 @@
 # Test Suite
 /test/testdocs/
 /test/env/
-/test/logs/
-/test/test_logs/
 /test/.pytest_cache
+/test/*log*
 
 # Cache
 *__pycache__*
