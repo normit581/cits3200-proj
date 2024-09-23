@@ -6,10 +6,10 @@ class MyOverlay {
     // complete the progress, set to 100%, and hide the overlay
     completeProgress() {
         const self = this;
+        clearInterval(self.intervalId);
+        self.updateProgress(100);
         setTimeout(function () {
-            clearInterval(self.intervalId);
-            self.updateProgress(100);
-            $('#progress-overlay').fadeOut(); // small delay before closing
+            $('#progress-overlay-container').fadeOut(); // small delay before closing
         }, 500);
     }
     // start simulating progress with random increments
@@ -19,7 +19,7 @@ class MyOverlay {
         if (self.intervalId) {
             clearInterval(this.intervalId); // clear any existing interval
         }
-        $('#progress-overlay').fadeIn();
+        $('#progress-overlay-container').fadeIn();
 
         self.intervalId = setInterval(function () {
             // random increment progress (1-5%)
@@ -35,7 +35,7 @@ class MyOverlay {
     }
     // update progress
     updateProgress(currentProgress) {
-        $('#progress').css('width', currentProgress + '%');
-        $('#progress-text').text(currentProgress + '%');
+        $('#progress-overlay').css('width', currentProgress + '%');
+        $('#progress-overlay-text').text(currentProgress + '%');
     }
 }
