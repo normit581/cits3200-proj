@@ -136,17 +136,61 @@ $(document).ready(function() {
         $div.find('p').each(function(){
             const $p = $(this);
             const rsid = $(this).data('rsid');
-            $p.tooltip({
+            const matchingSiblings = $div.find(`p[data-rsid='${rsid}']`).toArray();
+            const triggerTargets = [$p[0], ...matchingSiblings];
+            tippy(this, {
+                content: `<strong>${rsid}</strong>`,
                 placement: position,
-                fallbackPlacements: ['right', 'left'],
-                trigger: 'manual',
-                html: true,
-                title: `<strong>${rsid}</strong>`
-            }).on('click', () => {
-                if(!getSelection().toString()){
-                    $(this).tooltip('toggle');
+                followCursor: 'vertical',
+                // followCursor: 'horizontal',
+                trigger: 'click',
+                hideOnClick: 'toggle',
+                interactive: true,
+                allowHTML: true,
+                triggerTarget: triggerTargets,
+                // inlinePositioning: true,
+                // popperOptions: {
+                //     boundary: $div.find('[data-id="card-body-scroll"]')[0]
+                // },
+
+                onShow(instance) {
+                    const tooltip = instance.popper;
+                    
+                    // Track mouse movement and check if the cursor is outside the boundary
+                    const mouseMoveHandler = (event) => {
+                        const pRect = $p[0].getBoundingClientRect();
+                        const mouseX = event.clientX;
+                        const mouseY = event.clientY;
+
+                        const isOutside = (
+                            mouseX < pRect.left ||
+                            mouseX > pRect.right ||
+                            mouseY < pRect.top ||
+                            mouseY > pRect.bottom
+                        );
+
+                        if (isOutside) {
+                            tooltip.classList.add('tooltip-cursor-out');  // Add the class if outside
+                        } else {
+                            tooltip.classList.remove('tooltip-cursor-out');  // Remove the class if inside
+                        }
+                    };
+
+                    document.addEventListener('mousemove', mouseMoveHandler);
+
+                    // Store the event handler reference to clean it up later
+                    instance.mouseMoveHandler = mouseMoveHandler;
+                },
+                onHide(instance) {
+                    // Remove the mousemove event listener when tooltip is hidden
+                    document.removeEventListener('mousemove', instance.mouseMoveHandler);
                 }
             });
+            // $p.on('click', () => {
+            //     if(!getSelection().toString()){
+            //         $(this).tooltip('toggle');
+            //     }
+            // });
         });
     });
 
@@ -170,6 +214,71 @@ $(document).ready(function() {
             }
         });
     });
+
+    // let lastScrollTop = 0;
+    // $('[data-id="card-body-scroll"]').scroll(function(){
+    //     const $scoll = $(this);
+    //     const currentScrollTop = $scoll.scrollTop(); // Get current scroll position
+    //     let scrollPosition = currentScrollTop > lastScrollTop ? 'down' : 'up';
+    //     lastScrollTop = currentScrollTop; // Update last scroll position
+    //     // Check each <p> tag inside the div
+    //     $scoll.find('p[aria-describedby]').each(function() {
+    //         const $p = $(this);
+    //         const rsid = $p.data('rsid');
+    //         if(scrollPosition === 'up'){
+    //             const $pTags = $p.prev(`[data-rsid="${rsid}"]`)
+    //             if($pTags.length){
+    //                 $pTags.first().tooltip('show')
+    //                 $p.tooltip('hide')
+    //             }
+    //         } else{
+    //             const $pTags = $p.next(`[data-rsid="${rsid}"]`)
+    //             if($pTags.length){
+    //                 $pTags.first().tooltip('show')
+    //                 $p.tooltip('hide')
+    //             }
+    //         }
+    //     });
+    // })
+    
+    // $('[data-id="card-body-scroll"]').scroll(function(){ 
+    //     const $scrollContainer = $(this);
+    //     const containerTop = $scrollContainer.offset().top;
+    //     const containerBottom = containerTop + $scrollContainer.outerHeight();
+        
+    //     // Iterate over each <p> tag inside the scroll container
+    //     $scrollContainer.find('p[aria-describedby]').each(function() {
+    //         const $p = $(this);
+    //         const pHeight = $p.outerHeight();
+    //         const rsid = $p.data('rsid');
+    
+    //         // Get the top and bottom positions of the <p> element
+    //         const pTop = $p.offset().top + pHeight; 
+    //         const pBottom = ($p.offset().top + pHeight) - pHeight;
+    
+    //         // Check if the <p> tag is above the visible area (scroll top)
+    //         if (pTop < containerTop) {
+    //             console.log('aaa');
+    //             const $nextPTags = $p.nextAll(`p[data-rsid="${rsid}"]`);
+    //             if ($nextPTags.length) {
+    //                 $p.tooltip('hide'); // Hide current tooltip
+    //                 $nextPTags.first().tooltip('show');  // Show next tooltip
+    //             }
+    //             return false; // Exit the loop after action
+    //         }
+    
+    //         // Check if the <p> tag is below the visible area (scroll bottom)
+    //         if (pBottom > containerBottom) {
+    //             console.log('bbb');
+    //             const $prevPTags = $p.prevAll(`p[data-rsid="${rsid}"]`);
+    //             if ($prevPTags.length) {
+    //                 $p.tooltip('hide'); // Hide current tooltip
+    //                 $prevPTags.first().tooltip('show');  // Show previous tooltip
+    //             }
+    //             return false; // Exit the loop after action
+    //         }
+    //     });
+    // });    
 
     triggerContextMenuEvent($('.card-body > div'), true);
 });
