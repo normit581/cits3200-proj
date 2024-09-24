@@ -3,6 +3,7 @@ const defaultTextColour = 'red'; // Default font size
 let currentFontSize = defaultFontSize;
 let longPressInterval;
 const contextMenuID = 'custom-context-menu';
+const rsidTextShowedArray = [];
 
 function adjustCardHeight() {
     const height = document.getElementById('cardHeightInput').value;
@@ -22,6 +23,20 @@ function toggleButtonText(targetBtn, fromText, toText) {
     });
 }
 
+function rsidTextToggleVisibility(isShow){
+    const allElements = $('p[data-rsid]');
+    const uniqueRsidGroups = [...new Set(allElements.map(function () {
+        return $(this).attr('data-rsid');
+    }).get())];
+
+    uniqueRsidGroups.forEach(rsid => {
+        const isRsidShown = rsidTextShowedArray.includes(rsid);
+        if (isShow && !isRsidShown || !isShow && isRsidShown) {
+            $(`p[data-rsid="${rsid}"]`).first().click();
+        }
+    });
+}
+
 function rsidColourToggleVisibility(btn, target, isHideSiblings = false, hideText='Hide', showText='Show') {
     const $btn = $(btn);
     const $icon = $btn.find('i');
@@ -34,6 +49,7 @@ function rsidColourToggleVisibility(btn, target, isHideSiblings = false, hideTex
 
     toggleButtonText($btn, isHidden ? hideText : showText, isHidden ? showText : hideText);
 
+    if (!target) return;
     $(target)[action]('hidden-colour');
 
     if (isHideSiblings) {
@@ -88,7 +104,7 @@ function clearLongPress() {
 function pdfToggleElementsVisibility(isVisible) {
     const $contextMenu = $(`#${contextMenuID}`);
     const $visualiseResult = $("#visualise-result-container");
-    const $tooltipBootstrap = $('[role="tooltip"]');
+    const $tooltip = $('[role="tooltip"]');
     const $pdfRsids = $('span.pdf-rsid');
 
     const action = isVisible ? 'show' : 'hide';
@@ -96,7 +112,7 @@ function pdfToggleElementsVisibility(isVisible) {
     $visualiseResult.find(".card-body").toggleClass('pdf', !isVisible)
     $pdfRsids.toggleClass('pdf', !isVisible)
     $contextMenu[action]();
-    $tooltipBootstrap[action]();
+    $tooltip[action]();
 }
 
 function exportPDF() {
@@ -116,8 +132,6 @@ function exportSinglePDF() {
 $(document).ready(function() {
     $(`nav`).hide();
 
-    configureContextMenuButtons();
-
     $('p[data-colour]').each(function() {
         const colour = $(this).data('colour');
         const isMatch = $(this).data('is-match');
@@ -133,64 +147,60 @@ $(document).ready(function() {
     $('#visualise-result-container div[data-position]').each(function() {
         const $div = $(this);
         const position = $div.data('position');
+        const oppositePos = position === "left" ? "right" : "left";
         $div.find('p').each(function(){
             const $p = $(this);
             const rsid = $(this).data('rsid');
-            const matchingSiblings = $div.find(`p[data-rsid='${rsid}']`).toArray();
-            const triggerTargets = [$p[0], ...matchingSiblings];
+            const allMatchingSiblings = $div.find(`p[data-rsid='${rsid}']`).toArray();
+            const triggerTargets = [$p[0], ...allMatchingSiblings];
+
             tippy(this, {
                 content: `<strong>${rsid}</strong>`,
                 placement: position,
                 followCursor: 'vertical',
-                // followCursor: 'horizontal',
                 trigger: 'click',
                 hideOnClick: 'toggle',
                 interactive: true,
                 allowHTML: true,
                 triggerTarget: triggerTargets,
-                // inlinePositioning: true,
-                // popperOptions: {
-                //     boundary: $div.find('[data-id="card-body-scroll"]')[0]
-                // },
 
                 onShow(instance) {
+                    if(getSelection().toString()){
+                        return false;
+                    }
+
+                    if (!rsidTextShowedArray.includes(rsid)) {
+                        rsidTextShowedArray.push(rsid); // Add rsid to the array
+                        $(`div[data-position=${oppositePos}] p[data-rsid='${rsid}']`).first().click()
+                    }
+
                     const tooltip = instance.popper;
                     
                     // Track mouse movement and check if the cursor is outside the boundary
                     const mouseMoveHandler = (event) => {
                         const pRect = $p[0].getBoundingClientRect();
-                        const mouseX = event.clientX;
-                        const mouseY = event.clientY;
+                        const isOutside = event.clientX < pRect.left || event.clientX > pRect.right ||
+                            event.clientY < pRect.top || event.clientY > pRect.bottom;
 
-                        const isOutside = (
-                            mouseX < pRect.left ||
-                            mouseX > pRect.right ||
-                            mouseY < pRect.top ||
-                            mouseY > pRect.bottom
-                        );
-
-                        if (isOutside) {
-                            tooltip.classList.add('tooltip-cursor-out');  // Add the class if outside
-                        } else {
-                            tooltip.classList.remove('tooltip-cursor-out');  // Remove the class if inside
-                        }
+                        tooltip.classList.toggle('tooltip-cursor-out', isOutside); // Toggle class based on cursor position
                     };
 
                     document.addEventListener('mousemove', mouseMoveHandler);
-
-                    // Store the event handler reference to clean it up later
                     instance.mouseMoveHandler = mouseMoveHandler;
                 },
                 onHide(instance) {
-                    // Remove the mousemove event listener when tooltip is hidden
+                    if(getSelection().toString()){
+                        return false;
+                    }
+                    
+                    const index = rsidTextShowedArray.indexOf(rsid);
+                    if (index > -1) {
+                        rsidTextShowedArray.splice(index, 1); // Remove rsid from the array
+                        $(`div[data-position=${oppositePos}] p[data-rsid='${rsid}']`).first().click()
+                    }
                     document.removeEventListener('mousemove', instance.mouseMoveHandler);
                 }
             });
-            // $p.on('click', () => {
-            //     if(!getSelection().toString()){
-            //         $(this).tooltip('toggle');
-            //     }
-            // });
         });
     });
 
@@ -215,73 +225,16 @@ $(document).ready(function() {
         });
     });
 
-    // let lastScrollTop = 0;
-    // $('[data-id="card-body-scroll"]').scroll(function(){
-    //     const $scoll = $(this);
-    //     const currentScrollTop = $scoll.scrollTop(); // Get current scroll position
-    //     let scrollPosition = currentScrollTop > lastScrollTop ? 'down' : 'up';
-    //     lastScrollTop = currentScrollTop; // Update last scroll position
-    //     // Check each <p> tag inside the div
-    //     $scoll.find('p[aria-describedby]').each(function() {
-    //         const $p = $(this);
-    //         const rsid = $p.data('rsid');
-    //         if(scrollPosition === 'up'){
-    //             const $pTags = $p.prev(`[data-rsid="${rsid}"]`)
-    //             if($pTags.length){
-    //                 $pTags.first().tooltip('show')
-    //                 $p.tooltip('hide')
-    //             }
-    //         } else{
-    //             const $pTags = $p.next(`[data-rsid="${rsid}"]`)
-    //             if($pTags.length){
-    //                 $pTags.first().tooltip('show')
-    //                 $p.tooltip('hide')
-    //             }
-    //         }
-    //     });
-    // })
-    
-    // $('[data-id="card-body-scroll"]').scroll(function(){ 
-    //     const $scrollContainer = $(this);
-    //     const containerTop = $scrollContainer.offset().top;
-    //     const containerBottom = containerTop + $scrollContainer.outerHeight();
-        
-    //     // Iterate over each <p> tag inside the scroll container
-    //     $scrollContainer.find('p[aria-describedby]').each(function() {
-    //         const $p = $(this);
-    //         const pHeight = $p.outerHeight();
-    //         const rsid = $p.data('rsid');
-    
-    //         // Get the top and bottom positions of the <p> element
-    //         const pTop = $p.offset().top + pHeight; 
-    //         const pBottom = ($p.offset().top + pHeight) - pHeight;
-    
-    //         // Check if the <p> tag is above the visible area (scroll top)
-    //         if (pTop < containerTop) {
-    //             console.log('aaa');
-    //             const $nextPTags = $p.nextAll(`p[data-rsid="${rsid}"]`);
-    //             if ($nextPTags.length) {
-    //                 $p.tooltip('hide'); // Hide current tooltip
-    //                 $nextPTags.first().tooltip('show');  // Show next tooltip
-    //             }
-    //             return false; // Exit the loop after action
-    //         }
-    
-    //         // Check if the <p> tag is below the visible area (scroll bottom)
-    //         if (pBottom > containerBottom) {
-    //             console.log('bbb');
-    //             const $prevPTags = $p.prevAll(`p[data-rsid="${rsid}"]`);
-    //             if ($prevPTags.length) {
-    //                 $p.tooltip('hide'); // Hide current tooltip
-    //                 $prevPTags.first().tooltip('show');  // Show previous tooltip
-    //             }
-    //             return false; // Exit the loop after action
-    //         }
-    //     });
-    // });    
-
+    configureContextMenuButtons();
     triggerContextMenuEvent($('.card-body > div'), true);
 });
+
+function getTippyInstance(DOMselector){
+    const tip = tippy(DOMselector);
+    const el = document.querySelector(DOMselector)
+    const popper = tip.getPopperElement(el);
+    return popper
+}
 
 // Context Menu functions
 function configureContextMenuButtons(){
@@ -311,6 +264,15 @@ function configureContextMenuButtons(){
         .trigger('oninput');
     adjustCardHeight();
 
+    $('#hide-text-btn').on('click', function() { 
+        const isShow = $('#hide-text-btn').data('is-show')
+        rsidColourToggleVisibility(this, null);
+        rsidTextToggleVisibility(!isShow);
+        $('#hide-text-btn').data('is-show', !isShow);
+    });
+    $('#hide-text-btn').attr('data-is-show', true);
+    rsidTextToggleVisibility(true);
+    
     $('#hide-matching-colour-btn').on('click', function() { 
         const $target = $('.card-body p').not(`[data-is-match="false"]`);
         rsidColourToggleVisibility(this, $target, isHideSiblings = true);

@@ -65,3 +65,7 @@ p:not(.hidden-colour) + span.pdf {
 div.tooltip-cursor-out {
     display: none;
 }
+
+body {
+    overflow-x: hidden;
+}
