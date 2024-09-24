@@ -71,11 +71,17 @@ body {
 }
 
 /* text with equal spacing */
-.rsidButton .text {
+.rsidButton .char-evenly-space {
     font-family: monospace;
     white-space: nowrap;
 }
 
 .rsidButton .row > div.col-auto {
     padding-right: 5px;
+}
+
+ul.dropdown-menu.add-scroll {
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: 500px;
 }
