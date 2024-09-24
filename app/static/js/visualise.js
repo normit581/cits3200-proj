@@ -248,8 +248,13 @@ const customFunc = function(e) {
         });
 
         const $text = $('<div>', {
+            class: 'col-auto',
+            text: `${isHidden ? 'Show' : 'Hide'}`
+        });
+
+        const $rsidText = $('<div>', {
             class: 'col-auto text',
-            text: `${isHidden ? 'Show' : 'Hide'} ${rsid} [${colourHEX}]`
+            text: `${rsid}`
         });
 
         const $colorInput = $('<input>', {
@@ -259,11 +264,17 @@ const customFunc = function(e) {
             value: colourHEX
         });
 
+        const $hexColourText = $('<div>', {
+            class: 'col-auto text same-spacing',
+            text: `[${colourHEX}]`
+        });
+
         const $row = $('<div>', {
             class: 'row',
             html: $('<div>', { class: 'col-auto ps-4' }).append($icon)
-                .add($text)
+                .add($text).add($rsidText)
                 .add($('<div>', { class: 'col-auto' }).append($colorInput))
+                .add($hexColourText)
         });
 
         const $button = $('<button>', {
@@ -278,7 +289,7 @@ const customFunc = function(e) {
 
         $colorInput[isHidden ? 'hide': 'show']();
         $colorInput.on('input', function(){
-            toggleButtonText($text, rgbStringToHex($pTarget.css(cssStyle)), $(this).val())
+            toggleButtonText($hexColourText, rgbStringToHex($pTarget.css(cssStyle)), $(this).val())
             $rsidTargets.css(cssStyle, $(this).val());
         });
 

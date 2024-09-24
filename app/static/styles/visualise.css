@@ -57,3 +57,25 @@ span.pdf-rsid {
 p:not(.hidden-colour) + span.pdf {
     display: inline !important;
 }
+
+.tippy-box[data-reference-hidden] {
+    display: none;
+}
+
+div.tooltip-cursor-out {
+    display: none;
+}
+
+body {
+    overflow-x: hidden;
+}
+
+/* text with equal spacing */
+.rsidButton .text {
+    font-family: monospace;
+    white-space: nowrap;
+}
+
+.rsidButton .row > div.col-auto {
+    padding-right: 5px;
+}
