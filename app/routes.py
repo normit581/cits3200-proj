@@ -85,47 +85,6 @@ def unhandled_exception(e):
 @app.route('/visualise', methods=['POST'])
 def visualise():
     form = VisualiseDocumentForm()
-    if request.method == "POST":
-        # Get the data from the form
-        if form.validate_on_submit():
-            files = [form.base_file.data, form.compare_file.data]
-            
-            # Create loop that will iterate for the number of files in files
-            # error check
-            metadata_list = []
-            if len(files) == 2:
-                file1 = files[0]
-                file2 = files[1]
-
-                rsid1 = rsid_extract(file1)
-                rsid2 = rsid_extract(file2)
-                print(rsid1)
-                print('here')
-                similarity, matching_rsid = rsid_match2(rsid1, rsid2)
-                # print(f"Similarity: {similarity:.03f}%")
-                # print('matching_rsid:', matching_rsid)
-        
-                # extract data
-                metadata1, metadata2 = extract_metadata(file1, rsid1, rsid2, matching_rsid)
-                print(metadata1)
-                # rsid associated with text function call
-
-                metadata_list.append({
-                    'file_name': file1.filename,
-                    'metadata': metadata1
-                })
-
-                metadata_list.append({
-                    'file_name': file2.filename,
-                    'metadata': metadata2
-                })
-                
-                return render_template('visualise.html', matching_rsid=matching_rsid, similarity=similarity, metadata_list=metadata_list)
-    return render_template('visualise.html', form=form)
-
-@app.route('/visualise2', methods=['POST'])
-def visualise2():
-    form = VisualiseDocumentForm()
 
     if form.validate_on_submit():
         files = [form.base_file.data, form.compare_file.data]

@@ -7,6 +7,7 @@ const maxFileSize = 100 * 1024 * 1024; //100MB
 const maxTotalSize = maxFiles * maxFileSize;
 const contextMenuID = 'custom-context-menu';
 const dangerPercentage = 60, warningPercentage = 30
+const overlay = new MyOverlay();
 
 function toggleFileList(isOpen) {
     const fileListWidth = isOpen ? "15%" : "0%";
@@ -237,6 +238,7 @@ const onSuccessMatch = (response) => {
         $("#setting-bar-container").show();
         $("#upload-container").hide();
         triggerContextMenuEvent($('main'), true);
+        overlay.completeProgress();
     } else {
         GenerateDangerAlertDiv("Failed!", response.message);
     }
@@ -256,6 +258,7 @@ function match() {
     }
 
     $('#similarity-result').empty();
+    overlay.startProgress(0.5);
     CallPost(`/home`, validateMatchForm(), onSuccessMatch, onErrorMatch, onXhrMatch);
 }
 
