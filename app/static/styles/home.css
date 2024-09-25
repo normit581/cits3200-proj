@@ -172,11 +172,11 @@
     background-color: #f8f9fa;
 }
 
-.list-group-item {
+.card-docx-container-list .list-group-item {
     background-color: #fff;
-    border: 1px solid #ddd;
+    border-left: 4px solid transparent; /* Default border */
     padding: 10px 15px;
-    transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, border-left-width 0.3s ease;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -185,7 +185,8 @@
     z-index: 1;
 }
 
-.list-group-item:hover {
+.card-docx-container-list .list-group-item:hover {
+    border-left-width: 8px; /* Increase the left border width on hover */
     background-color: #f1f3f5;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -229,29 +230,18 @@
 
 /* Border/Badge Styles for Success, Warning, Danger */
 .border-success {
-    border-left: 4px solid #28a745 !important;
-    border-top: 0.5px solid #28a745 !important;
+    border-left-color: 1px solid #28a745 !important;
     z-index: 1;
 }
 
 .border-warning {
-    border-left: 4px solid #ffc107 !important;
-    border-top: 1px solid #ffc107 !important;
+    border-left-color: 1px solid #ffc107 !important;
     z-index: 2;
-    margin-top: -2px;
 }
 
 .border-danger {
-    border-left: 6px solid #dc3545 !important;
-    border-top: 2px solid #dc3545 !important;
-    border-bottom: 2px solid #dc3545 !important;
+    border-left-color: 1px solid #dc3545 !important;
     z-index: 3;
-    margin-top: -4px;
-}
-
-.border-warning + .border-success,
-.border-danger + .border-success {
-    margin-top: -4px;
 }
 
 .badge-success {
@@ -264,6 +254,11 @@
 
 .badge-danger {
     background-color: #dc3545 !important;
+}
+
+.border-warning + .border-success,
+.border-danger + .border-success {
+    margin-top: 0; /* Ensure no overlapping margins */
 }
 
 /* Base style for .border-thick elements */
