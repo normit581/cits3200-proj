@@ -351,12 +351,12 @@ function appendMatchResults(similarityResults) {
                 'data-compare-file': fileName,
                 'data-match-percent': matchPercent
             });
-            const $fileInfo = $('<div>', { class: 'd-flex align-items-center' }).append(
+            const $fileInfo = $('<div>', { class: 'd-flex align-items-center flex-grow-1 file-info' }).append(
                 $('<i>', { class: 'fa-solid fa-file me-3' }),
                 $('<span>', { class: 'file-name text-truncate' }).text(fileName)
             );
             const $matchInfo = $('<div>', { class: 'match-info d-flex align-items-center' }).append(
-                $('<span>', { class: 'text-muted' }).append(
+                $('<span>', { class: 'text-muted me-3 match-count' }).append(
                     $('<i>', { class: 'fa-solid fa-hashtag me-1' }),
                     matchCount
                 ),
