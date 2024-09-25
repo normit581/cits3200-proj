@@ -57,3 +57,15 @@ span.pdf-rsid {
 p:not(.hidden-colour) + span.pdf {
     display: inline !important;
 }
+
+.tippy-box[data-reference-hidden] {
+    display: none;
+}
+
+div.tooltip-cursor-out {
+    display: none;
+}
+
+body {
+    overflow-x: hidden;
+}
