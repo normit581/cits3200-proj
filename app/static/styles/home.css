@@ -230,22 +230,22 @@
 
 /* Border/Badge Styles for Success, Warning, Danger */
 .border-success {
-    border-left-color: 1px solid #28a745 !important;
+    border-left-color: #28a745 !important;
     z-index: 1;
 }
 
 .border-warning {
-    border-left-color: 1px solid #ffc107 !important;
+    border-left-color: #ffc107 !important;
     z-index: 2;
 }
 
 .border-danger {
-    border-left-color: 1px solid #dc3545 !important;
+    border-left-color: #dc3545 !important;
     z-index: 3;
 }
 
 .badge-success {
-    background-color: #28a745 ;
+    background-color: #28a745;
 }
 
 .badge-warning {
