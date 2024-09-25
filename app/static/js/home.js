@@ -517,15 +517,17 @@ function generateTitlePDF(element) {
     const selectedInputId = $(element).attr('data-target');
     const selectedLabel = $(element).next().text();
     const titleHTML = $(`<div data-result-docx-title="${selectedLabel}" class="h1 text-center mt-3"></div>`).text(selectedLabel);
+
     const divIdGrid = `#similarity-result div[data-view-name='grid'] [data-id='${selectedInputId}']`;
     const divIdList = `#similarity-result div[data-view-name='list'] > div[data-id='${selectedInputId}']`;
-    $(`#similarity-result div[data-view-name='list'] [data-id='doc1Student-0']`)
     $(divIdGrid).removeClass('hidden');
-    $(divIdList).removeClass('hidden');
-    if ($(divIdGrid).children('div').not('.hidden').length > 0)
+    if ($(divIdGrid).children('div').not('.hidden').length > 0) {
         $(titleHTML).insertBefore(divIdGrid);
-    if ($(divIdList).children('a').not('.hidden').length > 0)
+    }
+    $(divIdList).removeClass('hidden');
+    if ($(divIdList).children('div').not('.hidden').length > 0) {
         $(titleHTML.clone()).insertBefore(divIdList);
+    }
 }
 
 function updateFilter(value) {
