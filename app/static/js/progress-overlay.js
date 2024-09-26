@@ -13,20 +13,25 @@ class MyOverlay {
         }, 500);
     }
     // start simulating progress with random increments
-    startProgress(intervalInSeconds) {
+    startProgress(intervalInSeconds, callback) {
         const self = this;
         self.resetProgress();
         if (self.intervalId) {
             clearInterval(this.intervalId); // clear any existing interval
         }
-        $('#progress-overlay-container').fadeIn();
-
+        
         self.intervalId = setInterval(function () {
             // random increment progress (1-5%)
             const randomIncrement = Math.floor(Math.random() * 5) + 1;
             self.progress = Math.min(self.progress + randomIncrement, 99); // up to 99%
             self.updateProgress(self.progress);
         }, intervalInSeconds * 1000);
+
+        $('#progress-overlay-container').fadeIn(function(){
+            if (typeof callback === 'function') {
+                callback(); // execute the callback
+            }
+        });
     }
     // reset the progress to 0
     resetProgress() {

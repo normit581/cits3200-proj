@@ -5,8 +5,9 @@
 {% block head %}
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/visualise.css')}}">
   <script src="{{ url_for('static', filename='js/context-menu.js') }}" defer></script>
-  <script src="{{ url_for('static', filename='js/visualise.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/progress-overlay.js') }}" defer></script>
   <script src="{{ url_for('static', filename='js/colour.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/visualise.js') }}" defer></script>
   <script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.min.js"></script>
   <script src="https://unpkg.com/tippy.js@6/dist/tippy-bundle.umd.js"></script>
 {% endblock %}
@@ -17,6 +18,7 @@
         {% include "/layout/alert_modal.html" %}
     </div>
 </div>
+{% include "/layout/progress_overlay.html" %}
 
 <div id="custom-context-menu">
   <div class="btn-group-vertical" role="group" aria-label="Vertical button group">

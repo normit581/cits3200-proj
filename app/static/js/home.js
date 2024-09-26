@@ -227,6 +227,7 @@ const onErrorMatch = (xhr) => {
             }
             break;
     }
+    overlay.completeProgress();
     GenerateDangerAlertDiv("Failed!", `ErrorCode: ${xhr.status}. ${responseText}`);
 };
 
