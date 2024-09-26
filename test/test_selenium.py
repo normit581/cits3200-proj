@@ -21,6 +21,7 @@ current_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "test_fil
 class FlaskSeleniumTest(unittest.TestCase):
     
     # setup
+
     @classmethod
     def setUpClass(cls):
         cls.app = create_app(TestingConfig)
@@ -75,8 +76,6 @@ class FlaskSeleniumTest(unittest.TestCase):
         assert progress_width == "100", f"Expected progress bar width to be 100%, but got {progress_width}%"
 
 
-
-
     def test_upload_files_failed(self):
         # try file with image inside
         file_input = WebDriverWait(self.driver, 5).until(
@@ -96,12 +95,12 @@ class FlaskSeleniumTest(unittest.TestCase):
         )
         submit_button.click()
             # Wait for the alert message to be visible
-        alert_element = WebDriverWait(self.driver, 10).until(
+        alert = WebDriverWait(self.driver, 10).until(
             EC.presence_of_element_located((By.CLASS_NAME, "alert-danger"))
         )
 
         # Capture the alert message
-        alert_message = alert_element.text
+        alert_message = alert.text
 
         # Assert that either validation error or 500 error is present
         assert ("ErrorCode: 500" in alert_message), f"Unexpected alert message: {alert_message}"
@@ -134,8 +133,23 @@ class FlaskSeleniumTest(unittest.TestCase):
 
     # test size limit
     def test_upload_large_file(self):
+        # Get file input
+        file_input = WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, "input[type='file']"))
+        )
+        # Have large file and send key
+        large_file = os.path.join(current_dir, "large_file.docx")
+        file_input.send_keys(large_file)
 
-        pass
+        # Wait for error
+        alert = WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.CLASS_NAME, "alert-danger"))
+        )
+        alert_message = alert.text
+        # If GenerateDangerAlertDiv("Failed!", `File ${file.name} exceeds the maximum size of 100MB.`
+        # actual size is 1mb but using this as the print message from home.js
+        self.assertIn(f"×\nFailed!\nFile large_file.docx exceeds the maximum size of 100MB", alert_message)
+
     # # test not .docx
     def test_upload_invalid_file_extension(self):
 
@@ -154,16 +168,26 @@ class FlaskSeleniumTest(unittest.TestCase):
         file_input.send_keys('\n'.join(invalid_files))
 
         # Wait for the error message to be generated in the DOM
-        alert_element = WebDriverWait(self.driver, 10).until(
-            EC.presence_of_element_located((By.CLASS_NAME, "alert-danger"))  # Assuming this is the class of the alert div
+        alert = WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.CLASS_NAME, "alert-danger"))
         )
 
         # Get the text of the alert element
-        alert_message = alert_element.text
+        alert_message = alert.text
 
         # Assert that the alert message contains the expected text
         self.assertIn("Only .docx files are allowed.", alert_message)
 
-
+    # Test with no files added, just submit nothing
+    def test_submit_without_files(self):
+        submit_button = WebDriverWait(self.driver, 5).until(
+            EC.element_to_be_clickable((By.ID, "submit")),
+        )
+        submit_button.click()
+        alert = WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.CLASS_NAME, "alert-danger"))
+        )
+        alert_message = alert.text
+        self.assertIn("Please add at least one file.", alert_message)
 if __name__ == "__main__":
     unittest.main() 
