@@ -1,5 +1,6 @@
 import zipfile
 import xml.etree.ElementTree as ET
+from app.utilities.metadata import RSID
 
 def clean_text(elem):
 
@@ -62,7 +63,7 @@ def rsid_match2(rsid1, rsid2) :
             
             }
 
-    rsid_match = 100 * common_rsid_count / total1
+    rsid_match = RSID.calculate_similarity(common_rsid_count, total1)
     # print("common rsid:", common_rsid_count)
-    return rsid_match, matching_rsid
+    return rsid_match, matching_rsid, common_rsid_count
 

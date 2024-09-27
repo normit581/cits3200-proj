@@ -66,6 +66,8 @@
           <div class="card">
               <div class="card-header">
                   <h5>{{ document.file_name }}</h5>
+                  <small>Similarity: {{ document.metadata.similarity }}</small>
+                  <small>Count: {{ document.metadata.count }}</small>
                   <small>Created on: {{ document.metadata.created.strftime('%Y-%m-%d %H:%M:%S') }}</small>
               </div>
               <div class="card-body" style="overflow-y: auto;" data-id="card-body-scroll">

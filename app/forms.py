@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import SubmitField
+from wtforms import SubmitField, IntegerField
 from wtforms.validators import ValidationError
 from app.fields import WordFileField, WordFilesField
 
@@ -17,3 +17,6 @@ class MatchDocumentForm(FlaskForm):
 class VisualiseDocumentForm(FlaskForm):
     base_file = WordFileField('File')
     compare_file = WordFileField('File')
+    base_count = IntegerField('Base Count')
+    compare_count = IntegerField('Compare Count')
+    common_count = IntegerField('Common Count')
