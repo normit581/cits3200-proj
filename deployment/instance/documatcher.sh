@@ -1,6 +1,6 @@
 #!/bin/bash
 
-REPO_DIR="/home/admin/app"
+REPO_DIR="/home/ubuntu/app"
 
 cd "$REPO_DIR" || exit
 

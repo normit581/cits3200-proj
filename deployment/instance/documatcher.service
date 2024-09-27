@@ -3,4 +3,4 @@ Description=Update and deploy the repository if changes are detected
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/appserver.sh
+ExecStart=/usr/local/bin/documatcher.sh
