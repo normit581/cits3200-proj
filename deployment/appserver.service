@@ -1,0 +1,6 @@
+[Unit]
+Description=Update and deploy the repository if changes are detected
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/appserver.sh

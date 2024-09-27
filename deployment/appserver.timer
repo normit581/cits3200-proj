@@ -1,0 +1,9 @@
+[Unit]
+Description=Periodically check and deploy updates for the repository
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=10min
+
+[Install]
+WantedBy=timers.target
