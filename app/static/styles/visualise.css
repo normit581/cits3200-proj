@@ -7,6 +7,10 @@
     height: auto !important;
 }
 
+.card-body.pdf p {
+    border-bottom: 0px solid red;
+}
+
 .fluid-col-6 {
     flex: 0 0 auto;
     width: 48.5%;
@@ -84,4 +88,8 @@ ul.dropdown-menu.add-scroll {
     overflow-y: auto;
     overflow-x: hidden;
     height: 500px;
+}
+
+p.highlighted {    
+    border-bottom: 3px solid red;
 }

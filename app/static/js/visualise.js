@@ -5,6 +5,7 @@ let longPressInterval;
 const contextMenuID = 'custom-context-menu';
 const rsidTextShowedArray = [];
 const overlay = new MyOverlay();
+let currentNavigateIndexRSID = 0
 
 function adjustCardHeight() {
     const height = document.getElementById('cardHeightInput').value;
@@ -168,6 +169,7 @@ $(document).ready(function() {
         const cssColourHEX = rgbStringToHex(colour)
         $(this).css(cssStyle, cssColourHEX);
         $(this).attr('title', rsid);
+        $(this).attr('aria-expanded', true)
     });
 
     // assign tooltip to each <p>
@@ -233,7 +235,8 @@ $(document).ready(function() {
             const $p = $(this);
             const rsid = $(this).data('rsid');
             const $span = $('<span class="pdf-rsid">')
-            const $link = $('<a href="#"><i class="pe-1 fa fa-2xs fa-external-link"></i></a>');
+            // const $link = $('<a href="#"><i class="pe-1 fa fa-2xs fa-external-link"></i></a>');
+            const $link = '';
 
             if (currentRsid !== rsid) {
                 $span.text(`[${currentRsid}]`).insertBefore($p).append($link);
@@ -242,6 +245,30 @@ $(document).ready(function() {
                 $span.text(`[${rsid}]`).insertAfter($p).append($link);  
             }
         });
+    });
+
+    $(document).on('mouseup', function (e) {
+        if ($(e.target).closest(`#${contextMenuID}`).length) {
+            return;
+        }
+        $('p[data-rsid]').removeClass('highlighted');
+        const selection = document.getSelection();
+        if (!selection.isCollapsed) { // Ensure there is a selection
+            const range = selection.getRangeAt(0);  // Get the selected range
+            const commonAncestor = range.commonAncestorContainer.nodeType === 3 
+                                   ? range.commonAncestorContainer.parentNode  // If it's text, get its parent node
+                                   : range.commonAncestorContainer;
+            // Find all <p> elements within the common ancestor
+            const $paragraphs = $(commonAncestor).find('p').addBack('p');
+            $paragraphs.each(function() {
+                const $p = $(this);
+                // Check if the paragraph is at least partially within the selection
+                if (selection.containsNode(this, true)) { 
+                    const rsid = $p.data('rsid');
+                    $(`p[data-rsid='${rsid}']`).addClass('highlighted');
+                }
+            });
+        }
     });
 });
 
@@ -294,6 +321,13 @@ function configureContextMenuButtons(){
 
 const customFunc = function(e) {
     e.preventDefault();
+    $('p[data-rsid]').removeClass('highlighted');
+    const $ele = $(e.target);
+    if ($ele.is('[data-rsid]')) {
+        const rsid = $ele.data('rsid'); // Retrieve the value of data-rsid
+        $(`p[data-rsid='${rsid}']`).addClass('highlighted');
+    }
+    
     const $divContainer = $(this);
     const uniqueRSIDs = [...new Set($divContainer.find('p').map(function() {
         return $(this).data('rsid');
