@@ -4,6 +4,7 @@ let currentFontSize = defaultFontSize;
 let longPressInterval;
 const contextMenuID = 'custom-context-menu';
 const rsidTextShowedArray = [];
+const overlay = new MyOverlay();
 
 function adjustCardHeight() {
     const height = document.getElementById('cardHeightInput').value;
@@ -29,11 +30,14 @@ function rsidTextToggleVisibility(isShow){
         return $(this).attr('data-rsid');
     }).get())];
 
-    uniqueRsidGroups.forEach(rsid => {
-        const isRsidShown = rsidTextShowedArray.includes(rsid);
-        if (isShow && !isRsidShown || !isShow && isRsidShown) {
-            $(`p[data-rsid="${rsid}"]`).first().click();
-        }
+    overlay.startProgress(0.5, function(){
+        uniqueRsidGroups.forEach(rsid => {
+            const isRsidShown = rsidTextShowedArray.includes(rsid);
+            if (isShow && !isRsidShown || !isShow && isRsidShown) {
+                $(`p[data-rsid="${rsid}"]`).first().click();
+            }
+        })
+        overlay.completeProgress()
     });
 }
 
@@ -87,9 +91,6 @@ function switchVisualiseDocx(){
     const targets = [$($visualiseDocxs[0]).find('.card-body'), $($visualiseDocxs[1]).find('.card-body')];
     scrollAdjustPosition(targets, function() {
         $(firstDocx).insertAfter($(secondDocx));
-        $('[data-bs-toggle="tooltip"]').each(function() {
-            $(this).tooltip('update');
-        });
     });
 }
 
@@ -135,9 +136,30 @@ function exportSinglePDF() {
     exportPDF();
 }
 
+function processInBatches($elements, batchSize, batchCallback, doneCallback) {
+    let currentIndex = 0;
+
+    function processBatch() {
+        const batch = $elements.slice(currentIndex, currentIndex + batchSize);
+        // Process the current batch
+        batch.each(function () {
+            batchCallback($(this));
+        });
+
+        currentIndex += batchSize;
+        // If there are more elements to process, queue up the next batch
+        if (currentIndex < $elements.length) {
+            setTimeout(processBatch, 0); // 0 ms timeout to yield to the event loop
+        } else if (doneCallback) {
+            doneCallback(); // Call the done callback when all batches are processed
+        }
+    }
+    processBatch(); // Start the batch processing
+}
+
 $(document).ready(function() {
     $(`nav`).hide();
-
+    $(`#${contextMenuID}`).hide();
     $('p[data-colour]').each(function() {
         const colour = $(this).data('colour');
         const isMatch = $(this).data('is-match');
@@ -146,69 +168,60 @@ $(document).ready(function() {
         const cssColourHEX = rgbStringToHex(colour)
         $(this).css(cssStyle, cssColourHEX);
         $(this).attr('title', rsid);
-        $(this).attr('data-bs-toggle', 'tooltip');
     });
 
     // assign tooltip to each <p>
-    $('#visualise-result-container div[data-position]').each(function() {
-        const $div = $(this);
-        const position = $div.data('position');
+    const $allParagraphs = $('#visualise-result-container p[data-rsid]'); // Get all <p> elements
+    overlay.startProgress(0.5, processInBatches($allParagraphs, 50, function ($p) { 
+        const rsid = $p.data('rsid');
+        const position = $p.closest('div[data-position]').data('position');
         const oppositePos = position === "left" ? "right" : "left";
-        $div.find('p').each(function(){
-            const $p = $(this);
-            const rsid = $(this).data('rsid');
-            const allMatchingSiblings = $div.find(`p[data-rsid='${rsid}']`).toArray();
-            const triggerTargets = [$p[0], ...allMatchingSiblings];
+        const allMatchingSiblings = $p.closest('div[data-position]').find(`p[data-rsid='${rsid}']`).toArray();
+        const triggerTargets = [$p[0], ...allMatchingSiblings];
 
-            tippy(this, {
-                content: `<strong>${rsid}</strong>`,
-                placement: position,
-                followCursor: 'vertical',
-                trigger: 'click',
-                hideOnClick: 'toggle',
-                interactive: true,
-                allowHTML: true,
-                triggerTarget: triggerTargets,
-
-                onShow(instance) {
-                    if(getSelection().toString()){
-                        return false;
-                    }
-
-                    if (!rsidTextShowedArray.includes(rsid)) {
-                        rsidTextShowedArray.push(rsid); // Add rsid to the array
-                        $(`div[data-position=${oppositePos}] p[data-rsid='${rsid}']`).first().click()
-                    }
-
-                    const tooltip = instance.popper;
-                    
-                    // Track mouse movement and check if the cursor is outside the boundary
-                    const mouseMoveHandler = (event) => {
-                        const pRect = $p[0].getBoundingClientRect();
-                        const isOutside = event.clientX < pRect.left || event.clientX > pRect.right ||
-                            event.clientY < pRect.top || event.clientY > pRect.bottom;
-
-                        tooltip.classList.toggle('tooltip-cursor-out', isOutside); // Toggle class based on cursor position
-                    };
-
-                    document.addEventListener('mousemove', mouseMoveHandler);
-                    instance.mouseMoveHandler = mouseMoveHandler;
-                },
-                onHide(instance) {
-                    if(getSelection().toString()){
-                        return false;
-                    }
-                    
-                    const index = rsidTextShowedArray.indexOf(rsid);
-                    if (index > -1) {
-                        rsidTextShowedArray.splice(index, 1); // Remove rsid from the array
-                        $(`div[data-position=${oppositePos}] p[data-rsid='${rsid}']`).first().click()
-                    }
-                    document.removeEventListener('mousemove', instance.mouseMoveHandler);
+        tippy($p[0], {
+            content: `<strong>${rsid}</strong>`,
+            placement: oppositePos,
+            followCursor: 'vertical',
+            trigger: 'click',
+            hideOnClick: 'toggle',
+            interactive: true,
+            allowHTML: true,
+            triggerTarget: triggerTargets,
+            showOnCreate: true,
+            onShow(instance) {
+                if(getSelection().toString()) return false;
+                if (!rsidTextShowedArray.includes(rsid)) {
+                    rsidTextShowedArray.push(rsid); // Add rsid to the array
+                    $(`div[data-position=${oppositePos}] p[data-rsid='${rsid}']`).first().click()
                 }
-            });
+
+                const tooltip = instance.popper;
+                // Track mouse movement and check if the cursor is outside the boundary
+                const mouseMoveHandler = (event) => {
+                    const pRect = $p[0].getBoundingClientRect();
+                    const isOutside = event.clientX < pRect.left || event.clientX > pRect.right ||
+                        event.clientY < pRect.top || event.clientY > pRect.bottom;
+                    tooltip.classList.toggle('tooltip-cursor-out', isOutside); // Toggle class based on cursor position
+                };
+                document.addEventListener('mousemove', mouseMoveHandler);
+                instance.mouseMoveHandler = mouseMoveHandler;
+            },
+            onHide(instance) {
+                if(getSelection().toString()) return false;                
+                const index = rsidTextShowedArray.indexOf(rsid);
+                if (index > -1) {
+                    rsidTextShowedArray.splice(index, 1); // Remove rsid from the array
+                    $(`div[data-position=${oppositePos}] p[data-rsid='${rsid}']`).first().click()
+                }
+                document.removeEventListener('mousemove', instance.mouseMoveHandler);
+            }
         });
-    });
+    }, function () { // doneCallback
+        overlay.completeProgress();
+        configureContextMenuButtons();
+        triggerContextMenuEvent($('.card-body > div'), true);
+    }));
 
     // assign rsid for export pdf
     $('#visualise-result-container div.card-body > div').each(function() {
@@ -230,17 +243,7 @@ $(document).ready(function() {
             }
         });
     });
-
-    configureContextMenuButtons();
-    triggerContextMenuEvent($('.card-body > div'), true);
 });
-
-function getTippyInstance(DOMselector){
-    const tip = tippy(DOMselector);
-    const el = document.querySelector(DOMselector)
-    const popper = tip.getPopperElement(el);
-    return popper
-}
 
 // Context Menu functions
 function configureContextMenuButtons(){
@@ -277,7 +280,6 @@ function configureContextMenuButtons(){
         $('#hide-text-btn').data('is-show', !isShow);
     });
     $('#hide-text-btn').attr('data-is-show', true);
-    rsidTextToggleVisibility(true);
     
     $('#hide-matching-colour-btn').on('click', function() { 
         const $target = $('.card-body p').not(`[data-is-match="false"]`);

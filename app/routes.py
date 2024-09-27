@@ -108,19 +108,20 @@ def visualise():
         for i, docx in enumerate(docx_objects):
             filename = files[i].filename
             colours = {rsid: ColourHelper.random_light_rgb_str() for rsid in docx.unique_rsid.keys()}
-            paragraphs = [
-                [
-                    {
-                        "rsid": rsid,
-                        "colour": shared_colours.get(rsid, colours.get(rsid)),
-                        "text": txt,
-                        "is_match": rsid in common_rsids
-                    }
-                    for txt, rsid in zip(para.txt_array, para.rsid_array)
-                ]
-                for para in docx.paragraphs.values()
-            ]
-
+            paragraphs = []
+            for para in docx.paragraphs.values():
+                current_paragraph = []
+                for txt, rsid in zip(para.txt_array, para.rsid_array):
+                    if current_paragraph and current_paragraph[-1]['rsid'] == rsid:
+                        current_paragraph[-1]['text'] += txt  # Concatenate text if rsid matches the last one
+                    else:
+                        current_paragraph.append({
+                            "rsid": rsid,
+                            "colour": shared_colours.get(rsid, colours.get(rsid)),
+                            "text": txt,
+                            "is_match": rsid in common_rsids
+                        })
+                paragraphs.append(current_paragraph)
             result = {
                 "file_name": filename,
                 "metadata": {
