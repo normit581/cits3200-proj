@@ -1,9 +1,9 @@
 [Unit]
-Description=Periodically check and deploy updates for DocuMatcher
+Description=Keep DocuMatcher up to date with main
 
 [Timer]
 OnBootSec=0s
-OnCalender=* *-*-* 03:00:00
+OnCalendar=*-*-* 03:00:00
 
 [Install]
 WantedBy=timers.target
