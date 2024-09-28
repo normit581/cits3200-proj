@@ -399,6 +399,7 @@ function setupVisualiseForm() {
         $('#base_count').val($card_docx.data("base-count"))
         $('#compare_count').val($card_docx.data("compare-count"))
         $('#common_count').val($card_docx.data("common-count"))
+<<<<<<< HEAD
 
         if (setBaseFile && setCompareFile) {
             $("#visualise-form").submit();
@@ -409,6 +410,8 @@ function setupVisualiseForm() {
         const $row = $(this);
         const setBaseFile = setFileInput($row.data("base-file"), "#base_file");
         const setCompareFile = setFileInput($row.data("compare-file"), "#compare_file");
+=======
+>>>>>>> 24f40a5ce3f5e19d2dbd56cd97fab90c62f99800
 
         if (setBaseFile && setCompareFile) {
             $("#visualise-form").submit();
