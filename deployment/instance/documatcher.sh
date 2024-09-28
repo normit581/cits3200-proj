@@ -12,3 +12,4 @@ REMOTE_COMMIT=$(git rev-parse origin/main)
 if [ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]; then
     git pull
     ./deploy
+fi
