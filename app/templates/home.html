@@ -83,6 +83,9 @@
     {{ visualise_form.csrf_token(id="visualise_form_csrf_token") }}
     {{ visualise_form.base_file(accept=".docx", required=False) }}
     {{ visualise_form.compare_file(accept=".docx", required=False) }}
+    {{ visualise_form.base_count() }}
+    {{ visualise_form.compare_count() }}
+    {{ visualise_form.common_count() }}
   </form>
 </div>
 {% endblock %}
