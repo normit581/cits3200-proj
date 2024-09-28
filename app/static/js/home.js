@@ -308,8 +308,11 @@ function appendMatchResults(similarityResults) {
             const $card = $('<div>', {
                 class: 'card-docx-display card col-3',
                 'data-base-file': key,
-                'data-compare-file': fileName,
-                'data-match-percent': matchPercent
+                'data-compare-file': item.filename, 
+                'data-match-percent': item.value,
+                'data-base-count': similarityResults[item.filename].find(item => item.filename === key).count,
+                'data-compare-count': item.count,
+                'data-common-count': item.common_count
             });
             $card.append(
                 $('<div>', { class: 'card shaded' }).append(
@@ -353,7 +356,10 @@ function appendMatchResults(similarityResults) {
                 class: `list-group-item d-flex justify-content-between align-items-center ${borderColour}`,
                 'data-base-file': key,
                 'data-compare-file': fileName,
-                'data-match-percent': matchPercent
+                'data-match-percent': matchPercent,
+                'data-base-count': similarityResults[item.filename].find(item => item.filename === key).count,
+                'data-compare-count': matchCount,
+                'data-common-count': item.common_count
             });
             const $fileInfo = $('<div>', { class: 'd-flex align-items-center flex-grow-1 file-info' }).append(
                 $('<i>', { class: 'fa-solid fa-file me-3' }),
@@ -388,10 +394,14 @@ function appendMatchResults(similarityResults) {
 }
 
 function setupVisualiseForm() {
+    $('#base_count').val($('.card-docx-container .card-body').first().parents('.card-docx-display').first().data("base-count-file"))
     $('.card-docx-container .card-body').on('click', function() {
         const $card_docx = $(this).parents('.card-docx-display').first();
         const setBaseFile = setFileInput($card_docx.data("base-file"), "#base_file");
         const setCompareFile = setFileInput($card_docx.data("compare-file"), "#compare_file");
+        $('#base_count').val($card_docx.data("base-count"))
+        $('#compare_count').val($card_docx.data("compare-count"))
+        $('#common_count').val($card_docx.data("common-count"))
 
         if (setBaseFile && setCompareFile) {
             $("#visualise-form").submit();
@@ -402,6 +412,9 @@ function setupVisualiseForm() {
         const $row = $(this);
         const setBaseFile = setFileInput($row.data("base-file"), "#base_file");
         const setCompareFile = setFileInput($row.data("compare-file"), "#compare_file");
+        $('#base_count').val($row.data("base-count"))
+        $('#compare_count').val($row.data("compare-count"))
+        $('#common_count').val($row.data("common-count"))
 
         if (setBaseFile && setCompareFile) {
             $("#visualise-form").submit();

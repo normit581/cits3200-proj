@@ -36,9 +36,9 @@ def home():
                     print(f"Comparing file: {file1['filename']}")
                     for j, file2 in enumerate(file_data):
                         if i != j:
-                            similarity, matching_rsid = rsid_match2(file1['rsid'], file2['rsid'])
+                            similarity, matching_rsid, common_rsid_count = rsid_match2(file1['rsid'], file2['rsid'])
                             file_without_est = FileHelper.remove_extension(file2['filename'])
-                            comparisons.append({'filename': file_without_est, 'value': similarity, 'count': file2['rsid'][-1]})
+                            comparisons.append({'filename': file_without_est, 'value': similarity, 'count': file2['rsid'][-1], 'common_count':common_rsid_count})
                     file_without_est = FileHelper.remove_extension(file1['filename'])
                     result[file_without_est] = comparisons
 
@@ -88,6 +88,7 @@ def visualise():
 
     if form.validate_on_submit():
         files = [form.base_file.data, form.compare_file.data]
+        counts = [form.base_count.data, form.compare_count.data]
         results = []
         all_rsids = [set(), set()]
 
@@ -123,8 +124,10 @@ def visualise():
                         })
                 paragraphs.append(current_paragraph)
             result = {
-                "file_name": filename,
+                "file_name": docx.docx_name,
                 "metadata": {
+                    "similarity": RSID.calculate_similarity(form.common_count.data, counts[i], 2),
+                    "count": counts[i],
                     "title": docx.get_metadata(DOCX.TITLE),
                     "created": docx.get_metadata(DOCX.DATE_CREATED),
                     "paragraphs": paragraphs
