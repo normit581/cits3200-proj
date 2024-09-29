@@ -1,3 +1,10 @@
+/* Custom selection style to remove blue highlight */
+::selection {
+    /* Remove default selection background */
+    background: transparent;
+    background-color: rgb(255, 255, 0, 0.15) !important;
+}
+
 .card-body {
     height: auto;
     transition: height 0.3s ease;
@@ -91,5 +98,13 @@ ul.dropdown-menu.add-scroll {
 }
 
 p.highlighted {    
+    background-color: rgb(255, 255, 0, 0.15) !important;
+}
+
+p[data-is-match="false"].highlighted {    
+    border-bottom: 3px solid green;
+}
+
+p[data-is-match="true"].highlighted {    
     border-bottom: 3px solid red;
 }
