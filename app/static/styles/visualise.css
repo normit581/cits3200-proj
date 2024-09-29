@@ -70,6 +70,10 @@ div.tooltip-cursor-out {
     display: none;
 }
 
+div.tooltip-temp-hidden {
+    display: none;
+}
+
 body {
     overflow-x: hidden;
 }
