@@ -235,18 +235,40 @@
 }
 
 /* Flex Alignment */
-.list-group-item .d-flex {
+.card-docx-container-list .list-group-item .d-flex {
     align-items: center;
 }
 
-.list-group-item:first-child {
+/* Base style for .card-docx-container-list elements */
+.card-docx-container-list .list-group-item:first-child {
     border-top-left-radius: 0.25rem;
     border-top-right-radius: 0.25rem;
 }
 
-.list-group-item:last-child {
+.card-docx-container-list .list-group-item:last-child {
     border-bottom-left-radius: 0.25rem;
     border-bottom-right-radius: 0.25rem;
+}
+
+.card-docx-container-list .list-group-item+.list-group-item {
+    border-top-width: 0.5px;
+    border-bottom-width: 0.5px;
+}
+
+.card-docx-container-list .list-group-item:first-child {
+    border-top-width: 1.5px !important;
+}
+
+.card-docx-container-list .list-group-item:last-child {
+    border-bottom-width: 1.5px !important;
+}
+
+.hidden + .card-docx-container-list .list-group-item {
+    border-top-width: 0.5px !important;
+}
+
+.card-docx-container-list .list-group-item.hidden ~ div {
+    border-bottom-width: 0.5px !important;
 }
 
 /* Border/Badge Styles for Success, Warning, Danger */
@@ -282,31 +304,13 @@
     margin-top: 0; /* Ensure no overlapping margins */
 }
 
-/* Base style for .border-thick elements */
-a.border-thick {
-    border-left-width: 3px;
-    border-right-width: 3px;
-    border-top-width: 1.5px !important;
-    border-bottom-width: 1.5px !important;
-}
-
-a.border-thick:first-child {
-    border-top-width: 3px !important;
-}
-
-a.border-thick:last-child {
-    border-bottom-width: 3px !important;
-}
-
-.hidden + a.border-thick {
-    border-top-width: 3px !important;
-}
-
-a.border-thick.hidden ~ a {
-    border-bottom-width: 3px !important;
-}
-
 /* PDF Export Styles */
+.card-docx-container.pdf {
+    overflow-y: hidden !important;
+    height: auto !important;
+    padding: 0 !important;
+}
+
 .card-docx-container.pdf {
     overflow-y: hidden !important;
     height: auto !important;
@@ -321,6 +325,10 @@ a.border-thick.hidden ~ a {
     overflow-y: hidden !important;
     height: auto !important;
     padding: 15px !important;
+}
+
+.card-docx-container-list.pdf {
+    pointer-events: none !important;
 }
 
 #similarity-result .row > div[data-view-name="list"] {
