@@ -13,10 +13,14 @@ class FormHelper:
     @staticmethod
     def errors_to_str(form):
         error_messages = []
+        seen_messages = set()  # track unique error messages
         for field, errors in form.errors.items():
             for error in errors:
-                error_messages.append(f"<br>{field}: {error}")
-        return "".join(error_messages*2)
+                formatted_error = f"<br>{field}: {error}"
+                if formatted_error not in seen_messages:
+                    error_messages.append(formatted_error)
+                    seen_messages.add(formatted_error)
+        return "".join(error_messages)
 
 
 class ColourHelper:

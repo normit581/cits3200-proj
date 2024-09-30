@@ -12,7 +12,10 @@ class MatchDocumentForm(FlaskForm):
             raise ValidationError('Please add at least 1 docx file.')
 
         if len(files.data) > 20:
-            raise ValidationError('Maximum of 2 files allowed.')
+            raise ValidationError('Maximum of 20 files allowed.')
+
+        if len(files.data) < 2:
+            raise ValidationError('Minimum of 2 files allowed.')
 
 class VisualiseDocumentForm(FlaskForm):
     base_file = WordFileField('File')
