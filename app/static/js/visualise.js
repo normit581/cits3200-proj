@@ -6,6 +6,7 @@ const contextMenuID = 'custom-context-menu';
 const rsidTextShowedArray = [];
 const overlay = new MyOverlay();
 let currentNavigateIndexRSID = 0
+let isCompleteRenderTooltip = false;
 
 function adjustCardHeight() {
     const height = document.getElementById('cardHeightInput').value;
@@ -191,6 +192,9 @@ $(document).ready(function() {
             allowHTML: true,
             triggerTarget: triggerTargets,
             showOnCreate: true,
+            onCreate(instance) {
+              instance.popper.classList.add('tooltip-temp-hidden');
+            },
             onShow(instance) {
                 if(getSelection().toString()) return false;
                 if (!rsidTextShowedArray.includes(rsid)) {
@@ -201,6 +205,10 @@ $(document).ready(function() {
                 const tooltip = instance.popper;
                 // Track mouse movement and check if the cursor is outside the boundary
                 const mouseMoveHandler = (event) => {
+                    if (isCompleteRenderTooltip) {
+                        $('div[data-tippy-root]').removeClass('tooltip-temp-hidden');
+                        isCompleteRenderTooltip = false;
+                    }
                     const pRect = $p[0].getBoundingClientRect();
                     const isOutside = event.clientX < pRect.left || event.clientX > pRect.right ||
                         event.clientY < pRect.top || event.clientY > pRect.bottom;
@@ -221,6 +229,7 @@ $(document).ready(function() {
         });
     }, function () { // doneCallback
         overlay.completeProgress();
+        isCompleteRenderTooltip = true;
         configureContextMenuButtons();
         triggerContextMenuEvent($('.card-body > div'), true);
     }));
