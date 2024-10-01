@@ -391,6 +391,7 @@ function appendMatchResults(similarityResults) {
         $similarityResultView.find(`.card-docx-container-list[data-id="${target}"]`).removeClass('hidden'); // Show the selected list container
     });
     $aside.find('input').first().click();
+   // sortListView();
 }
 
 function setupVisualiseForm() {
@@ -563,23 +564,40 @@ function updateResultView(button){
     $('#list-view-btn').toggleClass('hidden');
 }
 
-let isDescending = true;
+let sortModes = [
+    { mode: 'matchDesc', label: 'Sort by Match % Descending', icon: 'fa-sort-amount-down' },
+    { mode: 'matchAsc', label: 'Sort by Match % Ascending', icon: 'fa-sort-amount-up' },
+    { mode: 'filenameAsc', label: 'Sort by Filename A-Z', icon: 'fa-sort-alpha-down' },
+    { mode: 'filenameDesc', label: 'Sort by Filename Z-A', icon: 'fa-sort-alpha-up' }
+];
+let currentSortIndex = 0;
 
 function sortListView() {
+    const currentSortMode = sortModes[currentSortIndex];
     $('#similarity-result .card-docx-container-list').each(function() {
         const $container = $(this);
         const $items = $container.children('.list-group-item').get();
         $items.sort(function(a, b) {
-            const percentA = parseFloat($(a).data('match-percent'));
-            const percentB = parseFloat($(b).data('match-percent'));
-            return isDescending ? percentB - percentA : percentA - percentB;
+            switch (currentSortMode.mode) {
+                case 'matchDesc':
+                    return parseFloat($(b).data('match-percent')) - parseFloat($(a).data('match-percent'));
+                case 'matchAsc':
+                    return parseFloat($(a).data('match-percent')) - parseFloat($(b).data('match-percent'));
+                case 'filenameAsc':
+                    return $(a).data('compare-file').localeCompare($(b).data('compare-file'), undefined, {numeric: true, sensitivity: 'base'});
+                case 'filenameDesc':
+                    return $(b).data('compare-file').localeCompare($(a).data('compare-file'), undefined, {numeric: true, sensitivity: 'base'});
+                default:
+                    return 0;
+            }
         });
         $.each($items, function(idx, item) {
             $container.append(item);
         });
     });
-    $('#sort-btn').html(isDescending ? '<i class="fa-solid fa-sort-amount-down"></i> Sort Ascending' : '<i class="fa-solid fa-sort-amount-up"></i> Sort Descending');
-    isDescending = !isDescending;
+    currentSortIndex = (currentSortIndex + 1) % sortModes.length; // Cycle to next sort mode
+    const nextSortMode = sortModes[currentSortIndex];
+    $('#sort-btn').html(`<i class="fa-solid ${nextSortMode.icon}"></i> ${nextSortMode.label}`);
 }
 
 $(document).ready(function() {
@@ -603,6 +621,8 @@ function configureContextMenuButtons(){
     $('#grid-view-btn').on('click', (e) => updateResultView(e.target));
     $('#list-view-btn').on('click', (e) => updateResultView(e.target));
     $('#sort-btn').on('click', () => sortListView());
+    // Set default sort mode
+    $('#sort-btn').html(`<i class="fa-solid ${sortModes[currentSortIndex].icon}"></i> ${sortModes[currentSortIndex].label}`);
     $('#list-view-btn').addClass('hidden');
 
     $('#pdf-btn').on('click', () => exportSinglePDF());
