@@ -572,8 +572,10 @@ let sortModes = [
 ];
 let currentSortIndex = 0;
 
-function sortListView() {
+function sortResultsView() {
     const currentSortMode = sortModes[currentSortIndex];
+    
+    // List
     $('#similarity-result .card-docx-container-list').each(function() {
         const $container = $(this);
         const $items = $container.children('.list-group-item').get();
@@ -595,6 +597,30 @@ function sortListView() {
             $container.append(item);
         });
     });
+    
+    // Grid
+    $('#similarity-result .card-docx-container').each(function() {
+        const $container = $(this);
+        const $items = $container.children('.card-docx-display').get();
+        $items.sort(function(a, b) {
+            switch (currentSortMode.mode) {
+                case 'matchDesc':
+                    return parseFloat($(b).data('match-percent')) - parseFloat($(a).data('match-percent'));
+                case 'matchAsc':
+                    return parseFloat($(a).data('match-percent')) - parseFloat($(b).data('match-percent'));
+                case 'filenameAsc':
+                    return $(a).data('compare-file').localeCompare($(b).data('compare-file'), undefined, {numeric: true, sensitivity: 'base'});
+                case 'filenameDesc':
+                    return $(b).data('compare-file').localeCompare($(a).data('compare-file'), undefined, {numeric: true, sensitivity: 'base'});
+                default:
+                    return 0;
+            }
+        });
+        $.each($items, function(idx, item) {
+            $container.append(item);
+        });
+    });
+    
     currentSortIndex = (currentSortIndex + 1) % sortModes.length; // Cycle to next sort mode
     const nextSortMode = sortModes[currentSortIndex];
     $('#sort-btn').html(`<i class="fa-solid ${nextSortMode.icon}"></i> ${nextSortMode.label}`);
