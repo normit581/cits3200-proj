@@ -646,7 +646,7 @@ function configureContextMenuButtons(){
 
     $('#grid-view-btn').on('click', (e) => updateResultView(e.target));
     $('#list-view-btn').on('click', (e) => updateResultView(e.target));
-    $('#sort-btn').on('click', () => sortListView());
+    $('#sort-btn').on('click', () => sortResultsView());
     // Set default sort mode
     $('#sort-btn').html(`<i class="fa-solid ${sortModes[currentSortIndex].icon}"></i> ${sortModes[currentSortIndex].label}`);
     $('#list-view-btn').addClass('hidden');
