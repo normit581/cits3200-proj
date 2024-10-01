@@ -608,7 +608,7 @@ function configureContextMenuButtons(){
     $('#pdf-btn').on('click', () => exportSinglePDF());
 
     $('#all-pdf-btn').on('click', () => exportAllPDF());
-
+    
     $('#custom-context-menu .input-group')
         .on('mouseenter', function() { $(this).find('button').addClass('active'); })
         .on('mouseleave', function() { $(this).find('button').removeClass('active'); });
