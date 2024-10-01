@@ -96,8 +96,13 @@
 }
 
 #similarity-result aside {
-    height: 500px;
     overflow-y: scroll;
+}
+
+#similarity-result aside,
+.card-docx-container,
+.card-docx-container-list {
+    height: calc(75vh);
 }
 
 /* Progress Bars */
@@ -127,7 +132,6 @@
 /* Card Styles */
 .card-docx-container {
     overflow-y: scroll;
-    height: 500px;
     padding: 0 5px;
     border-radius: 0.375rem;
     background-color: #e9ecef;
@@ -168,7 +172,6 @@
 .card-docx-container-list {
     overflow-y: scroll;
     padding: 7px 15px;
-    height: 500px;
     background-color: #f8f9fa;
 }
 
