@@ -563,6 +563,25 @@ function updateResultView(button){
     $('#list-view-btn').toggleClass('hidden');
 }
 
+let isDescending = true;
+
+function sortListView() {
+    $('#similarity-result .card-docx-container-list').each(function() {
+        const $container = $(this);
+        const $items = $container.children('.list-group-item').get();
+        $items.sort(function(a, b) {
+            const percentA = parseFloat($(a).data('match-percent'));
+            const percentB = parseFloat($(b).data('match-percent'));
+            return isDescending ? percentB - percentA : percentA - percentB;
+        });
+        $.each($items, function(idx, item) {
+            $container.append(item);
+        });
+    });
+    $('#sort-btn').html(isDescending ? '<i class="fa-solid fa-sort-amount-down"></i> Sort Ascending' : '<i class="fa-solid fa-sort-amount-up"></i> Sort Descending');
+    isDescending = !isDescending;
+}
+
 $(document).ready(function() {
     $(window).on('beforeunload', showRefreshAlert);
     configureContextMenuButtons();
@@ -583,6 +602,7 @@ function configureContextMenuButtons(){
 
     $('#grid-view-btn').on('click', (e) => updateResultView(e.target));
     $('#list-view-btn').on('click', (e) => updateResultView(e.target));
+    $('#sort-btn').on('click', () => sortListView());
     $('#list-view-btn').addClass('hidden');
 
     $('#pdf-btn').on('click', () => exportSinglePDF());
