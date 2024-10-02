@@ -275,12 +275,17 @@ function appendMatchResults(similarityResults) {
 
     const $contentContainer = $('<div>', { class: 'col-10 position-relative' });
 
+    const currentSortMode = sortModes[currentSortIndex];
+    const nextSortIndex = (currentSortIndex + 1) % sortModes.length;
+    const nextSortMode = sortModes[nextSortIndex];
+
     const $sortButton = $('<button>', {
         id: 'sort-toggle-btn',
         class: 'position-absolute',
         style: 'top: 10px; right: 10px; z-index: 1000; background: transparent; border: none;',
-        html: `<i class="fa-solid ${sortModes[currentSortIndex].icon}" style="font-size: 1.5rem; color: #000;"></i>`
-    }).attr('title', 'Toggle Sort');
+        html: `<i class="fa-solid ${currentSortMode.icon}" style="font-size: 1.5rem; color: #000;"></i>`
+    }).attr('title', `Switch to ${nextSortMode.label}`);
+
 
     const $reuploadButton = $('<button>', {
         id: 'reupload-btn',
@@ -289,12 +294,16 @@ function appendMatchResults(similarityResults) {
         html: `<i class="fa-solid fa-upload" style="font-size: 1.5rem; color: #000;"></i>`
     }).attr('title', 'Reupload');
 
+    const currentViewMode = viewModes[currentViewIndex];
+    const nextViewIndex = (currentViewIndex + 1) % viewModes.length;
+    const nextViewMode = viewModes[nextViewIndex];
+
     const $viewButton = $('<button>', {
         id: 'view-toggle-btn',
         class: 'position-absolute',
         style: 'top: 10px; right: 50px; z-index: 1000; background: transparent; border: none;',
-        html: `<i class="fa-solid ${viewModes[currentViewIndex].icon}" style="font-size: 1.5rem; color: #000;"></i>`
-    }).attr('title', viewModes[currentViewIndex].title);
+        html: `<i class="fa-solid ${currentViewMode.icon}" style="font-size: 1.5rem; color: #000;"></i>`
+    }).attr('title', currentViewMode.nextTitle);
 
     $contentContainer.append($reuploadButton, $sortButton, $viewButton);
     const $gridContainer = $('<div>', { class: 'hidden', 'data-view-name': 'grid' });
@@ -435,6 +444,7 @@ function appendMatchResults(similarityResults) {
         $similarityResultView.find(`.card-docx-container-list[data-id="${target}"]`).removeClass('hidden'); // Show the selected list container
     });
     $aside.find('input').first().click();
+    applySort();
    // sortListView();
 }
 
@@ -600,39 +610,28 @@ function updateFilter(value) {
 };
 
 let viewModes = [
-    { viewName: 'grid', icon: 'fa-th', title: 'Switch to List View' },
-    { viewName: 'list', icon: 'fa-list', title: 'Switch to Grid View' }
+    { viewName: 'list', icon: 'fa-list', label: 'List View', nextTitle: 'Switch to Grid View' },
+    { viewName: 'grid', icon: 'fa-th', label: 'Grid View', nextTitle: 'Switch to List View' }
 ];
 let currentViewIndex = 0;
 
-function toggleView() {
-    currentViewIndex = (currentViewIndex + 1) % viewModes.length;
+
+function toggleView(targetViewName) {
+    if (targetViewName) {
+        currentViewIndex = viewModes.findIndex(mode => mode.viewName === targetViewName);
+    } else {
+        currentViewIndex = (currentViewIndex + 1) % viewModes.length;
+    }
+
     const currentViewMode = viewModes[currentViewIndex];
+    const nextViewIndex = (currentViewIndex + 1) % viewModes.length;
+    const nextViewMode = viewModes[nextViewIndex];
 
     $('#similarity-result div[data-view-name]').addClass('hidden');
     $(`#similarity-result div[data-view-name='${currentViewMode.viewName}']`).removeClass('hidden');
 
-    const nextViewIndex = (currentViewIndex + 1) % viewModes.length;
-    const nextViewMode = viewModes[nextViewIndex];
     $('#view-toggle-btn').html(`<i class="fa-solid ${currentViewMode.icon}" style="font-size: 1.5rem; color: #000;"></i>`)
-        .attr('title', nextViewMode.title);
-
-    updateContextMenuViewButtons();
-}
-
-function updateResultView(button) {
-    const $button = $(button);
-    const viewName = $button.data('view-name');
-    currentViewIndex = viewModes.findIndex(mode => mode.viewName === viewName);
-
-    $('#similarity-result div[data-view-name]').addClass('hidden');
-    $(`#similarity-result div[data-view-name='${viewName}']`).removeClass('hidden');
-
-    const nextViewIndex = (currentViewIndex + 1) % viewModes.length;
-    const currentViewMode = viewModes[currentViewIndex];
-    const nextViewMode = viewModes[nextViewIndex];
-    $('#view-toggle-btn').html(`<i class="fa-solid ${currentViewMode.icon}" style="font-size: 1.5rem; color: #000;"></i>`)
-        .attr('title', nextViewMode.title);
+        .attr('title', currentViewMode.nextTitle);
 
     updateContextMenuViewButtons();
 }
@@ -648,15 +647,22 @@ function updateContextMenuViewButtons() {
 }
 
 let sortModes = [
-    { mode: 'matchDesc', label: 'Sort by Match % Descending', icon: 'fa-sort-amount-down' },
-    { mode: 'matchAsc', label: 'Sort by Match % Ascending', icon: 'fa-sort-amount-up' },
-    { mode: 'filenameAsc', label: 'Sort by Filename A-Z', icon: 'fa-sort-alpha-down' },
-    { mode: 'filenameDesc', label: 'Sort by Filename Z-A', icon: 'fa-sort-alpha-up' }
+    { mode: 'matchDesc', label: 'Match % Descending', icon: 'fa-sort-amount-down' },
+    { mode: 'matchAsc', label: 'Match % Ascending', icon: 'fa-sort-amount-up' },
+    { mode: 'filenameAsc', label: 'Filename A-Z', icon: 'fa-sort-alpha-down' },
+    { mode: 'filenameDesc', label: 'Filename Z-A', icon: 'fa-sort-alpha-up' }
 ];
 let currentSortIndex = 0;
 
 function sortResultsView() {
+    currentSortIndex = (currentSortIndex + 1) % sortModes.length;
+    applySort();
+}
+
+function applySort() {
     const currentSortMode = sortModes[currentSortIndex];
+    const nextSortIndex = (currentSortIndex + 1) % sortModes.length;
+    const nextSortMode = sortModes[nextSortIndex];
     
     // List
     $('#similarity-result .card-docx-container-list').each(function() {
@@ -703,11 +709,11 @@ function sortResultsView() {
             $container.append(item);
         });
     });
-    
-    currentSortIndex = (currentSortIndex + 1) % sortModes.length; // Cycle to next sort mode
-    const nextSortMode = sortModes[currentSortIndex];
-    $('#sort-btn').html(`<i class="fa-solid ${nextSortMode.icon}"></i> ${nextSortMode.label}`);
-    $('#sort-toggle-btn').html(`<i class="fa-solid ${nextSortMode.icon}" style="font-size: 1.5rem; color: #000;"></i>`);
+
+    $('#sort-btn').html(`<i class="fa-solid ${currentSortMode.icon}"></i> ${currentSortMode.label}`)
+        .attr('title', `Switch to ${nextSortMode.label}`);
+    $('#sort-toggle-btn').html(`<i class="fa-solid ${currentSortMode.icon}" style="font-size: 1.5rem; color: #000;"></i>`)
+        .attr('title', `Switch to ${nextSortMode.label}`);
 }
 
 $(document).ready(function() {
@@ -728,29 +734,45 @@ $(document).ready(function() {
 
 
 // Context Menu functions
-function configureContextMenuButtons(){
+function configureContextMenuButtons() {
     $('#reupload-btn').on('click', () => reuploadFiles());
 
     $('#grid-view-btn').on('click', function() {
-        updateResultView(this);
+        toggleView('grid');
     });
     $('#list-view-btn').on('click', function() {
-        updateResultView(this);
+        toggleView('list');
     });
+
+    updateContextMenuViewButtons();
+
     $('#sort-btn').on('click', () => sortResultsView());
-    // Set default sort mode
-    $('#sort-btn').html(`<i class="fa-solid ${sortModes[currentSortIndex].icon}"></i> ${sortModes[currentSortIndex].label}`);
-    $('#list-view-btn').addClass('hidden');
+    
+    const currentSortMode = sortModes[currentSortIndex];
+    const nextSortIndex = (currentSortIndex + 1) % sortModes.length;
+    const nextSortMode = sortModes[nextSortIndex];
+    $('#sort-btn').html(`<i class="fa-solid ${currentSortMode.icon}"></i> ${currentSortMode.label}`)
+        .attr('title', `Switch to ${nextSortMode.label}`);
 
     $('#pdf-btn').on('click', () => exportSinglePDF());
-
     $('#all-pdf-btn').on('click', () => exportAllPDF());
-    
+
     $('#custom-context-menu .input-group')
         .on('mouseenter', function() { $(this).find('button').addClass('active'); })
         .on('mouseleave', function() { $(this).find('button').removeClass('active'); });
+
     $('#matchSlider').on('input', (e) => updateFilter(e.target.value));
     $('#matchInput').on('input', (e) => updateFilter(e.target.value));
+}
+
+function updateContextMenuViewButtons() {
+    if (currentViewIndex === 0) {
+        $('#grid-view-btn').addClass('hidden');
+        $('#list-view-btn').removeClass('hidden');
+    } else {
+        $('#list-view-btn').addClass('hidden');
+        $('#grid-view-btn').removeClass('hidden');
+    }
 }
 
 const customFunc = function(e) {
