@@ -586,7 +586,7 @@ function toggleView() {
     $(`#similarity-result div[data-view-name='${nextViewMode.viewName}']`).removeClass('hidden');
 
     $('#view-toggle-btn').html(`<i class="fa-solid ${nextViewMode.icon}" style="font-size: 1.5rem; color: #000;"></i>`)
-        .attr('title', currentViewMode.nextTitle);
+        .attr('title', nextViewMode.nextTitle);
     currentViewIndex = nextViewIndex;
     updateContextMenuViewButtons();
 }
