@@ -364,7 +364,7 @@ function appendMatchResults(similarityResults) {
                     $('<i>', { class: 'fa-solid fa-hashtag me-1' }),
                     matchCount
                 ),
-                $('<span>', { class: `badge bg-primary me-2 ${badgeColour}` }).text(matchPercent === 0 ? '00.0%' : `${matchPercent.toFixed(1)}%`) // Match percentage
+                $('<span>', { class: `badge bg-primary me-2 ${badgeColour} fixed-width-badge` }).text(matchPercent === 0 ? '00.0%' : `${matchPercent.toFixed(1)}%`) // Match percentage
             );
             $row.append($fileInfo, $matchInfo);
             $mainContent.append($row);
