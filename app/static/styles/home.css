@@ -228,6 +228,11 @@
     gap: 10px; /* Ensures space between match count and percentage */
 }
 
+.fixed-width-badge {
+    width: 65px;
+    text-align:center;
+}
+
 /* Fixed width for match count to ensure alignment */
 .card-docx-container-list .match-count {
     min-width: 60px; /* Set a fixed width to ensure alignment */
