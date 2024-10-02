@@ -105,6 +105,33 @@
     height: calc(75vh);
 }
 
+#sort-toggle-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+#sort-toggle-btn i {
+    color: #000;
+}
+
+#sort-toggle-btn:hover i {
+    color: #007bff;
+}
+
+.col-10.position-relative {
+    padding-top: 50px;
+}
+
+[data-view-name='grid'],
+[data-view-name='list'] {
+    width: 100%;
+}
+
 /* Progress Bars */
 .progress {
     height: 20px;
