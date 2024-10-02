@@ -514,6 +514,11 @@ function toggleElementsVisibility(isVisible) {
     const $similarityResultAside = $similarityResult.find("aside");
     const $similarityResultGridDiv = $similarityResultAside.next();
     const $similarityResultListDiv = $similarityResultGridDiv.next();
+
+    const $reuploadButton = $('#reupload-btn');
+    const $viewButton = $('#view-toggle-btn');
+    const $sortButton = $('#sort-toggle-btn');
+
     const $contextMenu = $(`#${contextMenuID}`);
 
     const action = isVisible ? 'show' : 'hide';
@@ -522,6 +527,10 @@ function toggleElementsVisibility(isVisible) {
 
     $navBar[action]();
     $settingBar[action]();
+    $reuploadButton[action]();
+    $viewButton[action]();
+    $sortButton[action]();
+    
     $similarityResult.attr("class", containerClass);
     if (!$similarityResultGridDiv.hasClass('hidden')){
         $similarityResultGridDiv
@@ -616,13 +625,7 @@ let viewModes = [
 let currentViewIndex = 0;
 
 
-function toggleView(targetViewName) {
-    if (targetViewName) {
-        currentViewIndex = viewModes.findIndex(mode => mode.viewName === targetViewName);
-    } else {
-        currentViewIndex = (currentViewIndex + 1) % viewModes.length;
-    }
-
+function toggleView() {
     const currentViewMode = viewModes[currentViewIndex];
     const nextViewIndex = (currentViewIndex + 1) % viewModes.length;
     const nextViewMode = viewModes[nextViewIndex];
@@ -738,10 +741,10 @@ function configureContextMenuButtons() {
     $('#reupload-btn').on('click', () => reuploadFiles());
 
     $('#grid-view-btn').on('click', function() {
-        toggleView('grid');
+        toggleView();
     });
     $('#list-view-btn').on('click', function() {
-        toggleView('list');
+        toggleView();
     });
 
     updateContextMenuViewButtons();
