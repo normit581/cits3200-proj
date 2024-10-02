@@ -115,32 +115,8 @@
 }
 
 #sort-toggle-btn,
-#reupload-btn {
-    position: absolute;
-    top: 10px;
-    z-index: 1000;
-    background: transparent;
-    border: none;
+#reupload-toggle-btn {
     cursor: pointer;
-}
-
-#sort-toggle-btn {
-    right: 10px;
-}
-
-#reupload-btn {
-    right: 50px;
-}
-
-#sort-toggle-btn i,
-#reupload-btn i {
-    color: #000;
-    font-size: 1.5rem;
-}
-
-#sort-toggle-btn:hover i,
-#reupload-btn:hover i {
-    color: #007bff;
 }
 
 /* Progress Bars */

@@ -289,7 +289,14 @@ function appendMatchResults(similarityResults) {
         html: `<i class="fa-solid fa-upload" style="font-size: 1.5rem; color: #000;"></i>`
     }).attr('title', 'Reupload');
 
-    $contentContainer.append($reuploadButton, $sortButton);
+    const $viewButton = $('<button>', {
+        id: 'view-toggle-btn',
+        class: 'position-absolute',
+        style: 'top: 10px; right: 50px; z-index: 1000; background: transparent; border: none;',
+        html: `<i class="fa-solid ${viewModes[currentViewIndex].icon}" style="font-size: 1.5rem; color: #000;"></i>`
+    }).attr('title', viewModes[currentViewIndex].title);
+
+    $contentContainer.append($reuploadButton, $sortButton, $viewButton);
     const $gridContainer = $('<div>', { class: 'hidden', 'data-view-name': 'grid' });
     const $listContainer = $('<div>', { 'data-view-name': 'list' });
     $contentContainer.append($gridContainer).append($listContainer);
@@ -415,6 +422,9 @@ function appendMatchResults(similarityResults) {
         reuploadFiles();
     });
 
+    $viewButton.on('click', () => {
+        toggleView();
+    });
 
     const $similarityResultView = $('#similarity-result');
     $similarityResultView.find('.btn-group-vertical input').click(function() {
@@ -589,13 +599,52 @@ function updateFilter(value) {
     });
 };
 
-function updateResultView(button){
+let viewModes = [
+    { viewName: 'grid', icon: 'fa-th', title: 'Switch to List View' },
+    { viewName: 'list', icon: 'fa-list', title: 'Switch to Grid View' }
+];
+let currentViewIndex = 0;
+
+function toggleView() {
+    currentViewIndex = (currentViewIndex + 1) % viewModes.length;
+    const currentViewMode = viewModes[currentViewIndex];
+
+    $('#similarity-result div[data-view-name]').addClass('hidden');
+    $(`#similarity-result div[data-view-name='${currentViewMode.viewName}']`).removeClass('hidden');
+
+    const nextViewIndex = (currentViewIndex + 1) % viewModes.length;
+    const nextViewMode = viewModes[nextViewIndex];
+    $('#view-toggle-btn').html(`<i class="fa-solid ${currentViewMode.icon}" style="font-size: 1.5rem; color: #000;"></i>`)
+        .attr('title', nextViewMode.title);
+
+    updateContextMenuViewButtons();
+}
+
+function updateResultView(button) {
     const $button = $(button);
     const viewName = $button.data('view-name');
+    currentViewIndex = viewModes.findIndex(mode => mode.viewName === viewName);
+
     $('#similarity-result div[data-view-name]').addClass('hidden');
     $(`#similarity-result div[data-view-name='${viewName}']`).removeClass('hidden');
-    $('#grid-view-btn').toggleClass('hidden');
-    $('#list-view-btn').toggleClass('hidden');
+
+    const nextViewIndex = (currentViewIndex + 1) % viewModes.length;
+    const currentViewMode = viewModes[currentViewIndex];
+    const nextViewMode = viewModes[nextViewIndex];
+    $('#view-toggle-btn').html(`<i class="fa-solid ${currentViewMode.icon}" style="font-size: 1.5rem; color: #000;"></i>`)
+        .attr('title', nextViewMode.title);
+
+    updateContextMenuViewButtons();
+}
+
+function updateContextMenuViewButtons() {
+    if (currentViewIndex === 0) {
+        $('#grid-view-btn').addClass('hidden');
+        $('#list-view-btn').removeClass('hidden');
+    } else {
+        $('#list-view-btn').addClass('hidden');
+        $('#grid-view-btn').removeClass('hidden');
+    }
 }
 
 let sortModes = [
@@ -682,8 +731,12 @@ $(document).ready(function() {
 function configureContextMenuButtons(){
     $('#reupload-btn').on('click', () => reuploadFiles());
 
-    $('#grid-view-btn').on('click', (e) => updateResultView(e.target));
-    $('#list-view-btn').on('click', (e) => updateResultView(e.target));
+    $('#grid-view-btn').on('click', function() {
+        updateResultView(this);
+    });
+    $('#list-view-btn').on('click', function() {
+        updateResultView(this);
+    });
     $('#sort-btn').on('click', () => sortResultsView());
     // Set default sort mode
     $('#sort-btn').html(`<i class="fa-solid ${sortModes[currentSortIndex].icon}"></i> ${sortModes[currentSortIndex].label}`);
