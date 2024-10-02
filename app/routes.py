@@ -129,9 +129,12 @@ def visualise():
                 "file_name": docx.docx_name,
                 "metadata": {
                     "similarity": RSID.calculate_similarity(form.common_count.data, counts[i], 2),
+                    "total_words": docx.get_metadata(DOCX.NUMBER_WORDS),
                     "count": counts[i],
-                    "title": docx.get_metadata(DOCX.TITLE),
+                    "editing_time": docx.get_metadata(DOCX.TOTAL_TIME),
+                    "created_by": docx.get_metadata(DOCX.CREATED_BY),
                     "created": docx.get_metadata(DOCX.DATE_CREATED),
+                    "modified_by": docx.get_metadata(DOCX.LAST_MODIFIED_BY),
                     "paragraphs": paragraphs
                 }
             }

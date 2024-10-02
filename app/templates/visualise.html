@@ -64,21 +64,57 @@
         {% set position = 'left' if loop.index == 1 else 'right' %}
         <div class="fluid-col-6 ps-1 pe-1" data-position="{{position}}">
           <div class="card">
-              <div class="card-header">
-                  <h5>{{ document.file_name }}</h5>
-                  <small>Similarity: {{ document.metadata.similarity }}</small>
-                  <small>Count: {{ document.metadata.count }}</small>
-                  <small>Created on: {{ document.metadata.created.strftime('%Y-%m-%d %H:%M:%S') }}</small>
+            <div class="card-header">
+              <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">{{ document.file_name }}</h5>
+                <button class="btn btn-outline-secondary" type="button" title="summary docx details" data-bs-toggle="collapse" data-bs-target="#moreInfo-{{loop.index}}" aria-expanded="false" aria-controls="moreInfo-{{loop.index}}">
+                  <i class="fa-solid fa-circle-info"></i>
+                </button>
               </div>
-              <div class="card-body" style="overflow-y: auto;" data-id="card-body-scroll">
-                  {% for paragraph in document.metadata.paragraphs %}
-                    <div class="my-2">
-                      {% for para in paragraph %}
-                        <p data-colour="{{ para.colour }}" data-rsid="{{ para.rsid }}" data-is-match="{{ 'true' if para.is_match else 'false' }}">{{ para.text }}</p>
-                      {% endfor %}
-                    </div>
-                  {% endfor %}
+              <div class="collapse" id="moreInfo-{{loop.index}}">
+                <table class="table table-light table-sm m-0 table-borderless table-hover">
+                  <tbody>
+                    <tr>
+                      <th scope="row">Similarity:</th>
+                      <td>{{ document.metadata.similarity }}%</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Number Words:</th>
+                      <td>{{ document.metadata.total_words }}</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">RSID Counts:</th>
+                      <td>{{ document.metadata.count }}</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Total Editing Time:</th>
+                      <td>{{ document.metadata.editing_time }}</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Created By:</th>
+                      <td>{{ document.metadata.created_by }}</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Created on:</th>
+                      <td>{{ document.metadata.created.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Modified By:</th>
+                      <td>{{ document.metadata.modified_by }}</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
+            </div>
+            <div class="card-body" style="overflow-y: auto;" data-id="card-body-scroll">
+                {% for paragraph in document.metadata.paragraphs %}
+                  <div class="my-2">
+                    {% for para in paragraph %}
+                      <p data-colour="{{ para.colour }}" data-rsid="{{ para.rsid }}" data-is-match="{{ 'true' if para.is_match else 'false' }}">{{ para.text }}</p>
+                    {% endfor %}
+                  </div>
+                {% endfor %}
+            </div>
           </div>
         </div>
       {% endfor %}

@@ -53,11 +53,16 @@ class DOCX:
     """
     Constants for metadata keys in meta_dict
     """
-    CREATED_BY = "Created By"
-    DATE_CREATED = "Date Created"
-    DATE_LAST_MODIFIED = "Date Last Modified"
-    TITLE = "Title"
-    VERSION = "Version"
+    CREATED_BY          = "Created By"
+    DATE_CREATED        = "Date Created"
+    CREATED_BY          = "Created By"
+    LAST_MODIFIED_BY    = "Last Modified By"
+    DATE_LAST_MODIFIED  = "Date Last Modified"
+    REVISIONS           = "Number of Revisions"
+    TITLE               = "Title"
+    NUMBER_WORDS        = "Number of Words"
+    TOTAL_TIME          = "Total Time Spent"
+    VERSION             = "Version"
 
     def __init__(self, document_name):
         self.docx_name = document_name
