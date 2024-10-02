@@ -106,6 +106,7 @@
 }
 
 .col-10.position-relative {
+    position: relative;
     padding-top: 50px;
 }
 
@@ -353,24 +354,43 @@
 }
 
 @media print {
-    #similarity-result aside,
-    .card-docx-container,
-    .card-docx-container-list {
-        overflow: visible !important;
-        height: auto !important;
-    }
-    #similarity-result aside,
-    #sort-toggle-btn,
-    #reupload-btn,
-    #setting-bar-container,
+
     nav,
+    #setting-bar-container,
+    #reupload-btn,
+    #view-toggle-btn,
+    #sort-toggle-btn,
+    #similarity-result aside,
+    #custom-context-menu,
     footer {
         display: none !important;
     }
+
+    #similarity-result {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
     #similarity-result .col-10.position-relative {
         width: 100% !important;
         padding-top: 0 !important;
     }
+
+    .card-docx-container,
+    .card-docx-container-list {
+        overflow-y: visible !important;
+        height: auto !important;
+        padding: 0 !important;
+    }
+
+    .card-docx-container > div,
+    .card-docx-container-list .list-group-item {
+        pointer-events: none !important;
+        user-select: none !important;
+    }
+
     .card-docx-display,
     .card-docx-container-list .list-group-item {
         page-break-inside: avoid;
