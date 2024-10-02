@@ -264,6 +264,7 @@ function match() {
 }
 
 function appendMatchResults(similarityResults) {
+    currentViewIndex = 0;
     const $row = $('<div>', { class: 'row'});
     const $aside = $('<aside>', { class: 'col-2' }).append(
         $('<div>', {
@@ -444,6 +445,7 @@ function appendMatchResults(similarityResults) {
         $similarityResultView.find(`.card-docx-container-list[data-id="${target}"]`).removeClass('hidden'); // Show the selected list container
     });
     $aside.find('input').first().click();
+
     applySort();
    // sortListView();
 }
