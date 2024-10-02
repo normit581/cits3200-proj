@@ -507,56 +507,8 @@ function reuploadFiles() {
     triggerContextMenuEvent($('main'), false);
 }
 
-function toggleElementsVisibility(isVisible) {
-    const $navBar = $("nav");
-    const $settingBar = $("#setting-bar-container");
-    const $similarityResult = $("#similarity-result");
-    const $similarityResultAside = $similarityResult.find("aside");
-    const $similarityResultGridDiv = $similarityResultAside.next();
-    const $similarityResultListDiv = $similarityResultGridDiv.next();
-
-    const $reuploadButton = $('#reupload-btn');
-    const $viewButton = $('#view-toggle-btn');
-    const $sortButton = $('#sort-toggle-btn');
-
-    const $contextMenu = $(`#${contextMenuID}`);
-
-    const action = isVisible ? 'show' : 'hide';
-    const containerClass = isVisible ? "container" : "container-fluid";
-    const colClass = isVisible ? "col-10" : "col-12";
-
-    $navBar[action]();
-    $settingBar[action]();
-    $reuploadButton[action]();
-    $viewButton[action]();
-    $sortButton[action]();
-    
-    $similarityResult.attr("class", containerClass);
-    if (!$similarityResultGridDiv.hasClass('hidden')){
-        $similarityResultGridDiv
-            .attr("class", colClass)
-            .find(".card-docx-container")
-                .toggleClass('pdf', !isVisible)
-            .find("> div")
-                .toggleClass('pdf disable-hover', !isVisible)
-    }
-
-    if (!$similarityResultListDiv.hasClass('hidden')){
-        $similarityResultListDiv
-            .attr("class", colClass)
-            .find(".card-docx-container-list")
-                .toggleClass('pdf', !isVisible)
-            .find("> a")
-                .toggleClass('disable-hover', !isVisible);
-    }
-    $similarityResultAside[action]();
-    $contextMenu[action]();
-}
-
 function exportPDF() {
-    toggleElementsVisibility(false);
     window.print();
-    toggleElementsVisibility(true);
 }
 
 function exportSinglePDF() {
@@ -620,7 +572,7 @@ function updateFilter(value) {
 
 let viewModes = [
     { viewName: 'list', icon: 'fa-list', label: 'List View', nextTitle: 'Switch to Grid View' },
-    { viewName: 'grid', icon: 'fa-th', label: 'Grid View', nextTitle: 'Switch to List View' }
+    { viewName: 'grid', icon: 'fa-grip', label: 'Grid View', nextTitle: 'Switch to List View' }
 ];
 let currentViewIndex = 0;
 
@@ -631,21 +583,21 @@ function toggleView() {
     const nextViewMode = viewModes[nextViewIndex];
 
     $('#similarity-result div[data-view-name]').addClass('hidden');
-    $(`#similarity-result div[data-view-name='${currentViewMode.viewName}']`).removeClass('hidden');
+    $(`#similarity-result div[data-view-name='${nextViewMode.viewName}']`).removeClass('hidden');
 
-    $('#view-toggle-btn').html(`<i class="fa-solid ${currentViewMode.icon}" style="font-size: 1.5rem; color: #000;"></i>`)
+    $('#view-toggle-btn').html(`<i class="fa-solid ${nextViewMode.icon}" style="font-size: 1.5rem; color: #000;"></i>`)
         .attr('title', currentViewMode.nextTitle);
-
+    currentViewIndex = nextViewIndex;
     updateContextMenuViewButtons();
 }
 
 function updateContextMenuViewButtons() {
     if (currentViewIndex === 0) {
-        $('#grid-view-btn').addClass('hidden');
-        $('#list-view-btn').removeClass('hidden');
-    } else {
         $('#list-view-btn').addClass('hidden');
         $('#grid-view-btn').removeClass('hidden');
+    } else {
+        $('#grid-view-btn').addClass('hidden');
+        $('#list-view-btn').removeClass('hidden');
     }
 }
 
