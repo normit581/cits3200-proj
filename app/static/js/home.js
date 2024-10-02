@@ -273,7 +273,21 @@ function appendMatchResults(similarityResults) {
         })
     );
 
-    const $gridContainer = $('<div>', { class: 'col-10 hidden', 'data-view-name' : "grid"  });
+    const $contentContainer = $('<div>', { class: 'col-10 position-relative' });
+
+    const $sortButton = $('<button>', {
+        id: 'sort-toggle-btn',
+        class: 'position-absolute',
+        style: 'top: 10px; right: 10px; z-index: 1000; background: transparent; border: none;',
+        html: `<i class="fa-solid ${sortModes[currentSortIndex].icon}" style="font-size: 1.5rem; color: #000;"></i>`
+    }).attr('title', 'Toggle Sort');;
+
+    $contentContainer.append($sortButton);
+    const $gridContainer = $('<div>', { class: 'hidden', 'data-view-name': 'grid' });
+    const $listContainer = $('<div>', { 'data-view-name': 'list' });
+    $contentContainer.append($gridContainer).append($listContainer);
+    $contentContainer.css('padding-top', '50px');
+
     $.each(similarityResults, (key, values) => {
         const keyId = `${key}-${Object.keys(similarityResults).indexOf(key)}`;
         const $mainContent = $('<div>', {
@@ -334,7 +348,6 @@ function appendMatchResults(similarityResults) {
         $gridContainer.append($mainContent);
     });
 
-    const $listContainer = $('<div>', { class: 'col-10', 'data-view-name': "list" });
     $.each(similarityResults, (key, values) => {
         const keyId = `${key}-${Object.keys(similarityResults).indexOf(key)}`;
         const $mainContent = $('<div>', {
@@ -378,9 +391,15 @@ function appendMatchResults(similarityResults) {
         $listContainer.append($mainContent);
     });
 
-    $row.append($aside).append($gridContainer).append($listContainer);
+    $row.append($aside).append($contentContainer);
     $('#similarity-result').append($row);
-    $("#similarity-result").show();
+    $('#similarity-result').show();
+
+    $sortButton.on('click', () => {
+        sortResultsView();
+        const nextSortMode = sortModes[currentSortIndex];
+        $('#sort-toggle-btn').html(`<i class="fa-solid ${nextSortMode.icon}" style="font-size: 1.5rem; color: #000;"></i>`);
+    });
 
     const $similarityResultView = $('#similarity-result');
     $similarityResultView.find('.btn-group-vertical input').click(function() {
@@ -624,6 +643,7 @@ function sortResultsView() {
     currentSortIndex = (currentSortIndex + 1) % sortModes.length; // Cycle to next sort mode
     const nextSortMode = sortModes[currentSortIndex];
     $('#sort-btn').html(`<i class="fa-solid ${nextSortMode.icon}"></i> ${nextSortMode.label}`);
+    $('#sort-toggle-btn').html(`<i class="fa-solid ${nextSortMode.icon}" style="font-size: 1.5rem; color: #000;"></i>`);
 }
 
 $(document).ready(function() {
@@ -631,6 +651,7 @@ $(document).ready(function() {
     configureContextMenuButtons();
     setFileEvents();
     toggleFileList(false);
+    $('#sort-toggle-btn').html(`<i class="fa-solid ${sortModes[currentSortIndex].icon}"></i>`);
 
     $('#match-form').on('submit', function(e) {
         e.preventDefault();
@@ -639,6 +660,8 @@ $(document).ready(function() {
 
     $('#setting-bar-container').hide()
 });
+
+
 
 // Context Menu functions
 function configureContextMenuButtons(){
