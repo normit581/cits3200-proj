@@ -280,9 +280,16 @@ function appendMatchResults(similarityResults) {
         class: 'position-absolute',
         style: 'top: 10px; right: 10px; z-index: 1000; background: transparent; border: none;',
         html: `<i class="fa-solid ${sortModes[currentSortIndex].icon}" style="font-size: 1.5rem; color: #000;"></i>`
-    }).attr('title', 'Toggle Sort');;
+    }).attr('title', 'Toggle Sort');
 
-    $contentContainer.append($sortButton);
+    const $reuploadButton = $('<button>', {
+        id: 'reupload-btn',
+        class: 'position-absolute',
+        style: 'top: 10px; left: 10px; z-index: 1000; background: transparent; border: none;',
+        html: `<i class="fa-solid fa-upload" style="font-size: 1.5rem; color: #000;"></i>`
+    }).attr('title', 'Reupload');
+
+    $contentContainer.append($reuploadButton, $sortButton);
     const $gridContainer = $('<div>', { class: 'hidden', 'data-view-name': 'grid' });
     const $listContainer = $('<div>', { 'data-view-name': 'list' });
     $contentContainer.append($gridContainer).append($listContainer);
@@ -400,6 +407,14 @@ function appendMatchResults(similarityResults) {
         const nextSortMode = sortModes[currentSortIndex];
         $('#sort-toggle-btn').html(`<i class="fa-solid ${nextSortMode.icon}" style="font-size: 1.5rem; color: #000;"></i>`);
     });
+
+    $row.append($aside, $contentContainer);
+    $('#similarity-result').append($row).show();
+
+    $reuploadButton.on('click', () => {
+        reuploadFiles();
+    });
+
 
     const $similarityResultView = $('#similarity-result');
     $similarityResultView.find('.btn-group-vertical input').click(function() {
