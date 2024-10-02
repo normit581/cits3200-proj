@@ -114,6 +114,35 @@
     width: 100%;
 }
 
+#sort-toggle-btn,
+#reupload-btn {
+    position: absolute;
+    top: 10px;
+    z-index: 1000;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+#sort-toggle-btn {
+    right: 10px;
+}
+
+#reupload-btn {
+    right: 50px;
+}
+
+#sort-toggle-btn i,
+#reupload-btn i {
+    color: #000;
+    font-size: 1.5rem;
+}
+
+#sort-toggle-btn:hover i,
+#reupload-btn:hover i {
+    color: #007bff;
+}
+
 /* Progress Bars */
 .progress {
     height: 20px;
@@ -350,4 +379,29 @@
 
 #similarity-result .row > div[data-view-name="list"] {
     padding: 0 !important;
+}
+
+@media print {
+    #similarity-result aside,
+    .card-docx-container,
+    .card-docx-container-list {
+        overflow: visible !important;
+        height: auto !important;
+    }
+    #similarity-result aside,
+    #sort-toggle-btn,
+    #reupload-btn,
+    #setting-bar-container,
+    nav,
+    footer {
+        display: none !important;
+    }
+    #similarity-result .col-10.position-relative {
+        width: 100% !important;
+        padding-top: 0 !important;
+    }
+    .card-docx-display,
+    .card-docx-container-list .list-group-item {
+        page-break-inside: avoid;
+    }
 }
