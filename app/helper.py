@@ -9,6 +9,7 @@ class FileHelper:
         """Removes the extension from the provided filename."""
         return os.path.splitext(filename)[0]
     
+
 class FormHelper:
     @staticmethod
     def errors_to_str(form):
@@ -134,9 +135,9 @@ class XMLHelper:
 
         docx.append_txt(paragraph_id, rsid, tag_r_properties, txt)
 
-    def extract_app_xml(self, docx, app_content):
+    def extract_app_xml(self, docx:DOCX, app_content):
         
-        def extract_tag_value(tag, property_string, default='-'):
+        def extract_tag_value(tag: BeautifulSoup, property_string, default='-'):
             if tag:
                 value = tag.string or default
             else:
@@ -147,7 +148,7 @@ class XMLHelper:
         extract_tag_value(soup.find('TotalTime'), DOCX.TOTAL_TIME)
         extract_tag_value(soup.find('Words'), DOCX.NUMBER_WORDS)
 
-    def extract_metadata(self, docx, sourcefile):
+    def extract_metadata(self, docx:DOCX, sourcefile):
         """Extract and process document metadata."""
         doc = Document(sourcefile)
         doc_prop = doc.core_properties

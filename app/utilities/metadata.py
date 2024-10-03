@@ -55,7 +55,6 @@ class DOCX:
     """
     CREATED_BY          = "Created By"
     DATE_CREATED        = "Date Created"
-    CREATED_BY          = "Created By"
     LAST_MODIFIED_BY    = "Last Modified By"
     DATE_LAST_MODIFIED  = "Date Last Modified"
     REVISIONS           = "Number of Revisions"
