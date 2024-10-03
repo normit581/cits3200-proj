@@ -1,7 +1,7 @@
 import os, zipfile, random
 from bs4 import BeautifulSoup
 from docx import Document
-from app.utilities.metadata import PROPERTY
+from app.utilities.metadata import PROPERTY, DOCX
 
 class FileHelper:
     @staticmethod
@@ -57,18 +57,18 @@ class ColourHelper:
 
 class XMLHelper:
     # .docx XML tags for respective elements
-    BODY_TAG = "w:body"
-    PARAGRAPH_TAG = "p"
-    PARAGRAPH_PROPERTY_TAG = "pPr"
-    RUN_TAG = "r"
-    RUN_PROPERTY_TAG = "rPr"
-    HYPERLINK_TAG = "hyperlink"
-    TEXT_TAG = "t"
-    RSIDR_PROPERTY = "w:rsidR"
-    PARAGRAPH_ID_PROPERTY = "w14:paraId"
+    BODY_TAG                = "w:body"
+    PARAGRAPH_TAG           = "p"
+    PARAGRAPH_PROPERTY_TAG  = "pPr"
+    RUN_TAG                 = "r"
+    RUN_PROPERTY_TAG        = "rPr"
+    HYPERLINK_TAG           = "hyperlink"
+    TEXT_TAG                = "t"
+    RSIDR_PROPERTY          = "w:rsidR"
+    PARAGRAPH_ID_PROPERTY   = "w14:paraId"
 
-    MISSING_RSID_REPLACEMENT = "None"
-    MISSING_PARAGRAPH_ID_REPLACEMENT = "None"
+    MISSING_RSID_REPLACEMENT            = "None"
+    MISSING_PARAGRAPH_ID_REPLACEMENT    = "None"
 
     """Initializes and prepares the file for extraction."""
     def __init__(self, file):
@@ -85,6 +85,7 @@ class XMLHelper:
     def extract_to_docx(self, docx):
         """Extract data from XML to the docx object."""
         self.parse_xml(docx, self.document_content)
+        self.extract_app_xml(docx, self.app_content)
         self.extract_metadata(docx, self.sourcefile)
 
     def parse_xml(self, docx, document_content):
@@ -133,15 +134,32 @@ class XMLHelper:
 
         docx.append_txt(paragraph_id, rsid, tag_r_properties, txt)
 
+    def extract_app_xml(self, docx, app_content):
+        
+        def extract_tag_value(tag, property_string, default='-'):
+            if tag:
+                value = tag.string or default
+            else:
+                value = default
+            docx.append_metadata(property_string, value)
+
+        soup = BeautifulSoup(app_content, 'xml')
+        extract_tag_value(soup.find('TotalTime'), DOCX.TOTAL_TIME)
+        extract_tag_value(soup.find('Words'), DOCX.NUMBER_WORDS)
+
     def extract_metadata(self, docx, sourcefile):
         """Extract and process document metadata."""
         doc = Document(sourcefile)
+        doc_prop = doc.core_properties
         properties = {
-            docx.CREATED_BY: doc.core_properties.author,
-            docx.DATE_CREATED: doc.core_properties.created,
-            docx.DATE_LAST_MODIFIED: doc.core_properties.modified,
-            docx.TITLE: doc.core_properties.title,
-            docx.VERSION: doc.core_properties.version
+            DOCX.CREATED_BY         : doc_prop.author,
+            DOCX.DATE_CREATED       : doc_prop.created,
+            DOCX.CREATED_BY         : doc_prop.author,
+            DOCX.LAST_MODIFIED_BY   : doc_prop.last_modified_by,
+            DOCX.DATE_LAST_MODIFIED : doc_prop.modified,
+            DOCX.REVISIONS          : doc_prop.revision,
+            DOCX.TITLE              : doc_prop.title,
+            DOCX.VERSION            : doc_prop.version
         }
         for key, value in properties.items():
             docx.append_metadata(key, value)

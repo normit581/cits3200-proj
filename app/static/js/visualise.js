@@ -115,13 +115,19 @@ function pdfToggleElementsVisibility(isVisible) {
     const $visualiseResult = $("#visualise-result-container");
     const $tooltip = $('[role="tooltip"]');
     const $pdfRsids = $('span.pdf-rsid');
+    const $docxSummaryCollapse = $('div.card-header .collapse');
 
     const action = isVisible ? 'show' : 'hide';
 
-    $visualiseResult.find(".card-body").toggleClass('pdf', !isVisible)
-    $pdfRsids.toggleClass('pdf', !isVisible)
+    $visualiseResult.find(".card-body").toggleClass('pdf', !isVisible);
+    $pdfRsids.toggleClass('pdf', !isVisible);
+    $docxSummaryCollapse[!isVisible ? 'addClass' : 'removeClass']('show');
     $contextMenu[action]();
     $tooltip[action]();
+
+    const highlightedClass = isVisible ? 'pdf-highlighted' : 'highlighted';
+    const $highlightedText = $(`p.highlighted, p.pdf-highlighted`);
+    $highlightedText.removeClass('highlighted pdf-highlighted').addClass(highlightedClass);
 }
 
 function exportPDF() {
