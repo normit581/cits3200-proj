@@ -76,3 +76,6 @@ code example :
 
 # clean all logs in a log file
     logger.clean(<logs_file>)
+
+# performmance test
+    locust -f performancetest_remote.py --host=http://elijahmullens.com

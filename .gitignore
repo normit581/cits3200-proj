@@ -10,6 +10,7 @@
 /test/env/
 /test/.pytest_cache
 /test/*log*
+/test/*env*
 
 # Cache
 *__pycache__*
