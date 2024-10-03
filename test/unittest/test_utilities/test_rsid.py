@@ -20,9 +20,13 @@ def test_rsid_extract(setup_logger, setup_files):
             rsid_dict, rsid_count = rsid_extract(file_path)
             
             assert rsid_dict is not None
-            assert rsid_count == sum(rsid_dict.values())
+            count = 0
+            for k in rsid_dict :
+                count += rsid_dict[k]['count']
+    
+            assert rsid_count == count
             
-            test_log = f"{file} - RSID count: {rsid_count} - RSID dictionary: {rsid_dict}"
+            test_log = f"{file} - RSID count: {rsid_count}"
             logger.log(test_log, 'info')
 
 # test /app/utilities/rsid.py function rsid_match()
@@ -35,17 +39,18 @@ def test_rsid_match2(setup_logger, setup_files):
     rsid_dict1 = rsid_extract(current_file)
     
     for file in os.listdir(test_directory):
-        compare_file = os.path.join(test_directory, file)
-        rsid_dict2 = rsid_extract(compare_file)
-        output = rsid_match2(rsid_dict1, rsid_dict2)
-        
         if file == current:
             continue
         
-        if file.startswith('edited'):
-            assert output >= 10         # change the number
-        else:
-            assert output <= 60
+        compare_file = os.path.join(test_directory, file)
+        rsid_dict2 = rsid_extract(compare_file)
+        match_result, dict = rsid_match2(rsid_dict1, rsid_dict2)
         
-        test_log = f"{current} - {file} - {output}"
+        if file.startswith('edited'):
+            assert match_result >= 10         # change the number
+        else:
+            assert match_result <= 60
+        
+        test_log = f"{current} - {file} - {match_result}"
         logger.log(test_log, 'info')
+

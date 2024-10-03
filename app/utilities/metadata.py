@@ -103,6 +103,12 @@ class RSID:
         self.tag = tag
         self.index = index
 
+    @staticmethod
+    def calculate_similarity(common_count, total, digits=None):
+        if total == 0:  # Prevent division by zero
+            return 0
+        result = 100 * common_count / total
+        return round(result, digits) if digits is not None else result
 
 class PARAGRAPH:
     def __init__(self, id_):

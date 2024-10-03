@@ -7,6 +7,6 @@ services:
       dockerfile: Dockerfile
     image: documatcher
     ports:
-      - "80:80"
+      - "8080:8080"
     env_file:
       - "deployment/app.env"

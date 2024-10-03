@@ -1,3 +1,10 @@
+/* Custom selection style to remove blue highlight */
+::selection {
+    /* Remove default selection background */
+    background: transparent;
+    background-color: rgb(255, 255, 0, 0.15) !important;
+}
+
 .card-body {
     height: auto;
     transition: height 0.3s ease;
@@ -5,6 +12,10 @@
 
 .card-body.pdf {
     height: auto !important;
+}
+
+.card-body.pdf p {
+    border-bottom: 0px solid red;
 }
 
 .fluid-col-6 {
@@ -56,4 +67,48 @@ span.pdf-rsid {
 
 p:not(.hidden-colour) + span.pdf {
     display: inline !important;
+}
+
+.tippy-box[data-reference-hidden] {
+    display: none;
+}
+
+div.tooltip-cursor-out {
+    display: none;
+}
+
+div.tooltip-temp-hidden {
+    display: none;
+}
+
+body {
+    overflow-x: hidden;
+}
+
+/* text with equal spacing */
+.rsidButton .char-evenly-space {
+    font-family: monospace;
+    white-space: nowrap;
+}
+
+.rsidButton .row > div.col-auto {
+    padding-right: 5px;
+}
+
+ul.dropdown-menu.add-scroll {
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: 500px;
+}
+
+p.highlighted {    
+    background-color: rgb(255, 255, 0, 0.15) !important;
+}
+
+p[data-is-match="false"].highlighted {    
+    border-bottom: 3px solid green;
+}
+
+p[data-is-match="true"].highlighted {    
+    border-bottom: 3px solid red;
 }

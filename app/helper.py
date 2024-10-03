@@ -13,10 +13,14 @@ class FormHelper:
     @staticmethod
     def errors_to_str(form):
         error_messages = []
+        seen_messages = set()  # track unique error messages
         for field, errors in form.errors.items():
             for error in errors:
-                error_messages.append(f"<br>{field}: {error}")
-        return "".join(error_messages*2)
+                formatted_error = f"<br>{field}: {error}"
+                if formatted_error not in seen_messages:
+                    error_messages.append(formatted_error)
+                    seen_messages.add(formatted_error)
+        return "".join(error_messages)
 
 
 class ColourHelper:
@@ -33,6 +37,22 @@ class ColourHelper:
     @staticmethod    
     def random_light_rgb_str():
         return f"rgb({random.randint(200, 255)}, {random.randint(200, 255)}, {random.randint(200, 255)})" 
+    
+    @staticmethod    
+    def random_rgb_str():
+        return f"rgb({random.randint(50, 250)}, {random.randint(50, 250)}, {random.randint(50, 250)})"
+    
+    @staticmethod    
+    def remove_duplicates(colour_dict, max_retries=5):
+        used_colours = set(colour_dict.values())
+        for rsid, colour in colour_dict.items():
+            retries = 0
+            while colour in used_colours and retries < max_retries:
+                colour = ColourHelper.random_standard_rgb_str()
+                retries += 1
+            used_colours.add(colour)
+            colour_dict[rsid] = colour
+        return colour_dict
 
 
 class XMLHelper:

@@ -86,7 +86,7 @@ class FlaskSeleniumTest(unittest.TestCase):
         assert progress_width == "100", f"Expected progress bar width to be 100%, but got {progress_width}%"
 
 
-    def test_upload_files_failed(self):
+    def test_invalid_file(self):
         # try file with image inside
         file_input = WebDriverWait(self.driver, 5).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "input[type='file']"))
@@ -157,7 +157,6 @@ class FlaskSeleniumTest(unittest.TestCase):
 
     # Test not .docx
     def test_upload_invalid_file_extension(self):
-
         file_input = WebDriverWait(self.driver, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "input[type='file']"))
         )
@@ -222,16 +221,19 @@ class FlaskSeleniumTest(unittest.TestCase):
     #         if os.path.exists(file_path):
     #             os.remove(file_path)
     def test_special_characters(self):
-
         file_input = WebDriverWait(self.driver, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "input[type='file']"))
         )
         special_prefix = "!@#$%^&*()_+-=[]|;':,.<>?"
-        file = self.create_test_files(count=1, size_in_mb=1, prefix=special_prefix)
-        file_input.send_keys('\n'.join(file))
+
+        files = self.create_test_files(count=2, size_in_mb=1, prefix=special_prefix)
+
+        file_input.send_keys('\n'.join(files))
+
         submit_button = WebDriverWait(self.driver, 5).until(
             EC.element_to_be_clickable((By.ID, "submit")),
         )
+
         submit_button.click()
 
 
@@ -239,19 +241,42 @@ class FlaskSeleniumTest(unittest.TestCase):
         file_input = WebDriverWait(self.driver, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "input[type='file']"))
         )
-        file = self.create_test_files(count=1, size_in_mb=0, prefix="empty")
+        files = self.create_test_files(count=2, size_in_mb=0, prefix="empty")
 
-        file_input.send_keys('\n'.join(file))
+        file_input.send_keys('\n'.join(files))
 
         submit_button = WebDriverWait(self.driver, 5).until(
             EC.element_to_be_clickable((By.ID, "submit")),
         )
         submit_button.click()
 
-    # interrupted downloads pdf download
-    # tools to tell us what happened
-    # speed tests for the time allowed 
-    # corrupted files
-    # documentation testing that have been used by other people
+    def test_interrupted_upload(self):
+        files = self.create_test_files(count=2, size_in_mb=5, prefix="interrupted_test")
+
+        file_input = WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, "input[type='file']"))
+        )
+
+        file_input.send_keys('\n'.join(files))
+
+        submit_button = WebDriverWait(self.driver, 5).until(
+            EC.element_to_be_clickable((By.ID, "submit")),
+        )
+        submit_button.click()
+
+        # remove files during upload for interruption
+        time.sleep(2)
+        for file_path in files:
+            if os.path.exists(file_path):
+                os.remove(file_path)
+
+        # Wait for the error message
+        alert = WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.CLASS_NAME, "alert-danger"))
+        )
+        alert_message = alert.text
+
+        assert ("ErrorCode: 500" in alert_message), f"Unexpected alert message: {alert_message}"
+
 if __name__ == "__main__":
     unittest.main() 

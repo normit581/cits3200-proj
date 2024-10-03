@@ -1,0 +1,10 @@
+[Unit]
+Description=Keep DocuMatcher up to date with main
+
+[Timer]
+OnBootSec=0s
+OnCalendar=*-*-* 19:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -2,11 +2,12 @@ const docxExtension = "application/vnd.openxmlformats-officedocument.wordprocess
 let numFiles = 0;
 let fileId = 0;
 let currentFiles = new Map();
-const maxFiles = 2;
+const maxFiles = 20;
 const maxFileSize = 100 * 1024 * 1024; //100MB
 const maxTotalSize = maxFiles * maxFileSize;
 const contextMenuID = 'custom-context-menu';
 const dangerPercentage = 60, warningPercentage = 30
+const overlay = new MyOverlay();
 
 function toggleFileList(isOpen) {
     const fileListWidth = isOpen ? "15%" : "0%";
@@ -43,7 +44,7 @@ function deleteListItem(e) {
         $listItem.remove();
         currentFiles.delete(filename);
     }
-    
+
     handleFileList(-1);
     updateFileInput();
     updateProgressBar();
@@ -55,9 +56,9 @@ function createListItem(name) {
     const delIcon = $('<i>')
         .addClass('bi bi-trash3')
         .click({ itemId: fileId, filename }, deleteListItem);
-    
+
     const para = $('<p>').text(name);
-    
+
     let warningIcon = '';
     if (currentFiles.has(filename)){
         warningIcon = $('<i>')
@@ -95,7 +96,7 @@ function fileNameWithoutExt(fileName){
 function validateMatchForm(){
     const formData = new FormData();
     let isValid = true;
-    
+
     currentFiles.forEach((file, idx) => {
         if (validateFile(file)) {
             formData.append('files', file);
@@ -226,6 +227,7 @@ const onErrorMatch = (xhr) => {
             }
             break;
     }
+    overlay.completeProgress();
     GenerateDangerAlertDiv("Failed!", `ErrorCode: ${xhr.status}. ${responseText}`);
 };
 
@@ -237,6 +239,7 @@ const onSuccessMatch = (response) => {
         $("#setting-bar-container").show();
         $("#upload-container").hide();
         triggerContextMenuEvent($('main'), true);
+        overlay.completeProgress();
     } else {
         GenerateDangerAlertDiv("Failed!", response.message);
     }
@@ -247,7 +250,7 @@ function match() {
         GenerateDangerAlertDiv('Failed!', 'Please add at least one file.');
         return;
     }
-    
+
     const $warningItems = $('aside span').find('i.fa-triangle-exclamation');
     if ($warningItems.length > 0) {
         if(!confirm("Duplicate detected. Do you wish to continue?")){
@@ -256,72 +259,219 @@ function match() {
     }
 
     $('#similarity-result').empty();
+    overlay.startProgress(0.5);
     CallPost(`/home`, validateMatchForm(), onSuccessMatch, onErrorMatch, onXhrMatch);
 }
 
 function appendMatchResults(similarityResults) {
-    const row = $('<div class="row"></div>');
-    const aside = $('<aside class="col-2"><div class="btn-group-vertical col-12 shaded" role="group" aria-label="Vertical radio toggle button group"></div></aside>');
-    const container = $('<div class="col-10"></div>');
+    currentViewIndex = 0;
+    const $row = $('<div>', { class: 'row'});
+    const $aside = $('<aside>', { class: 'col-2' }).append(
+        $('<div>', {
+            class: 'btn-group-vertical col-12 shaded',
+            role: 'group',
+            'aria-label': 'Vertical radio toggle button group'
+        })
+    );
+
+    const $contentContainer = $('<div>', { class: 'col-10 position-relative' });
+
+    const currentSortMode = sortModes[currentSortIndex];
+    const nextSortIndex = (currentSortIndex + 1) % sortModes.length;
+    const nextSortMode = sortModes[nextSortIndex];
+
+    const $sortButton = $('<button>', {
+        id: 'sort-toggle-btn',
+        class: 'position-absolute',
+        style: 'top: 10px; right: 10px; z-index: 1000; background: transparent; border: none;',
+        html: `<i class="fa-solid ${currentSortMode.icon}" style="font-size: 1.5rem; color: #000;"></i>`
+    }).attr('title', `Switch to ${nextSortMode.label}`);
+
+
+    const $reuploadButton = $('<button>', {
+        id: 'reupload-btn',
+        class: 'position-absolute',
+        style: 'top: 10px; left: 10px; z-index: 1000; background: transparent; border: none;',
+        html: `<i class="fa-solid fa-upload" style="font-size: 1.5rem; color: #000;"></i>`
+    }).attr('title', 'Reupload');
+
+    const currentViewMode = viewModes[currentViewIndex];
+    const nextViewIndex = (currentViewIndex + 1) % viewModes.length;
+    const nextViewMode = viewModes[nextViewIndex];
+
+    const $viewButton = $('<button>', {
+        id: 'view-toggle-btn',
+        class: 'position-absolute',
+        style: 'top: 10px; right: 50px; z-index: 1000; background: transparent; border: none;',
+        html: `<i class="fa-solid ${currentViewMode.icon}" style="font-size: 1.5rem; color: #000;"></i>`
+    }).attr('title', currentViewMode.nextTitle);
+
+    $contentContainer.append($reuploadButton, $sortButton, $viewButton);
+    const $gridContainer = $('<div>', { class: 'hidden', 'data-view-name': 'grid' });
+    const $listContainer = $('<div>', { 'data-view-name': 'list' });
+    $contentContainer.append($gridContainer).append($listContainer);
+    $contentContainer.css('padding-top', '50px');
 
     $.each(similarityResults, (key, values) => {
         const keyId = `${key}-${Object.keys(similarityResults).indexOf(key)}`;
-        const mainContent = $('<div class="row card-docx-container hidden"></div>').attr('data-id', keyId);
+        const $mainContent = $('<div>', {
+            class: 'row card-docx-container hidden',
+            'data-id': keyId
+        });
+
         const radioId = `vbtn-radio-${keyId}`;
-        const radioInput = $('<input type="radio" class="btn-check">')
-            .attr({ name: 'vbtn-radio', id: radioId, autocomplete: 'off', 'data-target': keyId });
-        const radioLabel = $('<label class="btn btn-outline-secondary text-truncate mt-0"></label>')
-            .attr('for', radioId)
-            .text(key);
+        const $radioInput = $('<input>', {
+            type: 'radio',
+            class: 'btn-check',
+            name: 'vbtn-radio',
+            id: radioId,
+            autocomplete: 'off',
+            'data-target': keyId
+        });
+        const $radioLabel = $('<label>', {
+            class: 'btn btn-outline-secondary text-truncate mt-0',
+            for: radioId
+        }).text(key);
 
-        aside.find('.btn-group-vertical').append(radioInput).append(radioLabel);
-
+        $aside.find('.btn-group-vertical').append($radioInput).append($radioLabel);
+        // Iterate over each value in the results
         $.each(values, (i, item) => {
             const matchPercent = parseFloat(item.value);
-            const borderColour = 
-                matchPercent < warningPercentage ? 'border-success': 
-                matchPercent < dangerPercentage ? 'border-warning': 'border-danger';
-            const card = $(`<div class="card-docx-display card col-3"></div>`)
-                .attr({ 'data-base-file': key, 'data-compare-file': item.filename, 'data-match-percent': item.value});
-            card.append(
-                $('<div class="card shaded"></div>').append(
-                    $(`<div class="card-body border border-4 rounded-1 ${borderColour}"></div>`).append(
-                        $('<h4 class="text-truncate"></h4>').text(item.filename),
+            const matchCount = item.count, fileName = item.filename;
+            const borderColour =
+                matchPercent < warningPercentage ? 'border-success' :
+                matchPercent < dangerPercentage ? 'border-warning' : 'border-danger';
+
+            // Create card structure
+            const $card = $('<div>', {
+                class: 'card-docx-display card col-3',
+                'data-base-file': key,
+                'data-compare-file': item.filename, 
+                'data-match-percent': item.value,
+                'data-base-count': similarityResults[item.filename].find(item => item.filename === key).count,
+                'data-compare-count': item.count,
+                'data-common-count': item.common_count
+            });
+            $card.append(
+                $('<div>', { class: 'card shaded' }).append(
+                    $('<div>', { class: `card-body border border-4 rounded-1 ${borderColour}` }).append(
+                        $('<h4>', { class: 'text-truncate' }).text(fileName),
                         $('<hr>'),
-                        $('<div class="d-flex justify-content-between"></div>').append(
-                            $('<span></span>').text(`${matchPercent.toFixed(1)}%`),
-                            $('<div class="text-truncate"></div>').append(
-                                $('<i class="fa-solid fa-hashtag me-1"></i>'),
-                                $('<span></span>').text(item.count)
+                        $('<div>', { class: 'd-flex justify-content-between' }).append(
+                            $('<span>').text(`${matchPercent.toFixed(1)}%`),
+                            $('<div>', { class: 'text-truncate' }).append(
+                                $('<i>', { class: 'fa-solid fa-hashtag me-1' }),
+                                $('<span>').text(matchCount)
                             )
                         )
                     )
                 )
             );
-            mainContent.append(card);
+            $mainContent.append($card);
+        });
+        $gridContainer.append($mainContent);
+    });
+
+    $.each(similarityResults, (key, values) => {
+        const keyId = `${key}-${Object.keys(similarityResults).indexOf(key)}`;
+        const $mainContent = $('<div>', {
+            class: 'card-docx-container-list list-group rounded-0 hidden',
+            'data-id': keyId
         });
 
-        container.append(mainContent);
+        $.each(values, (i, item) => {
+            const matchPercent = parseFloat(item.value);
+            const matchCount = item.count, fileName = item.filename;
+            const borderColour =
+                matchPercent < warningPercentage ? 'border-success' :
+                matchPercent < dangerPercentage ? 'border-warning' : 'border-danger';
+
+            const badgeColour =
+                matchPercent < warningPercentage ? 'bg-success' :
+                matchPercent < dangerPercentage ? 'bg-warning' : 'bg-danger';
+            const $row = $('<div>', {
+                class: `list-group-item d-flex justify-content-between align-items-center ${borderColour}`,
+                'data-base-file': key,
+                'data-compare-file': fileName,
+                'data-match-percent': matchPercent,
+                'data-base-count': similarityResults[item.filename].find(item => item.filename === key).count,
+                'data-compare-count': matchCount,
+                'data-common-count': item.common_count
+            });
+            const $fileInfo = $('<div>', { class: 'd-flex align-items-center flex-grow-1 file-info' }).append(
+                $('<i>', { class: 'fa-solid fa-file me-3' }),
+                $('<span>', { class: 'file-name text-truncate' }).text(fileName)
+            );
+            const $matchInfo = $('<div>', { class: 'match-info d-flex align-items-center' }).append(
+                $('<span>', { class: 'text-muted me-3 match-count' }).append(
+                    $('<i>', { class: 'fa-solid fa-hashtag me-1' }),
+                    matchCount
+                ),
+                $('<span>', { class: `badge bg-primary me-2 ${badgeColour} fixed-width-badge` }).text(matchPercent === 0 ? '00.0%' : `${matchPercent.toFixed(1)}%`) // Match percentage
+            );
+            $row.append($fileInfo, $matchInfo);
+            $mainContent.append($row);
+        });
+        $listContainer.append($mainContent);
     });
 
-    row.append(aside).append(container);
-    $('#similarity-result').append(row);
-    $("#similarity-result").show();
+    $row.append($aside).append($contentContainer);
+    $('#similarity-result').append($row);
+    $('#similarity-result').show();
 
-    $('#similarity-result .btn-group-vertical input').click(function() {
+    $sortButton.on('click', () => {
+        sortResultsView();
+        const nextSortMode = sortModes[currentSortIndex];
+        $('#sort-toggle-btn').html(`<i class="fa-solid ${nextSortMode.icon}" style="font-size: 1.5rem; color: #000;"></i>`);
+    });
+
+    $row.append($aside, $contentContainer);
+    $('#similarity-result').append($row).show();
+
+    $reuploadButton.on('click', () => {
+        reuploadFiles();
+    });
+
+    $viewButton.on('click', () => {
+        toggleView();
+    });
+
+    const $similarityResultView = $('#similarity-result');
+    $similarityResultView.find('.btn-group-vertical input').click(function() {
         const target = $(this).data('target');
-        $('.card-docx-container').addClass('hidden'); // Hide all cards
-        $(`.card-docx-container[data-id="${target}"]`).removeClass('hidden'); // Show the selected card
+        $similarityResultView.find('.card-docx-container').addClass('hidden'); // Hide all grid containers
+        $similarityResultView.find('.card-docx-container-list').addClass('hidden'); // Hide all list containers
+        $similarityResultView.find(`.card-docx-container[data-id="${target}"]`).removeClass('hidden'); // Show the selected grid container
+        $similarityResultView.find(`.card-docx-container-list[data-id="${target}"]`).removeClass('hidden'); // Show the selected list container
     });
+    $aside.find('input').first().click();
 
-    aside.find('input').first().click(); // Automatically click the first radio button
+    applySort();
+   // sortListView();
 }
 
 function setupVisualiseForm() {
+    $('#base_count').val($('.card-docx-container .card-body').first().parents('.card-docx-display').first().data("base-count-file"))
     $('.card-docx-container .card-body').on('click', function() {
         const $card_docx = $(this).parents('.card-docx-display').first();
         const setBaseFile = setFileInput($card_docx.data("base-file"), "#base_file");
         const setCompareFile = setFileInput($card_docx.data("compare-file"), "#compare_file");
+        $('#base_count').val($card_docx.data("base-count"))
+        $('#compare_count').val($card_docx.data("compare-count"))
+        $('#common_count').val($card_docx.data("common-count"))
+
+        if (setBaseFile && setCompareFile) {
+            $("#visualise-form").submit();
+        }
+    });
+
+    $('.card-docx-container-list .list-group-item').on('click', function() {
+        const $row = $(this);
+        const setBaseFile = setFileInput($row.data("base-file"), "#base_file");
+        const setCompareFile = setFileInput($row.data("compare-file"), "#compare_file");
+        $('#base_count').val($row.data("base-count"))
+        $('#compare_count').val($row.data("compare-count"))
+        $('#common_count').val($row.data("common-count"))
 
         if (setBaseFile && setCompareFile) {
             $("#visualise-form").submit();
@@ -359,34 +509,8 @@ function reuploadFiles() {
     triggerContextMenuEvent($('main'), false);
 }
 
-function toggleElementsVisibility(isVisible) {
-    const $navBar = $("nav");
-    const $settingBar = $("#setting-bar-container");
-    const $similarityResult = $("#similarity-result");
-    const $similarityResultAside = $similarityResult.find("aside");
-    const $similarityResultDiv = $similarityResultAside.next();
-    const $contextMenu = $(`#${contextMenuID}`);
-    
-    const action = isVisible ? 'show' : 'hide';
-    const containerClass = isVisible ? "container" : "container-fluid";
-    const colClass = isVisible ? "col-10" : "col-12";
-    
-    $navBar[action]();
-    $settingBar[action]();
-    $similarityResult.attr("class", containerClass);
-    $similarityResultDiv.attr("class", colClass);
-    $similarityResultDiv.find(".card-docx-container")
-        .toggleClass('pdf', !isVisible)
-        .find("> div")
-        .toggleClass('pdf disable-hover', !isVisible);
-    $similarityResultAside[action]();
-    $contextMenu[action]();
-}
-
 function exportPDF() {
-    toggleElementsVisibility(false);
     window.print();
-    toggleElementsVisibility(true);
 }
 
 function exportSinglePDF() {
@@ -397,6 +521,7 @@ function exportSinglePDF() {
     }
     generateTitlePDF($checkedResult);
     exportPDF();
+    generateTitlePDF($('[name="vbtn-radio"]:checked'))
     destroyTitlePDF();
 }
 
@@ -412,8 +537,10 @@ function destroyTitlePDF() {
     $('div[data-result-docx-title]').remove();
     $('[name="vbtn-radio"]:not(:checked)').each(function(idx, asideElement) {
         const selectedInputId = $(asideElement).attr('data-target');
-        const divId = `#similarity-result [data-id='${selectedInputId}']`;
-        $(divId).addClass('hidden');
+        const divIdGrid = `#similarity-result div[data-view-name='grid'] [data-id='${selectedInputId}']`;
+        const divIdList = `#similarity-result div[data-view-name='list'] > div[data-id='${selectedInputId}']`;
+        $(divIdGrid).addClass('hidden');
+        $(divIdList).addClass('hidden');
     });
 }
 
@@ -421,27 +548,137 @@ function generateTitlePDF(element) {
     const selectedInputId = $(element).attr('data-target');
     const selectedLabel = $(element).next().text();
     const titleHTML = $(`<div data-result-docx-title="${selectedLabel}" class="h1 text-center mt-3"></div>`).text(selectedLabel);
-    const divId = `#similarity-result [data-id='${selectedInputId}']`;
-    $(divId).removeClass('hidden');
-    $(titleHTML).insertBefore(divId);
+
+    const divIdGrid = `#similarity-result div[data-view-name='grid'] [data-id='${selectedInputId}']`;
+    const divIdList = `#similarity-result div[data-view-name='list'] > div[data-id='${selectedInputId}']`;
+    $(divIdGrid).removeClass('hidden');
+    if ($(divIdGrid).children('div').not('.hidden').length > 0) {
+        $(titleHTML).insertBefore(divIdGrid);
+    }
+    $(divIdList).removeClass('hidden');
+    if ($(divIdList).children('div').not('.hidden').length > 0) {
+        $(titleHTML.clone()).insertBefore(divIdList);
+    }
 }
 
 function updateFilter(value) {
     const minValue = parseFloat(value);
     $('#matchSlider').val(minValue);
     $('#matchInput').val(minValue);
-    $('#similarity-result .card-docx-display').each(function() {
+    $('#similarity-result .card-docx-display, #similarity-result .card-docx-container-list > div').each(function() {
         const matchPercent = parseFloat($(this).data('match-percent'));
-        const action = matchPercent >= minValue ? 'show' : 'hide';
-        $(this)[action]();
+        const action = matchPercent >= minValue ? 'removeClass' : 'addClass';
+        $(this)[action]('hidden');
     });
 };
+
+let viewModes = [
+    { viewName: 'list', icon: 'fa-list', label: 'List View', nextTitle: 'Switch to Grid View' },
+    { viewName: 'grid', icon: 'fa-grip', label: 'Grid View', nextTitle: 'Switch to List View' }
+];
+let currentViewIndex = 0;
+
+
+function toggleView() {
+    const currentViewMode = viewModes[currentViewIndex];
+    const nextViewIndex = (currentViewIndex + 1) % viewModes.length;
+    const nextViewMode = viewModes[nextViewIndex];
+
+    $('#similarity-result div[data-view-name]').addClass('hidden');
+    $(`#similarity-result div[data-view-name='${nextViewMode.viewName}']`).removeClass('hidden');
+
+    $('#view-toggle-btn').html(`<i class="fa-solid ${nextViewMode.icon}" style="font-size: 1.5rem; color: #000;"></i>`)
+        .attr('title', nextViewMode.nextTitle);
+    currentViewIndex = nextViewIndex;
+    updateContextMenuViewButtons();
+}
+
+function updateContextMenuViewButtons() {
+    if (currentViewIndex === 0) {
+        $('#list-view-btn').addClass('hidden');
+        $('#grid-view-btn').removeClass('hidden');
+    } else {
+        $('#grid-view-btn').addClass('hidden');
+        $('#list-view-btn').removeClass('hidden');
+    }
+}
+
+let sortModes = [
+    { mode: 'matchDesc', label: 'Match % Descending', icon: 'fa-sort-amount-down' },
+    { mode: 'matchAsc', label: 'Match % Ascending', icon: 'fa-sort-amount-up' },
+    { mode: 'filenameAsc', label: 'Filename A-Z', icon: 'fa-sort-alpha-down' },
+    { mode: 'filenameDesc', label: 'Filename Z-A', icon: 'fa-sort-alpha-up' }
+];
+let currentSortIndex = 0;
+
+function sortResultsView() {
+    currentSortIndex = (currentSortIndex + 1) % sortModes.length;
+    applySort();
+}
+
+function applySort() {
+    const currentSortMode = sortModes[currentSortIndex];
+    const nextSortIndex = (currentSortIndex + 1) % sortModes.length;
+    const nextSortMode = sortModes[nextSortIndex];
+    
+    // List
+    $('#similarity-result .card-docx-container-list').each(function() {
+        const $container = $(this);
+        const $items = $container.children('.list-group-item').get();
+        $items.sort(function(a, b) {
+            switch (currentSortMode.mode) {
+                case 'matchDesc':
+                    return parseFloat($(b).data('match-percent')) - parseFloat($(a).data('match-percent'));
+                case 'matchAsc':
+                    return parseFloat($(a).data('match-percent')) - parseFloat($(b).data('match-percent'));
+                case 'filenameAsc':
+                    return $(a).data('compare-file').localeCompare($(b).data('compare-file'), undefined, {numeric: true, sensitivity: 'base'});
+                case 'filenameDesc':
+                    return $(b).data('compare-file').localeCompare($(a).data('compare-file'), undefined, {numeric: true, sensitivity: 'base'});
+                default:
+                    return 0;
+            }
+        });
+        $.each($items, function(idx, item) {
+            $container.append(item);
+        });
+    });
+    
+    // Grid
+    $('#similarity-result .card-docx-container').each(function() {
+        const $container = $(this);
+        const $items = $container.children('.card-docx-display').get();
+        $items.sort(function(a, b) {
+            switch (currentSortMode.mode) {
+                case 'matchDesc':
+                    return parseFloat($(b).data('match-percent')) - parseFloat($(a).data('match-percent'));
+                case 'matchAsc':
+                    return parseFloat($(a).data('match-percent')) - parseFloat($(b).data('match-percent'));
+                case 'filenameAsc':
+                    return $(a).data('compare-file').localeCompare($(b).data('compare-file'), undefined, {numeric: true, sensitivity: 'base'});
+                case 'filenameDesc':
+                    return $(b).data('compare-file').localeCompare($(a).data('compare-file'), undefined, {numeric: true, sensitivity: 'base'});
+                default:
+                    return 0;
+            }
+        });
+        $.each($items, function(idx, item) {
+            $container.append(item);
+        });
+    });
+
+    $('#sort-btn').html(`<i class="fa-solid ${currentSortMode.icon}"></i> ${currentSortMode.label}`)
+        .attr('title', `Switch to ${nextSortMode.label}`);
+    $('#sort-toggle-btn').html(`<i class="fa-solid ${currentSortMode.icon}" style="font-size: 1.5rem; color: #000;"></i>`)
+        .attr('title', `Switch to ${nextSortMode.label}`);
+}
 
 $(document).ready(function() {
     $(window).on('beforeunload', showRefreshAlert);
     configureContextMenuButtons();
     setFileEvents();
     toggleFileList(false);
+    $('#sort-toggle-btn').html(`<i class="fa-solid ${sortModes[currentSortIndex].icon}"></i>`);
 
     $('#match-form').on('submit', function(e) {
         e.preventDefault();
@@ -451,20 +688,48 @@ $(document).ready(function() {
     $('#setting-bar-container').hide()
 });
 
+
+
 // Context Menu functions
-function configureContextMenuButtons(){
-    $('#reupload-btn').on('click', () => reuploadFiles() );
+function configureContextMenuButtons() {
+    $('#reupload-btn').on('click', () => reuploadFiles());
+
+    $('#grid-view-btn').on('click', function() {
+        toggleView();
+    });
+    $('#list-view-btn').on('click', function() {
+        toggleView();
+    });
+
+    updateContextMenuViewButtons();
+
+    $('#sort-btn').on('click', () => sortResultsView());
     
-    $('#pdf-btn').on('click', () => exportSinglePDF() );
+    const currentSortMode = sortModes[currentSortIndex];
+    const nextSortIndex = (currentSortIndex + 1) % sortModes.length;
+    const nextSortMode = sortModes[nextSortIndex];
+    $('#sort-btn').html(`<i class="fa-solid ${currentSortMode.icon}"></i> ${currentSortMode.label}`)
+        .attr('title', `Switch to ${nextSortMode.label}`);
 
-    $('#all-pdf-btn').on('click', () => exportAllPDF() );
-
+    $('#pdf-btn').on('click', () => exportSinglePDF());
+    $('#all-pdf-btn').on('click', () => exportAllPDF());
 
     $('#custom-context-menu .input-group')
         .on('mouseenter', function() { $(this).find('button').addClass('active'); })
         .on('mouseleave', function() { $(this).find('button').removeClass('active'); });
+
     $('#matchSlider').on('input', (e) => updateFilter(e.target.value));
     $('#matchInput').on('input', (e) => updateFilter(e.target.value));
+}
+
+function updateContextMenuViewButtons() {
+    if (currentViewIndex === 0) {
+        $('#grid-view-btn').addClass('hidden');
+        $('#list-view-btn').removeClass('hidden');
+    } else {
+        $('#list-view-btn').addClass('hidden');
+        $('#grid-view-btn').removeClass('hidden');
+    }
 }
 
 const customFunc = function(e) {

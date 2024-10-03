@@ -5,9 +5,11 @@
 {% block head %}
   <link rel="stylesheet" href="{{ url_for('static', filename='styles/visualise.css')}}">
   <script src="{{ url_for('static', filename='js/context-menu.js') }}" defer></script>
-  <script src="{{ url_for('static', filename='js/visualise.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/progress-overlay.js') }}" defer></script>
   <script src="{{ url_for('static', filename='js/colour.js') }}" defer></script>
-
+  <script src="{{ url_for('static', filename='js/visualise.js') }}" defer></script>
+  <script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.min.js"></script>
+  <script src="https://unpkg.com/tippy.js@6/dist/tippy-bundle.umd.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -16,6 +18,7 @@
         {% include "/layout/alert_modal.html" %}
     </div>
 </div>
+{% include "/layout/progress_overlay.html" %}
 
 <div id="custom-context-menu">
   <div class="btn-group-vertical" role="group" aria-label="Vertical button group">
@@ -43,6 +46,9 @@
       <input id="cardHeightInput" type="number" class="form-control text-end" aria-label="Height (px)">
       <button type="button" class="rounded-0 sharp-color btn btn-light">px</button>
     </div>
+    <button id="hide-text-btn" class="btn btn-light text-start" type="button">
+      <i class="fa-solid fa-eye-slash"></i> Hide Text RSIDs
+    </button>
     <button id="hide-individual-colour-btn" class="btn btn-light text-start" type="button">
       <i class="fa-solid fa-eye-slash"></i> Hide Individual RSIDs
     </button>
@@ -60,9 +66,11 @@
           <div class="card">
               <div class="card-header">
                   <h5>{{ document.file_name }}</h5>
+                  <small>Similarity: {{ document.metadata.similarity }}</small>
+                  <small>Count: {{ document.metadata.count }}</small>
                   <small>Created on: {{ document.metadata.created.strftime('%Y-%m-%d %H:%M:%S') }}</small>
               </div>
-              <div class="card-body" style="overflow-y: auto;" id="card-body-{{ loop.index }}">
+              <div class="card-body" style="overflow-y: auto;" data-id="card-body-scroll">
                   {% for paragraph in document.metadata.paragraphs %}
                     <div class="my-2">
                       {% for para in paragraph %}
