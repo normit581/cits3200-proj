@@ -8,8 +8,7 @@ class Config(object):
 
 class TestingConfig(object):
     TESTING = True
-    MAX_CONTENT_LENGTH = 1 * 1024 * 1024
     DEBUG = True
     PRESERVE_CONTEXT_ON_EXCEPTION = False
     SERVER_NAME = 'localhost:5000'
-    
+    MAX_CONTENT_LENGTH = 20 * 1 * 1024 * 1024
