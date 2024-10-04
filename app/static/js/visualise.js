@@ -1,5 +1,4 @@
 const defaultFontSize = 16; // Default font size
-const defaultTextColour = 'red'; // Default font size
 let currentFontSize = defaultFontSize;
 let longPressInterval;
 const contextMenuID = 'custom-context-menu';

@@ -23,7 +23,7 @@ class MatchProcessor:
             comparisons = []
             for j, file2 in enumerate(file_data):
                 if i != j:
-                    similarity, matching_rsid, common_rsid_count = rsid_match2(file1['rsid'], file2['rsid'])
+                    similarity, _, common_rsid_count = rsid_match2(file1['rsid'], file2['rsid'])
                     file_without_ext = FileHelper.remove_extension(file2['filename'])
                     comparisons.append({'filename': file_without_ext, 'value': similarity, 'count': file2['rsid'][-1], 'common_count': common_rsid_count})
             file_without_ext = FileHelper.remove_extension(file1['filename'])
