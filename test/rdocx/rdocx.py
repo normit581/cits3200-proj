@@ -1,17 +1,16 @@
 import os
 import sys
-from utility.rsid import *
-from utility.gen import *
-from utility.log import *
+from utilities.rsid import *
+from utilities.gen import *
 
 def usage() :
-    print("\nusage: $ python gen.py <option>\n")
+    print("\nusage: $ python rdocx.py <option>\n")
     print("options: ")
     print("\tg <number of .docx>\t\t-----\tgenerate <number of .docx> new .docx file in /testdocs")
     print("\te <input .docx> <output .docx>\t-----\trandomly edit <input .docx> and save the result to newly created <output .docx> in /testdocs")
     print("\trsid <document.docx>\t-----\textract and print rsid of <document.docx> in /testdocs")
     print("\trsid_all <number of .docx>\t-----\textract and print rsid details of <number of .docx> .docx in /testdocs, only works went filename is document_n.docx")
-    print("\trsid_sim <document1.docx> <document2.docx>\t-----\tcompare rsid similarity between <document1.docx> and <document2.docx> in /testdocs")
+    print("\trsid_sim <document1.docx> <document2.docx>\t-----\tcalculate rsid matching between <document1.docx> and <document2.docx> in /testdocs")
     print("\tclean\t\t\t\t-----\tdelete all contents in /testdocs")
     exit()
 
@@ -26,6 +25,7 @@ if __name__ == "__main__" :
             usage()
         
         num_file = int(sys.argv[2])
+        # num_para = int(sys.argv[3])
         generate_docx(num_file)
         exit()
         
