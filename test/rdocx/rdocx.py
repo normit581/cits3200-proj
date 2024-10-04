@@ -6,7 +6,7 @@ from utilities.gen import *
 def usage() :
     print("\nusage: $ python rdocx.py <option>\n")
     print("options: ")
-    print("\tg <number of .docx>\t\t-----\tgenerate <number of .docx> new .docx file in /testdocs")
+    print("\tg <number of .docx> <number of paragraphs>\t\t-----\tgenerate <number of .docx> new .docx file in /testdocs")
     print("\te <input .docx> <output .docx>\t-----\trandomly edit <input .docx> and save the result to newly created <output .docx> in /testdocs")
     print("\trsid <document.docx>\t-----\textract and print rsid of <document.docx> in /testdocs")
     print("\trsid_all <number of .docx>\t-----\textract and print rsid details of <number of .docx> .docx in /testdocs, only works went filename is document_n.docx")
@@ -25,8 +25,8 @@ if __name__ == "__main__" :
             usage()
         
         num_file = int(sys.argv[2])
-        # num_para = int(sys.argv[3])
-        generate_docx(num_file)
+        num_para = int(sys.argv[3])
+        generate_docx(num_file, num_para)
         exit()
         
     if option == 'e' :

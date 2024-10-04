@@ -4,14 +4,14 @@ import random
 import string
 import os
 
-testdocx_dir = 'testdocs'
+testdocx_dir = '..\testdocs'
 os.makedirs(testdocx_dir, exist_ok=True)
 
 # Generate random text
 def generate_random_text(length):
     return ''.join(random.choices(string.ascii_letters + string.digits + ' ', k=length))
 
-def generate_docx(num_files) :
+def generate_docx(num_files, num_paras) :
     # Generate .docx files and edit them multiple times
     for i in range(num_files):
         filename = os.path.join(testdocx_dir, f'document_{i}.docx')
@@ -28,8 +28,11 @@ def generate_docx(num_files) :
         doc.Content.Text = f'Random Document {i}\n\n'
 
         # Generate initial random paragraphs
-        for _ in range(random.randint(5, 15)):
-            doc.Content.InsertAfter(generate_random_text(random.randint(50, 200)) + '\n\n')
+        if num_paras is None :
+            random.randint(5, 15)
+        
+        for _ in range(num_paras):
+            doc.Content.InsertAfter(generate_random_text(random.randint(100, 400)) + '\n\n')
 
         # Save the initial document
         doc.SaveAs(os.path.abspath(filename), FileFormat=win32.constants.wdFormatXMLDocument)
