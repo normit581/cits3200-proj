@@ -1,12 +1,12 @@
 from flask import render_template, flash, request, jsonify
 from app import app
 from app.forms import MatchDocumentForm, VisualiseDocumentForm
-from app.helper import FormHelper
+from app.helper import FormHelper, ConfigHelper
 from app.processor import *
 
 @app.context_processor
 def inject_global_variable():
-    return dict(project_name="DocuMatcher")
+    return dict(project_name=ConfigHelper.get_config_value(ConfigHelper.PROJECT_NAME))
 
 @app.route('/', methods=['GET'])
 @app.route('/home', methods=['GET', 'POST'])
@@ -14,8 +14,9 @@ def home():
     form = MatchDocumentForm()
     visualise_form = VisualiseDocumentForm()
     if request.method == 'POST':
-        if request.content_length and request.content_length > app.config['MAX_CONTENT_LENGTH']:
-            return jsonify({'error': f'File size exceeds the maximum limit of {app.config["MAX_CONTENT_LENGTH"] // (1024 * 1024)}MB.'}), 413
+        max_content_length = ConfigHelper.get_config_value(ConfigHelper.MAX_CONTENT_LENGTH)
+        if request.content_length and request.content_length > max_content_length:
+            return jsonify({'error': f'File size exceeds the maximum limit of {max_content_length} MB.'}), 413
         if form.validate_on_submit():
             processor = MatchProcessor(form)
             try:
@@ -27,7 +28,8 @@ def home():
                 return jsonify({'error': 'An error occurred while processing the files.'}), 500
         else:
             return jsonify({'message': FormHelper.errors_to_str(form), 'success':False}), 400
-    return render_template('home.html', form=form, visualise_form=visualise_form)
+    return render_template('home.html', form=form, visualise_form=visualise_form, 
+                           config = ConfigHelper.get_all_config())
 
 @app.route('/team', methods=['GET'])
 def team():
@@ -44,7 +46,7 @@ def method_not_allowed(error):
 
 @app.errorhandler(413)
 def request_entity_too_large(error):
-    flash(f'The uploaded file is too large. Maximum allowed size is {app.config["MAX_CONTENT_LENGTH"] // (1024 * 1024)}MB.')
+    flash(f'The uploaded file is too large. Maximum allowed size is {ConfigHelper.get_config_value(ConfigHelper.MAX_CONTENT_LENGTH)}MB.')
     return render_template('/layout/page_not_found.html'), 413
 
 @app.errorhandler(500)

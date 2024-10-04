@@ -1,3 +1,4 @@
+from flask import current_app
 import os, zipfile, random
 from bs4 import BeautifulSoup
 from docx import Document
@@ -164,3 +165,26 @@ class XMLHelper:
         }
         for key, value in properties.items():
             docx.append_metadata(key, value)
+
+
+class ConfigHelper:
+    """
+    Access config keys from config.py
+    """
+    UPLOAD_EXTENSIONS   = "UPLOAD_EXTENSIONS"
+    MAX_CONTENT_LENGTH  = "MAX_CONTENT_LENGTH"
+    MAX_FILES_UPLOAD    = "MAX_FILES_UPLOAD"
+    SECRET_KEY          = "SECRET_KEY"
+    PROJECT_NAME        = "PROJECT_NAME"
+
+    @staticmethod
+    def get_config_value(key):
+        try:
+            return current_app.config[key]
+        except KeyError:
+            raise KeyError(f"Config key '{key}' not found.")
+        
+    @staticmethod
+    def get_all_config():
+        # Convert all uppercase keys in current_app.config to lowercase
+        return {key.lower(): value for key, value in current_app.config.items() if key.isupper()}
