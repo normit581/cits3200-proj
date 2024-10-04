@@ -2,6 +2,20 @@ function splitCapitalLetter(){
     return projectName.split(/(?=[A-Z])/);
 }
 
+function humanReadableSize(sizeInBytes) {
+    if (sizeInBytes < 0) return "Invalid size";
+    const units = ["Bytes", "KB", "MB", "GB", "TB"];
+    let size = sizeInBytes;
+    let unitIndex = 0;
+    while (size >= 1024 && unitIndex < units.length - 1) {
+        size /= 1024.0;
+        unitIndex++;
+    }
+    // Format the size to two decimal places
+    return `${size.toFixed(2)} ${units[unitIndex]}`;
+}
+
+
 function setLogo() {
     titles = splitCapitalLetter();
     $(".my-logo").replaceWith(

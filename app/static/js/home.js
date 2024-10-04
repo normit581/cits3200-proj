@@ -4,6 +4,7 @@ let fileId = 0;
 let currentFiles = new Map();
 let isRemindBeforeRefresh = false;
 const maxTotalSize = maxFiles * maxFileSize;
+const maxTotalSizeDisplayText = humanReadableSize(maxFileSize);
 const contextMenuID = 'custom-context-menu';
 const dangerPercentage = 60, warningPercentage = 30
 const overlay = new MyOverlay();
@@ -122,7 +123,7 @@ function validateFile(file) {
         return false;
     }
     if (file.size > maxFileSize) {
-        GenerateDangerAlertDiv("Failed!", `File ${file.name} exceeds the maximum size of 100MB.`);
+        GenerateDangerAlertDiv("Failed!", `File ${file.name} exceeds the maximum size of ${maxTotalSizeDisplayText}.`);
         return false;
     }
     return true;
@@ -159,7 +160,7 @@ function handleFiles(files) {
 
         const newTotalSize = updateTotalSize() + file.size;
         if (newTotalSize > maxTotalSize) {
-            GenerateDangerAlertDiv('Failed!', `Total file size exceeds the maximum of ${maxFileSize} MB.`);
+            GenerateDangerAlertDiv('Failed!', `Total file size exceeds the maximum of ${maxTotalSizeDisplayText}.`);
             return false;
         }
 

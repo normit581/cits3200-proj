@@ -16,7 +16,7 @@ def home():
     if request.method == 'POST':
         max_content_length = ConfigHelper.get_config_value(ConfigHelper.MAX_CONTENT_LENGTH)
         if request.content_length and request.content_length > max_content_length:
-            return jsonify({'error': f'File size exceeds the maximum limit of {max_content_length} MB.'}), 413
+            return jsonify({'error': f'File size exceeds the maximum limit of {ConfigHelper().max_content_length_display_text}.'}), 413
         if form.validate_on_submit():
             processor = MatchProcessor(form)
             try:
@@ -46,7 +46,7 @@ def method_not_allowed(error):
 
 @app.errorhandler(413)
 def request_entity_too_large(error):
-    flash(f'The uploaded file is too large. Maximum allowed size is {ConfigHelper.get_config_value(ConfigHelper.MAX_CONTENT_LENGTH)}MB.')
+    flash(f'The uploaded file is too large. Maximum allowed size is {ConfigHelper().max_content_length_display_text}.')
     return render_template('/layout/page_not_found.html'), 413
 
 @app.errorhandler(500)
