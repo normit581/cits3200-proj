@@ -278,5 +278,42 @@ class FlaskSeleniumTest(unittest.TestCase):
 
         assert ("ErrorCode: 500" in alert_message), f"Unexpected alert message: {alert_message}"
 
+
+    # duplicate files test
+    def test_duplicate(self):
+        file_input = WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, "input[type='file']"))
+        )
+
+        files = self.create_test_files(count=1, size_in_mb=1, prefix="duplicate_test")
+        duplicate_file = files[0]
+        file_paths = [duplicate_file, duplicate_file]
+
+        file_input.send_keys('\n'.join(file_paths))
+
+        submit_button = WebDriverWait(self.driver, 5).until(
+            EC.element_to_be_clickable((By.ID, "submit")),
+        )
+        submit_button.click()
+  
+        alert = WebDriverWait(self.driver, 10).until(EC.alert_is_present())
+
+        alert_message = alert.text
+
+        self.assertIn("Duplicate detected. Do you wish to continue?", alert_message)
+
+        alert.accept()
+
+
+        # Clean up created file after test
+        if files:
+            for file_path in files:
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+        
+        if os.path.exists(duplicate_file):
+            os.remove(duplicate_file)
+
+
 if __name__ == "__main__":
     unittest.main() 
