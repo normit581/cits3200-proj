@@ -5,7 +5,10 @@ import string
 import os
 import time
 
-testdocx_dir = 'testdocs'
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+test_dir = os.path.dirname(parent_dir)
+testdocx_dir = os.path.join(test_dir, 'testdocs')
 os.makedirs(testdocx_dir, exist_ok=True)
 
 # Generate random text
@@ -36,7 +39,7 @@ def generate_docx(num_files, num_paras) :
         print(f'Created {filename}')
 
         # Perform several random edits
-        num_edits = random.randint(1, 3)
+        num_edits = random.randint(5, 10)
         for edit in range(num_edits):
             # Get a random paragraph in the document
             para_count = doc.Paragraphs.Count
@@ -57,7 +60,7 @@ def generate_docx(num_files, num_paras) :
         doc.Close()
         
         for j in range(num_paras) :
-            edit_same_docx(f'document_{i}.docx', 1)
+            edit_same_docx(f'document_{i}.docx', random.randint(1, 10))
             # time.sleep(0.5)
             
     # Quit Word
@@ -92,32 +95,33 @@ def delete_paragraph(doc, index):
 def add_paragraph(doc, text):
     doc.Content.InsertAfter(text + '\n\n')
 
-def edit_docx(input_file, output_file, num_edit) :   
-    input_path = os.path.join(testdocx_dir, input_file)
-    output_path = os.path.join(testdocx_dir, output_file)
-    
-    # Start MS Word and open the document
-    word = win32.Dispatch('Word.Application')
-    word.Visible = False
-    doc = word.Documents.Open(os.path.abspath(input_path))
+def edit_docx(input_file, num_copy) :
+    for i in range(int(num_copy)) :  
+        output_file = f"edited{i}_{input_file}" 
+        input_path = os.path.join(testdocx_dir, input_file)
+        output_path = os.path.join(testdocx_dir, output_file)
+        
+        # Start MS Word and open the document
+        word = win32.Dispatch('Word.Application')
+        # word.Visible = False
+        doc = word.Documents.Open(os.path.abspath(input_path))
 
-    # Perform operations
-    r = random.randint(1, 3)
-    for i in range(int(num_edit)) :
-        rearrange_paragraphs(doc)  # Rearrange paragraphs
-        edit_paragraph(doc, r, "This is the new text for the second paragraph.")  # Edit second paragraph
-        delete_paragraph(doc, r)  # Delete the third paragraph
-        add_paragraph(doc, generate_random_text(random.randint(50, 100)))  # Add a new paragraph
+        # Perform operations
+        r = random.randint(1, 3)
+        for i in range(random.randint(1, 10)) :
+            rearrange_paragraphs(doc)  # Rearrange paragraphs
+            edit_paragraph(doc, r, "This is the new text for the second paragraph.")  # Edit second paragraph
+            delete_paragraph(doc, r)  # Delete the third paragraph
+            add_paragraph(doc, generate_random_text(random.randint(50, 100)))  # Add a new paragraph
 
-    # Save the modified document
-    doc.SaveAs(os.path.abspath(output_path), FileFormat=win32.constants.wdFormatXMLDocument)
-    doc.Close()
-
+        # Save the modified document
+        doc.SaveAs(os.path.abspath(output_path), FileFormat=win32.constants.wdFormatXMLDocument)
+        doc.Close()
+        print(f'modified {input_file} save as {output_file}')
     # Quit Word
     word.Quit()
-    print(f'modified {input_file} save as {output_file}')
+        
     
-
 def edit_same_docx(input_file, num_edit):   
     # Construct the input file path
     input_path = os.path.join(testdocx_dir, input_file)
