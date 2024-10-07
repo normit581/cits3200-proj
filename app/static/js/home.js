@@ -314,6 +314,15 @@ function appendMatchResults(similarityResults) {
         style: 'width: 45%; left: 25%; position: absolute; top: 5px; border:  0.1rem solid #343a40'
     });
 
+  /*  $searchBar.on('input', function() {
+        const searchTerm = $(this).val().toLowerCase(); // Assigns search input, converts to lowercase
+        const $items = $('.list-group-item, .card-docx-display') // Both list and grid view
+        $items.each(function() {
+            const name = $(this).data('compare-file').toLowerCase(); // Converts filenames to lowercase
+            $(this).toggle(name.includes(searchTerm));
+        });
+    }); */
+
     $contentContainer.append($reuploadButton, $sortButton, $viewButton, $searchBar);
     const $gridContainer = $('<div>', { class: 'hidden', 'data-view-name': 'grid' });
     const $listContainer = $('<div>', { 'data-view-name': 'list' });
