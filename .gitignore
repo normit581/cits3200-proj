@@ -6,6 +6,7 @@
 *.idea
 
 # Test Suite
+*testdocs*
 /test/testdocs/
 /test/env/
 /test/.pytest_cache
