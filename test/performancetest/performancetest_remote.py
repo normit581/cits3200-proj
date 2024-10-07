@@ -2,6 +2,12 @@ import os
 import random
 from locust import HttpUser, task, between
 
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+test_dir = os.path.dirname(parent_dir)
+testdocx_dir = os.path.join(parent_dir, 'testdocs')
+os.makedirs(testdocx_dir, exist_ok=True)
+
 class WebAppUser(HttpUser):
     wait_time = between(1, 5)
 
@@ -11,16 +17,23 @@ class WebAppUser(HttpUser):
 
 class FileUploadUser(HttpUser):
     wait_time = between(1, 5)
+    files_to_upload_count = 2
 
     @task
-    def upload_multiple_files(self):
+    def upload_files(self):
         # Define the directory containing the files you want to upload
-        directory = '/mnt/c/Users/cklai/OneDrive/Desktop/cits3200/cits3200-proj/test/testdocs/'  # Update this to your actual directory
+        directory = testdocx_dir
+        print(testdocx_dir)
         # List all files in the directory
         files = [f for f in os.listdir(directory) if f.endswith('.docx')]
 
-        # Choose a random number of files to upload (1 to n)
-        num_files_to_upload = random.randint(2, len(files))
+        # Ensure we do not try to upload more files than are available
+        num_files_to_upload = min(self.files_to_upload_count, len(files))
+
+        # Stop the user if the upload count has reached the total number of files
+        # if self.files_to_upload_count > len(files):
+        #     print(f"Uploaded all files. Stopping user.")
+        #     raise StopUser
 
         # Select random files to upload
         selected_files = random.sample(files, num_files_to_upload)
@@ -43,3 +56,6 @@ class FileUploadUser(HttpUser):
         # Close the files after the request
         for file_tuple in files_to_upload.values():
             file_tuple[1].close()  # Close the file object
+
+        # Increment the number of files to upload for the next request
+        self.files_to_upload_count += 1
