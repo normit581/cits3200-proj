@@ -314,14 +314,20 @@ function appendMatchResults(similarityResults) {
         style: 'width: 45%; left: 25%; position: absolute; top: 5px; border:  0.1rem solid #343a40'
     });
 
-  /*  $searchBar.on('input', function() {
-        const searchTerm = $(this).val().toLowerCase(); // Assigns search input, converts to lowercase
-        const $items = $('.list-group-item, .card-docx-display') // Both list and grid view
-        $items.each(function() {
-            const name = $(this).data('compare-file').toLowerCase(); // Converts filenames to lowercase
-            $(this).toggle(name.includes(searchTerm));
+    function updateSearchFilter(search) {
+        const searchTerm = search.toLowerCase();  // Converts input to lowercase
+        $('#similarity-result .card-docx-display, #similarity-result .card-docx-container-list > div').each(function() {
+            const fileName = $(this).data('compare-file').toLowerCase();  // Converts filenames to lowercase
+            const action = fileName.includes(searchTerm) ? 'removeClass' : 'addClass';
+            $(this)[action]('hidden');  // Hides based on filter
         });
-    }); */
+    }
+    
+    $searchBar.on('input', function() {
+        const search = $(this).val();
+        updateSearchFilter(search); 
+    });
+  
 
     $contentContainer.append($reuploadButton, $sortButton, $viewButton, $searchBar);
     const $gridContainer = $('<div>', { class: 'hidden', 'data-view-name': 'grid' });
