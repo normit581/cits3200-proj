@@ -118,13 +118,14 @@ function pdfToggleElementsVisibility(isVisible) {
 
     const action = isVisible ? 'show' : 'hide';
 
+    $visualiseResult.toggleClass('pdf', !isVisible);
     $visualiseResult.find(".card-body").toggleClass('pdf', !isVisible);
     $pdfRsids.toggleClass('pdf', !isVisible);
     $docxSummaryCollapse[!isVisible ? 'addClass' : 'removeClass']('show');
     $contextMenu[action]();
     $tooltip[action]();
 
-    const highlightedClass = isVisible ? 'pdf-highlighted' : 'highlighted';
+    const highlightedClass = isVisible ? 'highlighted' : 'pdf-highlighted';
     const $highlightedText = $(`p.highlighted, p.pdf-highlighted`);
     $highlightedText.removeClass('highlighted pdf-highlighted').addClass(highlightedClass);
 }

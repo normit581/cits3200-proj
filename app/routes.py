@@ -46,18 +46,18 @@ def method_not_allowed(error):
 
 @app.errorhandler(413)
 def request_entity_too_large(error):
-    flash(f'The uploaded file is too large. Maximum allowed size is {ConfigHelper().max_content_length_display_text}.')
+    flash(f'The uploaded file is too large. Maximum allowed size is {ConfigHelper().max_content_length_display_text}.', 'error')
     return render_template('/layout/page_not_found.html'), 413
 
 @app.errorhandler(500)
 def internal_server_error(error):
-    flash(f'Internal Server Error: {error}')
+    flash(f'Internal Server Error: {error}', 'error')
     app.logger.error('Server Error: %s', (error))
     return render_template('/layout/page_not_found.html'), 500
 
 @app.errorhandler(Exception)
 def unhandled_exception(e):
-    flash(f'Unhandled Error: {e}')
+    flash(f'Unhandled Error: {e}', 'error')
     app.logger.error('Unhandled Exception: %s', (e))
     return render_template('/layout/page_not_found.html'), 500
 
