@@ -2,6 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import SubmitField, IntegerField
 from wtforms.validators import ValidationError
 from app.fields import WordFileField, WordFilesField
+from app.helper import ConfigHelper
 
 class MatchDocumentForm(FlaskForm):
     files = WordFilesField('File')
@@ -9,13 +10,15 @@ class MatchDocumentForm(FlaskForm):
 
     def validate_files(self, files):
         if not files.data:
-            raise ValidationError('Please add at least 1 docx file.')
+            raise ValidationError('Please add at least 2 docx file.')
 
-        if len(files.data) > 20:
-            raise ValidationError('Maximum of 20 files allowed.')
+        max_files_upload = ConfigHelper.get_config_value(ConfigHelper.MAX_FILES_UPLOAD)
+        if len(files.data) > max_files_upload:
+            raise ValidationError(f'Maximum of {max_files_upload} files allowed.')
 
         if len(files.data) < 2:
             raise ValidationError('Minimum of 2 files allowed.')
+
 
 class VisualiseDocumentForm(FlaskForm):
     base_file = WordFileField('File')

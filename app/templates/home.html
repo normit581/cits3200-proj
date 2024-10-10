@@ -91,4 +91,9 @@
     {{ visualise_form.common_count() }}
   </form>
 </div>
+
+<script>
+  const maxFileSize = {{ config.max_content_length }};
+  const maxFiles = {{ config.max_files_upload }};
+</script>
 {% endblock %}

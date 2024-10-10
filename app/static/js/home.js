@@ -2,9 +2,9 @@ const docxExtension = "application/vnd.openxmlformats-officedocument.wordprocess
 let numFiles = 0;
 let fileId = 0;
 let currentFiles = new Map();
-const maxFiles = 20;
-const maxFileSize = 100 * 1024 * 1024; //100MB
+let isRemindBeforeRefresh = false;
 const maxTotalSize = maxFiles * maxFileSize;
+const maxTotalSizeDisplayText = humanReadableSize(maxFileSize);
 const contextMenuID = 'custom-context-menu';
 const dangerPercentage = 60, warningPercentage = 30
 const overlay = new MyOverlay();
@@ -123,7 +123,7 @@ function validateFile(file) {
         return false;
     }
     if (file.size > maxFileSize) {
-        GenerateDangerAlertDiv("Failed!", `File ${file.name} exceeds the maximum size of 100MB.`);
+        GenerateDangerAlertDiv("Failed!", `File ${file.name} exceeds the maximum size of ${maxTotalSizeDisplayText}.`);
         return false;
     }
     return true;
@@ -154,13 +154,13 @@ function handleFiles(files) {
         if (!validateFile(file)) return;
 
         if (currentFiles.size >= maxFiles) {
-            alert(`Maximum of ${maxFiles} files reached.`);
+            GenerateDangerAlertDiv('Failed!', `Maximum of ${maxFiles} files reached. Only the first ${maxFiles} will be uploaded.`);
             return false;
         }
 
         const newTotalSize = updateTotalSize() + file.size;
         if (newTotalSize > maxTotalSize) {
-            alert("Total file size exceeds the maximum of 200MB.");
+            GenerateDangerAlertDiv('Failed!', `Total file size exceeds the maximum of ${maxTotalSizeDisplayText}.`);
             return false;
         }
 
@@ -240,6 +240,7 @@ const onSuccessMatch = (response) => {
         $("#upload-container").hide();
         triggerContextMenuEvent($('main'), true);
         overlay.completeProgress();
+        isRemindBeforeRefresh = true;
     } else {
         GenerateDangerAlertDiv("Failed!", response.message);
     }
@@ -492,13 +493,6 @@ function setFileInput(filename, inputID) {
     return true;
 }
 
-function showRefreshAlert(event) {
-    const message = "Changes you made may not be saved.";
-    event.preventDefault();
-    event.returnValue = message;
-    return message;
-}
-
 function reuploadFiles() {
     CloseAlertDiv();
     $('#upload-container').show();
@@ -674,7 +668,14 @@ function applySort() {
 }
 
 $(document).ready(function() {
-    $(window).on('beforeunload', showRefreshAlert);
+    $(window).on('beforeunload', function (event) {
+        if (!isRemindBeforeRefresh)
+            return; // unload without prompting
+        const confirmationMessage = "Changes you made may not be saved.";;
+        event.returnValue = confirmationMessage; // most browsers use this
+        return confirmationMessage; // older browsers
+    });
+
     configureContextMenuButtons();
     setFileEvents();
     toggleFileList(false);
@@ -687,8 +688,6 @@ $(document).ready(function() {
 
     $('#setting-bar-container').hide()
 });
-
-
 
 // Context Menu functions
 function configureContextMenuButtons() {

@@ -11,7 +11,7 @@ def page_not_found(e):
     return render_template('/layout/page_not_found.html', project_name="DocuMatcher"), 404
 
 
-def create_app(config: Config | None):
+def create_app(config: Config = None):
     if not config:
         config = Config
 
