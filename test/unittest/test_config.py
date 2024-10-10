@@ -2,7 +2,7 @@ import os
 import pytest
 from werkzeug.datastructures import FileStorage
 from utility.log import Log
-from utility.gen import *
+# from utility.gen import *
 
 import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
@@ -37,16 +37,16 @@ def setup_files():
     print(current_file)
     
     # Generate random .docx if current not in test_directory
-    if current not in os.listdir(test_directory):
-        generate_docx(2)
+    # if current not in os.listdir(test_directory):
+    #     generate_docx(2)
     
     # Generate randomly edited .docx from current.docx
-    current_edit = current
-    for i in range(1, DEPTH_OF_EDIT + 1):
-        edited = f'edited{i}_{current}'
-        if edited not in os.listdir(test_directory):
-            edit_docx(current_edit, edited)
-        current_edit = edited
+    # current_edit = current
+    # for i in range(1, DEPTH_OF_EDIT + 1):
+    #     edited = f'edited{i}_{current}'
+    #     if edited not in os.listdir(test_directory):
+    #         edit_docx(current_edit, edited)
+    #     current_edit = edited
     
     return test_directory, current, current_file
 
