@@ -25,26 +25,10 @@ function deleteListItem(e) {
     const { itemId, filename } = e.data;
     const $listItem = $(`#list-item-${itemId}`);
 
-    const $matchingWarnings = $('aside span').filter(function() {
-        return $(this).find('p').text().trim() === $listItem.find('p').text().trim();
-    });
-
-    if ($matchingWarnings.length > 1) {
-        if(!confirm("Note that all duplicated file name with warning will be removed. Continue?")){
-            return false;
-        }
-        $matchingWarnings.last().find('i.fa-triangle-exclamation').remove();
-        // Remove all but the last one
-        $matchingWarnings.slice(0, -1).each(function() {
-            $(this).tooltip('dispose'); // Dispose tooltips before removing
-            $(this).remove(); // Remove the element
-        });
-    } else{
-        $listItem.tooltip('dispose');
-        $listItem.remove();
-        currentFiles.delete(filename);
-    }
-
+    $listItem.tooltip('dispose');
+    $listItem.remove();
+    currentFiles.delete(filename);
+    
     handleFileList(-1);
     updateFileInput();
     updateProgressBar();
@@ -52,31 +36,33 @@ function deleteListItem(e) {
 
 function createListItem(name) {
     const filename = fileNameWithoutExt(name);
-
-    const delIcon = $('<i>')
-        .addClass('bi bi-trash3')
-        .click({ itemId: fileId, filename }, deleteListItem);
-
-    const para = $('<p>').text(name);
-
+    let createdFilename = filename;
     let warningIcon = '';
     if (currentFiles.has(filename)){
         warningIcon = $('<i>')
-            .attr('title', 'duplicate file detected')
+            .attr('title', `duplicate file with ${filename}`)
             .addClass('fa-solid fa-triangle-exclamation text-warning mt-1 mx-auto text-center');
+        name = `${name}-${fileId}`
+        createdFilename = `${filename}-${fileId}`
     }
 
+    const delIcon = $('<i>')
+        .addClass('bi bi-trash3')
+        .click({ itemId: fileId, filename: createdFilename }, deleteListItem);
+
+    const para = $('<p>').text(name);
     const item = $('<span>')
         .attr({
             'data-bs-toggle': 'tooltip',
             'data-bs-title': name,
             'data-bs-placement': 'right',
+            'data-original-file-name': filename,
+            'data-file-name': createdFilename,
             'id': `list-item-${fileId}`
         })
         .addClass('d-flex justify-content-between')
         .tooltip()
         .append(warningIcon, para, delIcon);
-
     fileId++;
     return item;
 }
@@ -165,10 +151,14 @@ function handleFiles(files) {
         }
 
         handleFileList(1);
-        const item = createListItem(file.name);
+        const originalFileName = file.name;
+        const item = createListItem(originalFileName);
         $fileList.append(item);
-
-        currentFiles.set(fileNameWithoutExt(file.name), file);
+        const createdFileName = item.attr('data-file-name');
+        if (originalFileName !== createdFileName){ // means duplicated file name
+            file = new File([file], createdFileName, { type: file.type });
+        }
+        currentFiles.set(createdFileName, file);
 
         updateFileInput();
         applyConfirmAnimation();
