@@ -12,7 +12,7 @@ class MatchDocumentForm(FlaskForm):
         if not files.data:
             raise ValidationError('Please add at least 2 docx file.')
 
-        max_files_upload = ConfigHelper.get_config_value(ConfigHelper.MAX_FILES_UPLOAD)
+        max_files_upload = ConfigHelper().max_files_upload_value
         if len(files.data) > max_files_upload:
             raise ValidationError(f'Maximum of {max_files_upload} files allowed.')
 

@@ -184,10 +184,11 @@ class ConfigHelper:
         except KeyError:
             raise KeyError(f"Config key '{key}' not found.")
         
-    @staticmethod
-    def get_all_config():
+    def get_all_config(self):
         # Convert all uppercase keys in current_app.config to lowercase
-        return {key.lower(): value for key, value in current_app.config.items() if key.isupper()}
+        all_configs = {key.lower(): value for key, value in current_app.config.items() if key.isupper()}
+        all_configs[self.MAX_FILES_UPLOAD.lower()] = self.max_files_upload_value
+        return all_configs
     
     @staticmethod
     def human_readable_size(size_in_bytes):
@@ -212,3 +213,11 @@ class ConfigHelper:
         """
         max_content_length = self.get_config_value(self.MAX_CONTENT_LENGTH)
         return self.human_readable_size(max_content_length)
+    
+    @property
+    def max_files_upload_value(self):
+        max_files_upload = self.get_config_value(self.MAX_FILES_UPLOAD)
+        if isinstance(max_files_upload, int) and 1 <= max_files_upload <= 9999:
+            return max_files_upload
+        else:
+            return 999_999_999
