@@ -241,7 +241,11 @@ class FlaskSeleniumTest(unittest.TestCase):
 
         submit_button.click()
 
+        for file_path in files:
+            if os.path.exists(file_path):
+                os.remove(file_path)
 
+    # test empty file
     def test_empty_file(self):
         file_input = WebDriverWait(self.driver, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "input[type='file']"))
@@ -254,6 +258,10 @@ class FlaskSeleniumTest(unittest.TestCase):
             EC.element_to_be_clickable((By.ID, "submit")),
         )
         submit_button.click()
+        
+        for file_path in files:
+            if os.path.exists(file_path):
+                os.remove(file_path)
 
     def test_interrupted_upload(self):
         files = self.create_test_files(count=2, size_in_mb=5, prefix="interrupted_test")
