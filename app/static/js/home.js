@@ -2,9 +2,9 @@ const docxExtension = "application/vnd.openxmlformats-officedocument.wordprocess
 let numFiles = 0;
 let fileId = 0;
 let currentFiles = new Map();
-const maxFiles = 20;
-const maxFileSize = 100 * 1024 * 1024; //100MB
+let isRemindBeforeRefresh = false;
 const maxTotalSize = maxFiles * maxFileSize;
+const maxTotalSizeDisplayText = humanReadableSize(maxFileSize);
 const contextMenuID = 'custom-context-menu';
 const dangerPercentage = 60, warningPercentage = 30
 const overlay = new MyOverlay();
@@ -25,26 +25,10 @@ function deleteListItem(e) {
     const { itemId, filename } = e.data;
     const $listItem = $(`#list-item-${itemId}`);
 
-    const $matchingWarnings = $('aside span').filter(function() {
-        return $(this).find('p').text().trim() === $listItem.find('p').text().trim();
-    });
-
-    if ($matchingWarnings.length > 1) {
-        if(!confirm("Note that all duplicated file name with warning will be removed. Continue?")){
-            return false;
-        }
-        $matchingWarnings.last().find('i.fa-triangle-exclamation').remove();
-        // Remove all but the last one
-        $matchingWarnings.slice(0, -1).each(function() {
-            $(this).tooltip('dispose'); // Dispose tooltips before removing
-            $(this).remove(); // Remove the element
-        });
-    } else{
-        $listItem.tooltip('dispose');
-        $listItem.remove();
-        currentFiles.delete(filename);
-    }
-
+    $listItem.tooltip('dispose');
+    $listItem.remove();
+    currentFiles.delete(filename);
+    
     handleFileList(-1);
     updateFileInput();
     updateProgressBar();
@@ -52,31 +36,33 @@ function deleteListItem(e) {
 
 function createListItem(name) {
     const filename = fileNameWithoutExt(name);
-
-    const delIcon = $('<i>')
-        .addClass('bi bi-trash3')
-        .click({ itemId: fileId, filename }, deleteListItem);
-
-    const para = $('<p>').text(name);
-
+    let createdFilename = filename;
     let warningIcon = '';
     if (currentFiles.has(filename)){
         warningIcon = $('<i>')
-            .attr('title', 'duplicate file detected')
+            .attr('title', `duplicate file with ${filename}`)
             .addClass('fa-solid fa-triangle-exclamation text-warning mt-1 mx-auto text-center');
+        name = `${name}-${fileId}`
+        createdFilename = `${filename}-${fileId}`
     }
 
+    const delIcon = $('<i>')
+        .addClass('bi bi-trash3')
+        .click({ itemId: fileId, filename: createdFilename }, deleteListItem);
+
+    const para = $('<p>').text(name);
     const item = $('<span>')
         .attr({
             'data-bs-toggle': 'tooltip',
             'data-bs-title': name,
             'data-bs-placement': 'right',
+            'data-original-file-name': filename,
+            'data-file-name': createdFilename,
             'id': `list-item-${fileId}`
         })
         .addClass('d-flex justify-content-between')
         .tooltip()
         .append(warningIcon, para, delIcon);
-
     fileId++;
     return item;
 }
@@ -123,7 +109,7 @@ function validateFile(file) {
         return false;
     }
     if (file.size > maxFileSize) {
-        GenerateDangerAlertDiv("Failed!", `File ${file.name} exceeds the maximum size of 100MB.`);
+        GenerateDangerAlertDiv("Failed!", `File ${file.name} exceeds the maximum size of ${maxTotalSizeDisplayText}.`);
         return false;
     }
     return true;
@@ -154,21 +140,25 @@ function handleFiles(files) {
         if (!validateFile(file)) return;
 
         if (currentFiles.size >= maxFiles) {
-            alert(`Maximum of ${maxFiles} files reached.`);
+            GenerateDangerAlertDiv('Failed!', `Maximum of ${maxFiles} files reached. Only the first ${maxFiles} will be uploaded.`);
             return false;
         }
 
         const newTotalSize = updateTotalSize() + file.size;
         if (newTotalSize > maxTotalSize) {
-            alert("Total file size exceeds the maximum of 200MB.");
+            GenerateDangerAlertDiv('Failed!', `Total file size exceeds the maximum of ${maxTotalSizeDisplayText}.`);
             return false;
         }
 
         handleFileList(1);
-        const item = createListItem(file.name);
+        const originalFileName = file.name;
+        const item = createListItem(originalFileName);
         $fileList.append(item);
-
-        currentFiles.set(fileNameWithoutExt(file.name), file);
+        const createdFileName = item.attr('data-file-name');
+        if (originalFileName !== createdFileName){ // means duplicated file name
+            file = new File([file], createdFileName, { type: file.type });
+        }
+        currentFiles.set(createdFileName, file);
 
         updateFileInput();
         applyConfirmAnimation();
@@ -240,6 +230,7 @@ const onSuccessMatch = (response) => {
         $("#upload-container").hide();
         triggerContextMenuEvent($('main'), true);
         overlay.completeProgress();
+        isRemindBeforeRefresh = true;
     } else {
         GenerateDangerAlertDiv("Failed!", response.message);
     }
@@ -306,7 +297,30 @@ function appendMatchResults(similarityResults) {
         html: `<i class="fa-solid ${currentViewMode.icon}" style="font-size: 1.5rem; color: #000;"></i>`
     }).attr('title', currentViewMode.nextTitle);
 
-    $contentContainer.append($reuploadButton, $sortButton, $viewButton);
+    const $searchBar = $('<input>', {
+        type: 'text',
+        id: 'search-bar',
+        class: 'form-control',
+        placeholder: 'Search...',
+        style: 'width: 45%; left: 25%; position: absolute; top: 5px; border:  0.1rem solid #343a40'
+    });
+
+    function updateSearchFilter(search) {
+        const searchTerm = search.toLowerCase();  // Converts input to lowercase
+        $('#similarity-result .card-docx-display, #similarity-result .card-docx-container-list > div').each(function() {
+            const fileName = $(this).data('compare-file').toLowerCase();  // Converts filenames to lowercase
+            const action = fileName.includes(searchTerm) ? 'removeClass' : 'addClass';
+            $(this)[action]('hidden');  // Hides based on filter
+        });
+    }
+    
+    $searchBar.on('input', function() {
+        const search = $(this).val();
+        updateSearchFilter(search); 
+    });
+  
+
+    $contentContainer.append($reuploadButton, $sortButton, $viewButton, $searchBar);
     const $gridContainer = $('<div>', { class: 'hidden', 'data-view-name': 'grid' });
     const $listContainer = $('<div>', { 'data-view-name': 'list' });
     $contentContainer.append($gridContainer).append($listContainer);
@@ -492,13 +506,6 @@ function setFileInput(filename, inputID) {
     return true;
 }
 
-function showRefreshAlert(event) {
-    const message = "Changes you made may not be saved.";
-    event.preventDefault();
-    event.returnValue = message;
-    return message;
-}
-
 function reuploadFiles() {
     CloseAlertDiv();
     $('#upload-container').show();
@@ -674,7 +681,14 @@ function applySort() {
 }
 
 $(document).ready(function() {
-    $(window).on('beforeunload', showRefreshAlert);
+    $(window).on('beforeunload', function (event) {
+        if (!isRemindBeforeRefresh)
+            return; // unload without prompting
+        const confirmationMessage = "Changes you made may not be saved.";;
+        event.returnValue = confirmationMessage; // most browsers use this
+        return confirmationMessage; // older browsers
+    });
+
     configureContextMenuButtons();
     setFileEvents();
     toggleFileList(false);
@@ -687,8 +701,6 @@ $(document).ready(function() {
 
     $('#setting-bar-container').hide()
 });
-
-
 
 // Context Menu functions
 function configureContextMenuButtons() {

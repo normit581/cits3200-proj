@@ -22,6 +22,7 @@
  
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/base.css' )}}">
     <script src="{{ url_for('static', filename='js/base.js') }}"></script>
+    <link rel="icon" href="{{ url_for('static', filename='img/project-logo.ico') }}">
   {% block head %}
   {% endblock %}
 </head>
@@ -39,5 +40,9 @@
   {% block footer %}
     {% include '/layout/footer.html' %}
   {% endblock %}
+
+  <script>
+    const projectName = '{{ project_name }}';
+  </script>
 </body>
 </html>

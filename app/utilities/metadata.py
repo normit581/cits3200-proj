@@ -53,11 +53,15 @@ class DOCX:
     """
     Constants for metadata keys in meta_dict
     """
-    CREATED_BY = "Created By"
-    DATE_CREATED = "Date Created"
-    DATE_LAST_MODIFIED = "Date Last Modified"
-    TITLE = "Title"
-    VERSION = "Version"
+    CREATED_BY          = "Created By"
+    DATE_CREATED        = "Date Created"
+    LAST_MODIFIED_BY    = "Last Modified By"
+    DATE_LAST_MODIFIED  = "Date Last Modified"
+    REVISIONS           = "Number of Revisions"
+    TITLE               = "Title"
+    NUMBER_WORDS        = "Number of Words"
+    TOTAL_TIME          = "Total Time Spent"
+    VERSION             = "Version"
 
     def __init__(self, document_name):
         self.docx_name = document_name
@@ -95,6 +99,29 @@ class DOCX:
     
     def get_metadata(self, key):
         return self.metadata.get(key)
+    
+    def human_readable_time(time_in_minutes):
+        """
+        Convert time in minutes to a human-readable format (e.g., minutes, hours, days).
+        """
+        time_in_minutes = int(time_in_minutes)
+        if time_in_minutes < 0:
+            return "Invalid time"
+
+        days = time_in_minutes // (60 * 24)
+        hours = (time_in_minutes % (60 * 24)) // 60
+        minutes = time_in_minutes % 60
+
+        # build the output string
+        readable_time = []
+        if days > 0:
+            readable_time.append(f"{days} days")
+        if hours > 0:
+            readable_time.append(f"{hours} hours")
+        if minutes > 0:
+            readable_time.append(f"{minutes} mins")
+        # join all parts, or return "0 mins" if no parts
+        return ' '.join(readable_time) if readable_time else "0 mins"
 
 
 

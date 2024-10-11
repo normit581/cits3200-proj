@@ -1,5 +1,4 @@
 const defaultFontSize = 16; // Default font size
-const defaultTextColour = 'red'; // Default font size
 let currentFontSize = defaultFontSize;
 let longPressInterval;
 const contextMenuID = 'custom-context-menu';
@@ -115,13 +114,20 @@ function pdfToggleElementsVisibility(isVisible) {
     const $visualiseResult = $("#visualise-result-container");
     const $tooltip = $('[role="tooltip"]');
     const $pdfRsids = $('span.pdf-rsid');
+    const $docxSummaryCollapse = $('div.card-header .collapse');
 
     const action = isVisible ? 'show' : 'hide';
 
-    $visualiseResult.find(".card-body").toggleClass('pdf', !isVisible)
-    $pdfRsids.toggleClass('pdf', !isVisible)
+    $visualiseResult.toggleClass('pdf', !isVisible);
+    $visualiseResult.find(".card-body").toggleClass('pdf', !isVisible);
+    $pdfRsids.toggleClass('pdf', !isVisible);
+    $docxSummaryCollapse[!isVisible ? 'addClass' : 'removeClass']('show');
     $contextMenu[action]();
     $tooltip[action]();
+
+    const highlightedClass = isVisible ? 'highlighted' : 'pdf-highlighted';
+    const $highlightedText = $(`p.highlighted, p.pdf-highlighted`);
+    $highlightedText.removeClass('highlighted pdf-highlighted').addClass(highlightedClass);
 }
 
 function exportPDF() {

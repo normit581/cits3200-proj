@@ -15,7 +15,11 @@
 }
 
 .card-body.pdf p {
-    border-bottom: 0px solid red;
+    border-bottom: 0px !important;
+}
+
+#visualise-result-container.pdf .collapse {
+    pointer-events: none !important;
 }
 
 .fluid-col-6 {
