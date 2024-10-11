@@ -38,5 +38,6 @@ typing_extensions==4.12.2
 urllib3==2.2.3
 Werkzeug==3.0.3
 WTForms==3.1.2
+selenium==4.25.0
 zope.event==5.0
 zope.interface==7.0.3
