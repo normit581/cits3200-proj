@@ -16,9 +16,15 @@ see /randomdox_generatot/README.md if need to generate test .docx files
 ```
 ## run pytest
 ```
+    cd test/unittest
     pytest
 ```
 ## run selenium test
+```
+    cd test
+    python3 test_selenium.py
+        or 
+    python test_selenium.py
 ```
     
 test logs path: /test/test_logs

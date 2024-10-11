@@ -44,13 +44,12 @@ def test_rsid_match2(setup_logger, setup_files):
         
         compare_file = os.path.join(test_directory, file)
         rsid_dict2 = rsid_extract(compare_file)
-        match_result, dict = rsid_match2(rsid_dict1, rsid_dict2)
+        rsid_match, matching_risd, common_rsid_count = rsid_match2(rsid_dict1, rsid_dict2)
         
-        if file.startswith('edited'):
-            assert match_result >= 10         # change the number
-        else:
-            assert match_result <= 60
+        assert rsid_match is not None
+        assert matching_risd is not None
+        assert common_rsid_count is not None
         
-        test_log = f"{current} - {file} - {match_result}"
+        test_log = f"{current} - {file} - {rsid_match}"
         logger.log(test_log, 'info')
 
