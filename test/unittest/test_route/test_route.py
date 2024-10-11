@@ -1,15 +1,3 @@
-"""
-form:
-<app.forms.MatchDocumentForm object at 0x7fe05473db70>
-
-form.files:
-<input id="files" multiple name="files" type="file">
-
-form.files.data
-[<FileStorage: 'document_0.docx' ('application/vnd.openxmlformats-officedocument.wordprocessingml.document')>, <FileStorage: 'document_1.docx' 
-
-"""
-
 import io
 import os
 from bs4 import BeautifulSoup
@@ -37,10 +25,10 @@ def test_home_post_with_files(client, setup_files):
 
     # Extract CSRF token from the form
     csrf_token = soup.find('input', {'name': 'csrf_token'})['value']
-
+    
     # Create file-like objects for the test files
     file1 = (io.BytesIO(open(current_file, 'rb').read()), current)
-    file2 = (io.BytesIO(open(os.path.join(test_directory, f"edited1_{current}"), 'rb').read()), f"edited1_{current}")
+    file2 = (io.BytesIO(open(os.path.join(test_directory, f"edited0_{current}"), 'rb').read()), f"edited1_{current}")
 
     # Send the files via a POST request with the CSRF token
     response = client.post(

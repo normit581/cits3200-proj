@@ -30,11 +30,6 @@ class FileUploadUser(HttpUser):
         # Ensure we do not try to upload more files than are available
         num_files_to_upload = min(self.files_to_upload_count, len(files))
 
-        # Stop the user if the upload count has reached the total number of files
-        # if self.files_to_upload_count > len(files):
-        #     print(f"Uploaded all files. Stopping user.")
-        #     raise StopUser
-
         # Select random files to upload
         selected_files = random.sample(files, num_files_to_upload)
 
