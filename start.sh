@@ -1,6 +1,6 @@
 #!/bin/sh
 
-envfile="./release.env"
+envfile="deployment/app.env"
 virtualenv=".venv/bin/activate"
 appdir="app"
 
