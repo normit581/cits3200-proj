@@ -228,6 +228,7 @@ const onSuccessMatch = (response) => {
         setupVisualiseForm();
         $("#setting-bar-container").show();
         $("#upload-container").hide();
+        $('aside').css('margin-top', '55px')
         triggerContextMenuEvent($('main'), true);
         overlay.completeProgress();
         isRemindBeforeRefresh = true;
@@ -424,8 +425,7 @@ function appendMatchResults(similarityResults) {
             );
             const $matchInfo = $('<div>', { class: 'match-info d-flex align-items-center' }).append(
                 $('<span>', { class: 'text-muted me-3 match-count' }).append(
-                    $('<i>', { class: 'fa-solid fa-hashtag me-1' }),
-                    matchCount
+                    $('<i>', { class: 'fa-solid fa-hashtag me-1' }), matchCount
                 ),
                 $('<span>', { class: `badge bg-primary me-2 ${badgeColour} fixed-width-badge` }).text(matchPercent === 0 ? '00.0%' : `${matchPercent.toFixed(1)}%`) // Match percentage
             );

@@ -6,5 +6,4 @@ if [ ! -f deployment/app.env ]; then
   exit 1
 fi
 
-docker compose build \
-  && docker compose up -d
+docker compose up --build -d
