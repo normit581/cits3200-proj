@@ -237,6 +237,7 @@ const onSuccessMatch = (response) => {
 };
 
 function match() {
+    CloseAlertDiv();
     if (currentFiles.size === 0) {
         GenerateDangerAlertDiv('Failed!', 'Please add at least one file.');
         return;
