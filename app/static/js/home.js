@@ -344,6 +344,7 @@ function appendMatchResults(similarityResults) {
         });
         const $radioLabel = $('<label>', {
             class: 'btn btn-outline-secondary text-truncate mt-0',
+            title: keyId,
             for: radioId
         }).text(key);
 
@@ -459,7 +460,6 @@ function appendMatchResults(similarityResults) {
         $similarityResultView.find(`.card-docx-container-list[data-id="${target}"]`).removeClass('hidden'); // Show the selected list container
     });
     $aside.find('input').first().click();
-
     applySort();
    // sortListView();
 }

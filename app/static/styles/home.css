@@ -1,3 +1,17 @@
+
+/* button group verticla centering issue */
+/* https://stackoverflow.com/questions/76979420/how-to-stop-bootstrap-5-button-group-from-centering-after-click */
+#similarity-result aside .btn-check {
+    clip: rect(1px, 1px, 1px, 1px);
+    clip-path: inset(50%);
+    height: 0px;
+    width: 1px;
+    /* margin: -3px 0 -2px 0; */
+    overflow: hidden;
+    padding: 0;
+    position: relative;
+}
+
 /* Drop Zone Styles */
 .drop-zone {
     border: 2px dashed #007bff;
