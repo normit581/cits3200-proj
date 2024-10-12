@@ -65,4 +65,9 @@ code example :
     logger.clean(<logs_file>)
 
 # performmance test
-    locust -f performancetest/performancetest_remote.py --host=http://127.0.0.1:5000
+run locust on localhost
+    cd test
+    locust -f performancetest/pt_increment_upload.py --host=http://127.0.0.1:5000
+    
+Then access locust control page in browser
+    localhost:8089
