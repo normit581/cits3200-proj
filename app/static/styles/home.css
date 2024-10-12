@@ -361,6 +361,7 @@
 @media print {
 
     nav,
+    #search-bar,
     #setting-bar-container,
     #reupload-btn,
     #view-toggle-btn,
