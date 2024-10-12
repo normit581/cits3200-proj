@@ -99,7 +99,6 @@
     overflow-y: scroll;
 }
 
-#similarity-result aside,
 .card-docx-container,
 .card-docx-container-list {
     height: calc(75vh);
