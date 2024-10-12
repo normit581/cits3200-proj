@@ -18,7 +18,7 @@ def test_metadata_extract(setup_logger, setup_files) :
             rsid1 = rsid_extract(file_path)
             rsid2 = rsid_extract(file_path)
 
-            similarity, matching_rsid = rsid_match2(rsid1, rsid2)
+            _, matching_rsid, _ = rsid_match2(rsid1, rsid2)
             metadata1, metadata2 = extract_metadata(file_path, rsid1, rsid2, matching_rsid)
             
             assert metadata1['title'] is not None

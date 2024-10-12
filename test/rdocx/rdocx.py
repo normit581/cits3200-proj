@@ -6,7 +6,7 @@ from utilities.gen import *
 def usage() :
     print("\nusage: $ python rdocx.py <option>\n")
     print("options: ")
-    print("\tg <number of .docx> <depth of complexity>\t\t-----\tgenerate <number of .docx> new .docx file in /testdocs")
+    print("\tg <number of .docx> <number of edit>\t\t-----\tgenerate <number of .docx> new .docx file in /testdocs")
     print("\te <input .docx> <number of copy>\t-----\trandomly edit <input .docx> and save the result to newly created <output .docx> in /testdocs")
     print("\trsid <document.docx>\t-----\textract and print rsid of <document.docx> in /testdocs")
     print("\trsid_all <number of .docx>\t-----\textract and print rsid details of <number of .docx> .docx in /testdocs, only works went filename is document_n.docx")

@@ -1,0 +1,12 @@
+2024-10-12 00:58:34 - INFO - START test
+2024-10-12 00:58:34 - INFO - test_metadata()
+2024-10-12 00:58:34 - INFO - END test
+
+2024-10-12 00:58:34 - INFO - START test
+2024-10-12 00:58:34 - INFO - test_rsid_extract()
+2024-10-12 00:58:34 - INFO - END test
+
+2024-10-12 00:58:34 - INFO - START test
+2024-10-12 00:58:34 - INFO - test_rsid_match2()
+2024-10-12 00:58:34 - INFO - END test
+
