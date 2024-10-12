@@ -1,0 +1,15 @@
+[Unit]
+Description=Start DocuMatcher container on boot/reload
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=simple
+User=ubuntu
+Restart=always
+ExecStart=/usr/bin/docker start DocuMatcher
+ExecStop=/usr/bin/docker stop DocuMatcher
+TimeoutStartSec=0
+
+[Install]
+WantedBy=multi-user.target

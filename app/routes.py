@@ -29,7 +29,7 @@ def home():
         else:
             return jsonify({'message': FormHelper.errors_to_str(form), 'success':False}), 400
     return render_template('home.html', form=form, visualise_form=visualise_form, 
-                           config = ConfigHelper.get_all_config())
+                           config = ConfigHelper().get_all_config())
 
 @app.route('/team', methods=['GET'])
 def team():
