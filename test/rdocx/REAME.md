@@ -22,8 +22,8 @@
 ## usage: $ python rdocx.py <option>
 
         options:
-        g <number of .docx>                     -----   generate <number of .docx> new .docx file in /testdocs
-        e <input .docx> <output .docx>          -----   randomly edit <input .docx> and save the result to newly created <output .docx> in /testdocs
+        g <number of .docx> <number of edit>                     -----   generate <number of .docx> new .docx file in /testdocs the new .docx file will be edited <number of edit> times
+        e <input .docx> <number of copy>          -----   randomly edit <input .docx> and save the result to newly created <output .docx> in /testdocs
         rsid <document.docx>                    -----   extract and print rsid of <document.docx> in /testdocs
         rsid_all                                -----   extract and print rsid details of  .docx in /testdocs, only works went filename is document_<int>.docx
         rsid_sim <1.docx> <2.docx>              -----   calculate similarities between <1.docx> and <2.docx>

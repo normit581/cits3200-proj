@@ -12,6 +12,8 @@
 /test/.pytest_cache
 /test/*log*
 /test/*env*
+/test/unittest/logs
+*pytest_cache*
 
 # Cache
 *__pycache__*
