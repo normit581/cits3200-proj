@@ -473,6 +473,20 @@ function appendMatchResults(similarityResults) {
 
     applySort();
    // sortListView();
+   const asideElement = document.querySelector('#similarity-result aside');
+   let scrollPosition = 0;
+   
+   asideElement.addEventListener('scroll', () => {
+       scrollPosition = asideElement.scrollTop;
+   });
+   
+   asideElement.querySelectorAll('input[type="radio"]').forEach((radio) => {
+       radio.addEventListener('click', () => {
+           setTimeout(() => {
+               asideElement.scrollTop = scrollPosition;
+           }, 0);
+       });
+   });
 }
 
 function setupVisualiseForm() {
@@ -761,3 +775,5 @@ const customFunc = function(e) {
     $('#pdf-btn').html(`<i class="fa-solid fa-file-export"></i> ${selectedLabel} PDF`);
     showContextMenu(e);
 };
+
+

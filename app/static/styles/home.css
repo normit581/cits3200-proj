@@ -105,6 +105,13 @@
     overflow-y: auto;
     animation: asideSlideIn 0.5s ease-in-out;
     transition: transform 0.2s;
+    scroll-behavior: smooth;
+    overflow-anchor: none;
+}
+
+#similarity-result aside input[type="radio"] {
+    outline: none;
+    box-shadow: none;
 }
 
 /* Animation for Aside Visibility */
