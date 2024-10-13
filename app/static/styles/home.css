@@ -109,11 +109,63 @@
     min-width: 200px;
 }
 
+/* Aside Styling */
+
 #similarity-result aside {
-    overflow-y: scroll;
+    height: calc(80vh);
+    background-color: #f8f9fa;
+    border-radius: 0.375rem;
+    padding: 15px;
+    overflow-y: auto;
+    animation: asideSlideIn 0.5s ease-in-out;
+    transition: transform 0.2s;
+    scroll-behavior: smooth;
+    overflow-anchor: none;
 }
 
-#similarity-result aside,
+#similarity-result aside input[type="radio"] {
+    outline: none;
+    box-shadow: none;
+}
+
+/* Animation for Aside Visibility */
+@keyframes asideSlideIn {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+#similarity-result aside {
+    animation: asideSlideIn 0.5s ease-in-out;
+}
+
+.btn-group-vertical .btn {
+    transition: all 0.2s ease-in-out;
+}
+
+@media (max-width: 900px) {
+    #similarity-result {
+        flex-direction: column;
+    }
+
+    #similarity-result aside {
+        width: 100%;
+        height: auto;
+        padding: 10px;
+    }
+
+    .col-10 {
+        width: 100%;
+    }
+}
+
+/* Containers */
+
 .card-docx-container,
 .card-docx-container-list {
     height: calc(75vh);
@@ -127,6 +179,7 @@
 [data-view-name='grid'],
 [data-view-name='list'] {
     width: 100%;
+    border-radius: 0.375rem;
 }
 
 #sort-toggle-btn,
@@ -161,13 +214,16 @@
 /* Card Styles */
 .card-docx-container {
     overflow-y: scroll;
-    padding: 0 5px;
+    padding: 7px 15px;
     border-radius: 0.375rem;
-    background-color: #e9ecef;
 }
 
 .card-docx-display {
-    background-color: #e9ecef;
+    opacity: 0;
+    transform: scale(0.9);
+    animation: gridPopUp 0.4s ease-in-out forwards;
+
+    background-color: #f8f9fa;
     text-align: center;
     border: 0;
     font-size: 15px;
@@ -175,8 +231,19 @@
     line-height: 25px;
 }
 
+@keyframes gridPopUp {
+    0% {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
 .card-docx-display:hover {
-    transition: all 0.15s;
+    transition: all 0.4s;
     padding: 10px 15px;
     font-size: 18px;
 }
@@ -200,7 +267,8 @@
 /* List Styles */
 .card-docx-container-list {
     overflow-y: scroll;
-    padding: 7px 15px;
+    border-radius: 0.375rem !important;
+    padding: 15px 15px;
     background-color: #f8f9fa;
 }
 
@@ -215,6 +283,22 @@
     cursor: pointer;
     position: relative;
     z-index: 1;
+
+    opacity: 0;
+    transform: translateY(20px);
+    animation: listItemReveal 0.4s ease-in-out forwards;
+    margin: 1px;
+}
+
+@keyframes listItemReveal {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .card-docx-container-list .list-group-item:hover {
@@ -372,9 +456,20 @@
     padding: 0 !important;
 }
 
+.tool-btn:hover {
+    scale: 1.1;
+    transition: all 0.3s;
+}
+
+.tool-btn {
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
 @media print {
 
     nav,
+    #search-bar,
     #setting-bar-container,
     #reupload-btn,
     #view-toggle-btn,

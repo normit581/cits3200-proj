@@ -275,7 +275,7 @@ function appendMatchResults(similarityResults) {
 
     const $sortButton = $('<button>', {
         id: 'sort-toggle-btn',
-        class: 'position-absolute',
+        class: 'position-absolute tool-btn',
         style: 'top: 10px; right: 10px; z-index: 1000; background: transparent; border: none;',
         html: `<i class="fa-solid ${currentSortMode.icon}" style="font-size: 1.5rem; color: #000;"></i>`
     }).attr('title', `Switch to ${nextSortMode.label}`);
@@ -283,10 +283,17 @@ function appendMatchResults(similarityResults) {
 
     const $reuploadButton = $('<button>', {
         id: 'reupload-btn',
-        class: 'position-absolute',
+        class: 'position-absolute tool-btn',
         style: 'top: 10px; left: 10px; z-index: 1000; background: transparent; border: none;',
         html: `<i class="fa-solid fa-upload" style="font-size: 1.5rem; color: #000;"></i>`
     }).attr('title', 'Reupload');
+    
+    const $exportButton = $('<button>', {
+        id: 'reupload-btn',
+        class: 'position-absolute tool-btn',
+        style: 'top: 10px; left: 50px; z-index: 1000; background: transparent; border: none;',
+        html: `<i class="fa-solid fa-file-export" style="font-size: 1.5rem; color: #000;"></i>`
+    }).attr('title', 'Export PDF');
 
     const currentViewMode = viewModes[currentViewIndex];
     const nextViewIndex = (currentViewIndex + 1) % viewModes.length;
@@ -294,7 +301,7 @@ function appendMatchResults(similarityResults) {
 
     const $viewButton = $('<button>', {
         id: 'view-toggle-btn',
-        class: 'position-absolute',
+        class: 'position-absolute tool-btn',
         style: 'top: 10px; right: 50px; z-index: 1000; background: transparent; border: none;',
         html: `<i class="fa-solid ${currentViewMode.icon}" style="font-size: 1.5rem; color: #000;"></i>`
     }).attr('title', currentViewMode.nextTitle);
@@ -302,7 +309,7 @@ function appendMatchResults(similarityResults) {
     const $searchBar = $('<input>', {
         type: 'text',
         id: 'search-bar',
-        class: 'form-control',
+        class: 'form-control tool-btn',
         placeholder: 'Search...',
         style: 'width: 45%; left: 25%; position: absolute; top: 5px; border:  0.1rem solid #343a40'
     });
@@ -326,7 +333,7 @@ function appendMatchResults(similarityResults) {
     });
   
 
-    $contentContainer.append($reuploadButton, $sortButton, $viewButton, $searchBar);
+    $contentContainer.append($reuploadButton, $exportButton, $sortButton, $viewButton, $searchBar);
     const $gridContainer = $('<div>', { class: 'hidden', 'data-view-name': 'grid' });
     const $listContainer = $('<div>', { 'data-view-name': 'list' });
     $contentContainer.append($gridContainer).append($listContainer);
@@ -456,6 +463,10 @@ function appendMatchResults(similarityResults) {
         toggleView();
     });
 
+    $exportButton.on('click', () => {
+        exportSinglePDF()
+    });
+
     const $similarityResultView = $('#similarity-result');
     $similarityResultView.find('.btn-group-vertical input').click(function() {
         const target = $(this).data('target');
@@ -467,6 +478,20 @@ function appendMatchResults(similarityResults) {
     $aside.find('input').first().click();
     applySort();
    // sortListView();
+   const asideElement = document.querySelector('#similarity-result aside');
+   let scrollPosition = 0;
+   
+   asideElement.addEventListener('scroll', () => {
+       scrollPosition = asideElement.scrollTop;
+   });
+   
+   asideElement.querySelectorAll('input[type="radio"]').forEach((radio) => {
+       radio.addEventListener('click', () => {
+           setTimeout(() => {
+               asideElement.scrollTop = scrollPosition;
+           }, 0);
+       });
+   });
 }
 
 function setupVisualiseForm() {
@@ -760,3 +785,5 @@ const customFunc = function(e) {
     $('#pdf-btn').html(`<i class="fa-solid fa-file-export"></i> ${selectedLabel} PDF`);
     showContextMenu(e);
 };
+
+
