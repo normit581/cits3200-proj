@@ -1,3 +1,4 @@
+from flask import current_app
 import os, zipfile, random
 from bs4 import BeautifulSoup
 from docx import Document
@@ -9,6 +10,7 @@ class FileHelper:
         """Removes the extension from the provided filename."""
         return os.path.splitext(filename)[0]
     
+
 class FormHelper:
     @staticmethod
     def errors_to_str(form):
@@ -134,9 +136,9 @@ class XMLHelper:
 
         docx.append_txt(paragraph_id, rsid, tag_r_properties, txt)
 
-    def extract_app_xml(self, docx, app_content):
+    def extract_app_xml(self, docx:DOCX, app_content):
         
-        def extract_tag_value(tag, property_string, default='-'):
+        def extract_tag_value(tag: BeautifulSoup, property_string, default='-'):
             if tag:
                 value = tag.string or default
             else:
@@ -147,7 +149,7 @@ class XMLHelper:
         extract_tag_value(soup.find('TotalTime'), DOCX.TOTAL_TIME)
         extract_tag_value(soup.find('Words'), DOCX.NUMBER_WORDS)
 
-    def extract_metadata(self, docx, sourcefile):
+    def extract_metadata(self, docx:DOCX, sourcefile):
         """Extract and process document metadata."""
         doc = Document(sourcefile)
         doc_prop = doc.core_properties
@@ -163,3 +165,59 @@ class XMLHelper:
         }
         for key, value in properties.items():
             docx.append_metadata(key, value)
+
+
+class ConfigHelper:
+    """
+    Access config keys from config.py
+    """
+    UPLOAD_EXTENSIONS   = "UPLOAD_EXTENSIONS"
+    MAX_CONTENT_LENGTH  = "MAX_CONTENT_LENGTH"
+    MAX_FILES_UPLOAD    = "MAX_FILES_UPLOAD"
+    SECRET_KEY          = "SECRET_KEY"
+    PROJECT_NAME        = "PROJECT_NAME"
+
+    @staticmethod
+    def get_config_value(key):
+        try:
+            return current_app.config[key]
+        except KeyError:
+            raise KeyError(f"Config key '{key}' not found.")
+        
+    def get_all_config(self):
+        # Convert all uppercase keys in current_app.config to lowercase
+        all_configs = {key.lower(): value for key, value in current_app.config.items() if key.isupper()}
+        all_configs[self.MAX_FILES_UPLOAD.lower()] = self.max_files_upload_value
+        return all_configs
+    
+    @staticmethod
+    def human_readable_size(size_in_bytes):
+        """
+        Convert a size in bytes to a human-readable format (e.g., KB, MB, GB).
+        """
+        if size_in_bytes < 0:
+            return "Invalid size"
+        units = ["Bytes", "KB", "MB", "GB", "TB"]
+        size = size_in_bytes
+        unit_index = 0
+        while size >= 1024 and unit_index < len(units) - 1:
+            size /= 1024.0
+            unit_index += 1
+        # format the size to two decimal places
+        return f"{size:.2f} {units[unit_index]}"
+
+    @property
+    def max_content_length_display_text(self):
+        """
+        Property to get human-readable display text for max content length.
+        """
+        max_content_length = self.get_config_value(self.MAX_CONTENT_LENGTH)
+        return self.human_readable_size(max_content_length)
+    
+    @property
+    def max_files_upload_value(self):
+        max_files_upload = self.get_config_value(self.MAX_FILES_UPLOAD)
+        if isinstance(max_files_upload, int) and 1 <= max_files_upload <= 9999:
+            return max_files_upload
+        else:
+            return 999_999_999

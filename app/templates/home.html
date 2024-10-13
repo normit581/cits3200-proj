@@ -57,7 +57,7 @@
   <h2 id="upload-header" class="mb-4">Upload Your .docx  Files</h2>
   <form id="match-form" action="{{ url_for('home') }}" method="POST" enctype="multipart/form-data">
     {{ form.hidden_tag() }}
-    <div class="d-flex flex-row">
+    <div class="d-flex flex-row" style="height: 50vh">
       <aside id="file-list" class="flex-column"></aside>
       <div id="drop-zone" class="drop-zone">
         <i class="fa-solid fa-upload fa-5x mb-3 d-block"></i>
@@ -91,4 +91,9 @@
     {{ visualise_form.common_count() }}
   </form>
 </div>
+
+<script>
+  const maxFileSize = {{ config.max_content_length }};
+  const maxFiles = {{ config.max_files_upload }};
+</script>
 {% endblock %}
