@@ -42,8 +42,6 @@ Develop a Document Matcher tool that automates the process of comparing rsid cod
 4. **PDF Export:** Ability to export the comparison results and metadata into a PDF format.
 5. **Customisation Options:** Users can customise colors and display settings for better visualisation.
 6. **Error Handling:** Robust error handling for file uploads and validation checks.
-7. **Responsive Design:** Ensures compatibility across various devices and screen sizes.
-
 
 ## Deployment
 
@@ -83,4 +81,4 @@ SECRET_KEY=06ca425d9bc0b3375983f595c849d4ff755d9dd727a4f98bd40d3c6fb6957a87
 
 ## Acknowledgments
 
-Flask, Jinja, JQuery, Bootstrap, Tippy.js
+Flask, Jinja2, JQuery, Bootstrap V5.3, Tippy.js
