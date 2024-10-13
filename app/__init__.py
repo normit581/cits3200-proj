@@ -23,6 +23,7 @@ def create_app(config: Config = None):
     return app
 
 
+# app = create_app(TestingConfig)
 app = create_app(Config)
 def list_routes():
     for rule in app.url_map.iter_rules():

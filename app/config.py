@@ -8,7 +8,7 @@ class Config(object):
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'never-guess'
     MAX_FILES_UPLOAD = -1
 
-class TestingConfig(object):
+class TestingConfig(Config):
     TESTING = True
     DEBUG = True
     PRESERVE_CONTEXT_ON_EXCEPTION = False

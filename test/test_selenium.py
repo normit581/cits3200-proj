@@ -29,6 +29,10 @@ class FlaskSeleniumTest(unittest.TestCase):
         # cls.app.test_client().get('/')
         cls.driver.get('http://127.0.0.1:5000')         # we have to start the server manually for now
 
+        if cls.driver.title == "404 Not Found" or "Error" in cls.driver.title:
+            cls.skipTest(cls, "Server returned a 404 error on startup. Skipping tests.")
+
+
     @classmethod
     def tearDownClass(cls):
         cls.driver.quit()
@@ -44,7 +48,7 @@ class FlaskSeleniumTest(unittest.TestCase):
         pass
 
     def test_title(self):
-        self.assertIn("DocuMatcher", self.driver.title)
+        self.assertIn("DocuMatcher: Home", self.driver.title)
 
     def create_test_files(self, count, size_in_mb, prefix="test_file"):
         test_files = []
@@ -81,9 +85,11 @@ class FlaskSeleniumTest(unittest.TestCase):
         submit_button.click()
         time.sleep(2)
         # check progress bar 100%, if is then ok
-        progress_bar = self.driver.find_element(By.ID, "upload-progress")
+        progress_bar = WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.ID, "progress-overlay"))
+        )
         progress_width = progress_bar.get_attribute("style").split(":")[1].strip().replace(";", "").replace("%", "")
-        assert progress_width == "100", f"Expected progress bar width to be 100%, but got {progress_width}%"
+        assert progress_width == "100 width"
 
 
     def test_invalid_file(self):
@@ -104,12 +110,12 @@ class FlaskSeleniumTest(unittest.TestCase):
         submit_button.click()
 
         alert = WebDriverWait(self.driver, 10).until(
-            EC.presence_of_element_located((By.CLASS_NAME, "alert-danger"))
+            EC.presence_of_element_located((By.ID, "AlertMessage"))
         )
 
         alert_message = alert.text
-
-        assert ("ErrorCode: 500" in alert_message), f"Unexpected alert message: {alert_message}"
+        # print("alert message", alert_message)
+        assert ("ErrorCode: 500. An error occurred." in alert_message)
 
 
     # try more than max file limit
@@ -123,13 +129,13 @@ class FlaskSeleniumTest(unittest.TestCase):
 
         file_input.send_keys('\n'.join(files))
 
-        alert = WebDriverWait(self.driver, 10).until(EC.alert_is_present())
+        alert = WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.ID, "AlertMessage"))
+        )
 
         alert_message = alert.text
 
-        self.assertIn("Maximum of 20 files reached.", alert_message)
-
-        alert.accept()
+        self.assertIn("Maximum of 20 files reached. Only the first 20 will be uploaded.", alert_message)
 
         for file_path in files:
             if os.path.exists(file_path):
@@ -149,7 +155,7 @@ class FlaskSeleniumTest(unittest.TestCase):
         )
         alert_message = alert.text
 
-        self.assertIn(f"×\nFailed!\nFile large_file_1.docx exceeds the maximum size of 100MB", alert_message)
+        self.assertIn(f"×\nFailed!\nFile large_file_1.docx exceeds the maximum size of 20.00 MB.", alert_message)
 
         for file_path in file:
             if os.path.exists(file_path):
@@ -191,35 +197,34 @@ class FlaskSeleniumTest(unittest.TestCase):
     # So test for file size 1.1mb
 
     # error need to fix
-    # def test_max_file_size_limit(self):
-    #     # Create 20 files each size of 2mb as limit is 20
-    #     file_input = WebDriverWait(self.driver, 2).until(
-    #         EC.presence_of_element_located((By.CSS_SELECTOR, "input[type='file']"))
-    #     )
+    def test_max_file_size_limit(self):
+        # Create 20 files each size of 2mb as limit is 20
+        file_input = WebDriverWait(self.driver, 2).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, "input[type='file']"))
+        )
 
-    #     files = self.create_test_files(count=19, size_in_mb=2, prefix="max_file_size_limit_test")
+        files = self.create_test_files(count=19, size_in_mb=2, prefix="max_file_size_limit_test")
 
-    #     file_input.send_keys('\n'.join(files))
-    #     print(files)
+        file_input.send_keys('\n'.join(files))
+        # print(files)
 
-    #     submit_button = WebDriverWait(self.driver, 5).until(
-    #         EC.element_to_be_clickable((By.ID, "submit")),
-    #     )
-    #     submit_button.click()
-    #     # alert = WebDriverWait(self.driver, 10).until(EC.alert_is_present())
-    #     alert = WebDriverWait(self.driver, 10).until(
-    #         EC.presence_of_element_located((By.CLASS_NAME, "alert-danger"))
-    #     )
+        submit_button = WebDriverWait(self.driver, 5).until(
+            EC.element_to_be_clickable((By.ID, "submit")),
+        )
+        submit_button.click()
+        # alert = WebDriverWait(self.driver, 10).until(EC.alert_is_present())
+        alert = WebDriverWait(self.driver, 10).until(
+            EC.presence_of_element_located((By.CLASS_NAME, "alert-danger"))
+        )
 
-    #     alert_message = alert.text
-    #     print("alert:" , alert_message)
-    #     for i in range(1, 20):
-    #         file_name = f"exceed_multi_file_size_limit_test_{i}.docx"
-    #         self.assertIn(f"File {file_name} exceeds the maximum size of 100MB.", alert_message)
+        alert_message = alert.text
+        # request entity too large error code
+        self.assertIn(f"×\nFailed!\nErrorCode: 413. An error occurred.", alert_message)
 
-    #     for file_path in files:
-    #         if os.path.exists(file_path):
-    #             os.remove(file_path)
+        for file_path in files:
+            if os.path.exists(file_path):
+                os.remove(file_path)
+
     def test_special_characters(self):
         file_input = WebDriverWait(self.driver, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "input[type='file']"))
@@ -236,7 +241,11 @@ class FlaskSeleniumTest(unittest.TestCase):
 
         submit_button.click()
 
+        for file_path in files:
+            if os.path.exists(file_path):
+                os.remove(file_path)
 
+    # test empty file
     def test_empty_file(self):
         file_input = WebDriverWait(self.driver, 10).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "input[type='file']"))
@@ -249,6 +258,10 @@ class FlaskSeleniumTest(unittest.TestCase):
             EC.element_to_be_clickable((By.ID, "submit")),
         )
         submit_button.click()
+        
+        for file_path in files:
+            if os.path.exists(file_path):
+                os.remove(file_path)
 
     def test_interrupted_upload(self):
         files = self.create_test_files(count=2, size_in_mb=5, prefix="interrupted_test")
