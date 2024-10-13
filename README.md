@@ -8,8 +8,8 @@
 **Sprints:** 3  
 
 ## Team Members 
-| UWA ID    | Name               | GitHub Username | Alternative Username   |
-|:---------:|:------------------:|:---------------:|:----------------------:|
+| UWA ID    | Name               | GitHub Username | Alternative Usernames  |
+|:---------:|:------------------:|:---------------:|:-----------------------|
 | 23335907  | Elijah Mullens     | Elijah017       | elijah                 |
 | 23326698  | Jack Blackwood     | QuamCode        | Quamsy                 |
 | 23171563  | Yiu Xuan Lok       | loklokyx        | Lok Yx, YxLok          |
