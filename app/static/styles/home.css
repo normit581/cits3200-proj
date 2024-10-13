@@ -435,6 +435,16 @@
     padding: 0 !important;
 }
 
+.tool-btn:hover {
+    scale: 1.1;
+    transition: all 0.3s;
+}
+
+.tool-btn {
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
 @media print {
 
     nav,
