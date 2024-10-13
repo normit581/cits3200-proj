@@ -308,16 +308,20 @@ function appendMatchResults(similarityResults) {
 
     function updateSearchFilter(search) {
         const searchTerm = search.toLowerCase();  // Converts input to lowercase
+        const minValue = parseFloat($('#matchSlider').val());
         $('#similarity-result .card-docx-display, #similarity-result .card-docx-container-list > div').each(function() {
             const fileName = $(this).data('compare-file').toLowerCase();  // Converts filenames to lowercase
-            const action = fileName.includes(searchTerm) ? 'removeClass' : 'addClass';
+            const matchPercent = parseFloat($(this).data('match-percent'));
+
+            const isVisible = fileName.includes(searchTerm) && matchPercent >= minValue;
+            const action = isVisible ? 'removeClass' : 'addClass';
             $(this)[action]('hidden');  // Hides based on filter
         });
     }
     
     $searchBar.on('input', function() {
         const search = $(this).val();
-        updateSearchFilter(search); 
+        updateSearchFilter(search);
     });
   
 
@@ -571,11 +575,16 @@ function generateTitlePDF(element) {
 
 function updateFilter(value) {
     const minValue = parseFloat(value);
+    const searchTerm = $('#search-bar').val().toLowerCase();
     $('#matchSlider').val(minValue);
     $('#matchInput').val(minValue);
+
     $('#similarity-result .card-docx-display, #similarity-result .card-docx-container-list > div').each(function() {
         const matchPercent = parseFloat($(this).data('match-percent'));
-        const action = matchPercent >= minValue ? 'removeClass' : 'addClass';
+        const fileName = $(this).data('compare-file').toLowerCase();
+
+        const isVisible = matchPercent >= minValue && fileName.includes(searchTerm);
+        const action = isVisible ? 'removeClass' : 'addClass';
         $(this)[action]('hidden');
     });
 };
