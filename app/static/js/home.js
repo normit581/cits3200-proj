@@ -228,7 +228,6 @@ const onSuccessMatch = (response) => {
         setupVisualiseForm();
         $("#setting-bar-container").show();
         $("#upload-container").hide();
-        $('aside').css('margin-top', '55px')
         triggerContextMenuEvent($('main'), true);
         overlay.completeProgress();
         isRemindBeforeRefresh = true;
