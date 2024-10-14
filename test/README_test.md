@@ -54,8 +54,6 @@ code example :
 run locust on localhost
     cd test
     locust -f performancetest/pt_increment_upload.py --host=http://127.0.0.1:5000
-    locust -f performancetest/pt_increment_upload.py --host=https://documatcher-service.ytv19cvqksd3p.ap-southeast-2.cs.amazonlightsail.com/
-
     locust -f performancetest/pt_multi_users.py --host=http://127.0.0.1:5000
     
 Then access locust control page in browser
