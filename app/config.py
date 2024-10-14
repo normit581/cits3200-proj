@@ -6,7 +6,7 @@ class Config(object):
     UPLOAD_EXTENSIONS = ['.docx']
     MAX_CONTENT_LENGTH = 210 * 1024 * 1024 #For additional headers
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'never-guess'
-    MAX_FILES_UPLOAD = -1
+    MAX_FILES_UPLOAD = 400
 
 class TestingConfig(Config):
     TESTING = True
