@@ -67,8 +67,6 @@ Run the following command and copy its output into `app.env`:
 python -c 'import secrets; print(secrets.token_hex())'
 ```
 
-### Windows (TODO)
-
 ## Example Config
 
 `app.env` when properly configured for deployment should look something like
